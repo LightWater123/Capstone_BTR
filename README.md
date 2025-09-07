@@ -1,5 +1,7 @@
 # Setup
 
+
+[installations.txt](https://github.com/user-attachments/files/22192671/installations.txt)
 laravel setup with breeze and frontend
 
 === BACKEND ===
