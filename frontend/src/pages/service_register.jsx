@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "../api/api"; // assuming axios is configured with baseURL and withCredentials
+import axios from "../api/api";
 
 export default function ServiceRegister() {
   const navigate = useNavigate();
@@ -17,6 +17,8 @@ export default function ServiceRegister() {
 
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+
+  const handleBack = () => navigate("/admin/dashboard");
 
   const serviceTypes = [
     { value: 'Vehicle', label: 'Vehicle' },
@@ -72,7 +74,15 @@ export default function ServiceRegister() {
   };
 
   return (
+    <>
+
     <div className="flex justify-center items-center w-dvw min-h-screen bg-gray-100">
+      <button
+          onClick={handleBack}
+          className="absolute top-6 left-6 text-sm bg-gray-200 text-gray-700 px-3 py-1 rounded hover:bg-gray-300 transition"
+        >
+          Back to Dashboard
+        </button>
       <form onSubmit={handleRegister} className="bg-white p-6 rounded shadow-md w-80">
         <h1 className="text-2xl font-bold mb-4 text-black">Service User Registration</h1>
 
@@ -115,5 +125,7 @@ export default function ServiceRegister() {
         </button>
       </form>
     </div>
+    </>
+    
   );
 }

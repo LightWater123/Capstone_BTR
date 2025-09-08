@@ -12,6 +12,7 @@ export default function AdminDashboard() {
   const handleInventoryList = () => {
     navigate("/inventory");
   };
+  
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
@@ -32,6 +33,7 @@ export default function AdminDashboard() {
         >
           Preventive Maintenance
         </button>
+
       </div>
     </div>
   );

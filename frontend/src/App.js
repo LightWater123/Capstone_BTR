@@ -9,6 +9,7 @@ import ServiceDashboard from "./pages/service_dashboard";
 import DirectorDashboard from "./pages/director_dashboard";
 import Inventory from "./pages/inventory";
 import ServiceMessages from "./pages/service_messages";
+import AdminMessages from "./pages/admin_messages";
 
 export default function App() {
   return (
@@ -22,6 +23,7 @@ export default function App() {
         <Route path="/oic/dashboard" element={<DirectorDashboard />} />
         <Route path="/inventory" element={<Inventory />} />
         <Route path="/service/messages" element={<ServiceMessages />} />
+        <Route path="/admin/messages" element={<AdminMessages />} />
       </Routes>
     </Router>
   );

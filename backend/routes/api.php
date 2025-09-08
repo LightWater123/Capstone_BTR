@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\EquipmentController;
 use App\Http\Controllers\MaintenanceScheduleController;
+use App\Http\Controllers\PdfParserController;
 
 Route::post('/login', [AuthenticatedSessionController::class, 'store']);
 Route::post('/logout', [AuthenticatedSessionController::class, 'destroy']);
@@ -16,6 +17,7 @@ Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
     Route::post('/inventory', [EquipmentController::class, 'store']);
     Route::put('/inventory/{id}', [EquipmentController::class, 'update']);
     Route::delete('/inventory/{id}', [EquipmentController::class, 'destroy']);
+    Route::post('parse-pdf', [PdfParserController::class, 'parse']);
 });
 
 // service user

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useInventory } from "../hooks/useInventory";
 import { useMaintenance } from "../hooks/useMaintenance";
 import { parsePdf } from "../hooks/usePdfParser";
@@ -45,6 +46,15 @@ export default function InventoryDashboard() {
   const [selectedItem, setSelectedItem] = useState(null);
   const [selectedDetailItem, setSelectedDetailItem] = useState(null);
   const [selectedEquipmentIds, setSelectedEquipmentIds] = useState([]);
+
+  // back function
+  const navigate = useNavigate();
+  const handleBack = () => navigate("/admin/dashboard");
+
+  // view sent messages
+  const handleViewMessages = () => {
+    navigate("/admin/messages");
+  } ;
 
   // PDF file
   const [pdfFile, setPdfFile] = useState(null);
@@ -146,10 +156,19 @@ export default function InventoryDashboard() {
       <h1 className="text-2xl font-bold text-gray-800">
         Preventive Maintenance - Inventory
       </h1>
+       
     </div>
 
     {/* Category Tabs */}
     <div className="flex gap-4 px-4 pt-4">
+      
+      <button
+        onClick={handleBack}
+        className="text-sm bg-gray-200 text-gray-700 px-3 py-1 rounded hover:bg-gray-300 transition"
+      >
+        Back to Dashboard
+      </button>
+
       {["PPE", "RPCSP"].map((type) => (
         <button
           key={type}
@@ -194,6 +213,13 @@ export default function InventoryDashboard() {
       >
         Schedule Maintenance
       </button>
+
+      <button
+          onClick={handleViewMessages}
+          className="mt-4 ml-4 bg-yellow-500 text-white px-4 py-2 rounded-md font-semibold hover:bg-yellow-600"
+        >
+          View Sent Messages
+        </button>
     </div>
 
     {/* Inventory Table */}
