@@ -3,8 +3,18 @@ import json
 import pdfplumber
 import re
 
+# ---------- helpers ----------------------------------------------------------
 def clean(cell):
-    return cell.strip() if isinstance(cell, str) else ""
+    """Return stripped string or empty string for None."""
+    return str(cell).strip() if cell is not None else ""
+
+def safe_cell(row, idx, default=""):
+    """Return cleaned cell at idx or default if idx out of range."""
+    return clean(row[idx]) if idx < len(row) else default
+
+def pad_row(row, target_len):
+    """Return a list that is always target_len long."""
+    return [safe_cell(row, i) for i in range(target_len)]
 
 def is_money(value):
     value = str(value).replace(',', '').replace('₱', '').replace('$', '').strip()
@@ -14,9 +24,12 @@ def is_small_int(value):
     value = str(value).replace(',', '').strip()
     return value.isdigit() and int(value) <= 1000
 
+# ---------- main -------------------------------------------------------------
 def parse_pdf(path, mode):
     rows = []
-    expected_columns = 10  # adjust if needed
+
+    # how many physical columns we want to work with
+    expected_columns = 10
 
     with pdfplumber.open(path) as pdf:
         for page in pdf.pages:
@@ -24,7 +37,6 @@ def parse_pdf(path, mode):
                 {"vertical_strategy": "lines", "horizontal_strategy": "lines"},
                 {"vertical_strategy": "lines_strict", "horizontal_strategy": "lines_strict"},
                 {"vertical_strategy": "text", "horizontal_strategy": "text"},
-                {"vertical_strategy": "explicit", "horizontal_strategy": "explicit"}
             ]
 
             for strategy in strategies:
@@ -34,38 +46,36 @@ def parse_pdf(path, mode):
                         continue
 
                     for table in tables:
-                        if len(table) < 2:
+                        if len(table) < 2:          # need at least header + 1 data row
                             continue
 
-                        for row in table[1:]:
-                            if not row or len(row) < 2:
+                        for raw_row in table[1:]:   # skip header
+                            if not raw_row or len([c for c in raw_row if c]) < 3:
                                 continue
 
-                            # Skip header-like or subtotal rows
-                            first_cell = clean(row[0]).lower()
-                            if first_cell in ["quantity", "value", "total", "grand total"]:
+                            first = clean(raw_row[0]).lower()
+                            if first in {"quantity", "value", "total", "grand total"}:
                                 continue
-                            if all(is_money(clean(c)) or is_small_int(clean(c)) for c in row if c) and not clean(row[0]).isalpha():
-                                continue
-                            if len([c for c in row if clean(c)]) < 3:
+                            if all(is_money(clean(c)) or is_small_int(clean(c))
+                                   for c in raw_row if c) and not first.isalpha():
                                 continue
 
-                            cells = [clean(c) for c in row if c is not None]
+                            # ---- guarantee correct length -----------------
+                            cells = pad_row(raw_row, expected_columns)
 
-                            # RPCSP post-processing
-                            if mode == "RPCSP":
-                                if len(cells) == expected_columns - 1:
-                                    merged = cells[4]
-                                    parts = re.findall(r'\d+(?:\.\d+)?', merged)
-                                    if len(parts) == 2:
-                                        unit_value = parts[0]
-                                        quantity_card = parts[1]
-                                        cells.insert(4, unit_value)
-                                        cells.insert(5, quantity_card)
+                            # ---- RPCSP-specific merge fix ---------------
+                            if mode.upper() == "RPCSP" and len(cells) == expected_columns:
+                                # if col-4 still holds “unit_value/quantity_card” glued together
+                                merged = cells[4]
+                                parts = re.findall(r'\d+(?:\.\d+)?', merged)
+                                if len(parts) == 2:
+                                    cells[4] = parts[0]          # unit_value
+                                    cells.insert(5, parts[1])    # quantity_card
+                                    # re-pad in case we grew the list
+                                    cells = pad_row(cells, expected_columns)
 
-                                while len(cells) < expected_columns:
-                                    cells.append("")
-
+                            # ---- build final dict -----------------------
+                            if mode.upper() == "RPCSP":
                                 data = {
                                     "article": cells[0],
                                     "description": cells[1],
@@ -80,44 +90,38 @@ def parse_pdf(path, mode):
                                     },
                                     "remarks_whereabouts": cells[9]
                                 }
-
-                            elif mode == "PPE":
-                                article = clean(row[0])
-                                description = clean(row[1])
+                            else:  # PPE
                                 data = {
-                                    "article": article,
-                                    "description": description,
-                                    "property_number_RO": clean(row[2]) if len(row) > 2 else "",
-                                    "property_number_CO": clean(row[3]) if len(row) > 3 else "",
-                                    "unit_of_measure": clean(row[4]) if len(row) > 4 else "",
-                                    "unit_value": clean(row[5]) if len(row) > 5 else "",
-                                    "quantity_per_property_card": clean(row[6]) if len(row) > 6 else "",
-                                    "quantity_per_physical_count": clean(row[7]) if len(row) > 7 else "",
+                                    "article": cells[0],
+                                    "description": cells[1],
+                                    "property_number_RO": cells[2],
+                                    "property_number_CO": cells[3],
+                                    "unit_of_measure": cells[4],
+                                    "unit_value": cells[5],
+                                    "quantity_per_property_card": cells[6],
+                                    "quantity_per_physical_count": cells[7],
                                     "shortage_overage": {
-                                        "quantity": clean(row[8]) if len(row) > 8 else "",
-                                        "value": clean(row[9]) if len(row) > 9 else ""
+                                        "quantity": cells[8],
+                                        "value": cells[9]
                                     },
-                                    "remarks_whereabouts": clean(row[-1]) if len(row) > 10 else ""
+                                    "remarks_whereabouts": cells[9]  # last col reused
                                 }
 
-                            if data["article"] or data["description"]:
+                            if data.get("article") or data.get("description"):
                                 rows.append(data)
 
-                    break  # stop trying other strategies
-
+                    break  # first strategy that gave tables wins
                 except Exception:
                     continue
-
     return rows
 
+# ---------- CLI entry ---------------------------------------------------------
 if __name__ == "__main__":
     if len(sys.argv) != 3:
+        print("usage: python parser.py <file.pdf> <RPCSP|PPE>")
         sys.exit(1)
 
-    file_path = sys.argv[1]
-    mode = sys.argv[2].strip().upper()
-    parsed_data = parse_pdf(file_path, mode)
-
-    json_output = json.dumps(parsed_data)
-    sys.stdout.write(json_output)
+    file_path, mode = sys.argv[1], sys.argv[2].strip().upper()
+    parsed = parse_pdf(file_path, mode)
+    sys.stdout.write(json.dumps(parsed, ensure_ascii=False, indent=None))
     sys.stdout.flush()
