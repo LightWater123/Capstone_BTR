@@ -26,4 +26,9 @@ class GoogleAuthController extends Controller
 
         return redirect('/dashboard')->with('success','Gmail linked!');
     }
+
+    public function send(string $to, string $subject, string $html)
+    {
+        
+    }
 }

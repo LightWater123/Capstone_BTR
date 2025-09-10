@@ -1,6 +1,5 @@
 <?php
 // app/Services/GmailService.php
-<?php
 
 namespace App\Services;
 

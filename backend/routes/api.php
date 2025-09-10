@@ -6,7 +6,7 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\EquipmentController;
 use App\Http\Controllers\MaintenanceController;
 use App\Http\Controllers\PdfParserController;
-use App\Http\Controllers\GoogleAuthControllerController;
+use App\Http\Controllers\GoogleAuthController;
 
 Route::post('/login', [AuthenticatedSessionController::class, 'store']);
 Route::post('/logout', [AuthenticatedSessionController::class, 'destroy']);
@@ -31,4 +31,5 @@ Route::post('/register', [RegisteredUserController::class, 'store']);
 // gmail api
 Route::get('/auth/google', [GoogleAuthController::class,'redirect']);
 Route::get('/auth/google/callback', [GoogleAuthController::class,'callback']);
+Route::get('/auth/google/send', [GoogleAuthController::class,'']);
 

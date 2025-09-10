@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import Flatpickr from 'react-flatpickr';
 import 'flatpickr/dist/flatpickr.css';
+import api from '../../api/api';
 
 export default function ScheduleModal({ asset, onClose, onScheduled }) {
   /* ---------- state ---------- */
@@ -21,7 +22,7 @@ export default function ScheduleModal({ asset, onClose, onScheduled }) {
       recipientEmail: '',
       recipientName: '',
       scheduledAt: new Date(),
-      message: `Hi, your ${asset.description} is due for maintenance on {date} at {time}. Reply YES to confirm or call (xxx) xxx-xxxx.`
+      message: `Hi, your ${asset.description} is due for maintenance on ${asset.start_date} at ${asset.end_date}. Reply YES to confirm or call (xxx) xxx-xxxx.`
     });
   }, [asset]);
 
@@ -45,7 +46,7 @@ export default function ScheduleModal({ asset, onClose, onScheduled }) {
         .replace('{date}', form.scheduledAt.toLocaleDateString())
         .replace('{time}', form.scheduledAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }))
     };
-    await axios.post('/api/maintenance/schedule', payload);
+    await api.post('/api/maintenance/schedule', payload);
     onScheduled();
     onClose();
   };
@@ -91,6 +92,7 @@ export default function ScheduleModal({ asset, onClose, onScheduled }) {
 
         <div className="flex justify-end gap-2">
           <button onClick={onClose} className="btn btn-secondary">Cancel</button>
+
           <button onClick={handleSchedule} disabled={loading} className="btn btn-primary">
             {loading ? 'Scheduling...' : 'Schedule & Notify'}
           </button>

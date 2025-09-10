@@ -23,7 +23,7 @@ export default function ServiceMessages() {
     if (!user?.email) return;
 
     const fetchMessages = () => {
-      axios.get('/api/maintenance-schedule/service', {
+      axios.get('/maintenance/schedule', {
         withCredentials: true
       })
         .then(res => {
