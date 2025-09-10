@@ -4,8 +4,9 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\EquipmentController;
-use App\Http\Controllers\MaintenanceScheduleController;
+use App\Http\Controllers\MaintenanceController;
 use App\Http\Controllers\PdfParserController;
+use App\Http\Controllers\GoogleAuthControllerController;
 
 Route::post('/login', [AuthenticatedSessionController::class, 'store']);
 Route::post('/logout', [AuthenticatedSessionController::class, 'destroy']);
@@ -21,11 +22,13 @@ Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
 });
 
 // service user
-Route::middleware(['auth:sanctum', 'role:service_user'])->group(function () {
-    Route::get('/maintenance-schedule/service', [MaintenanceScheduleController::class, 'forService']);
-    Route::post('/maintenance-schedule', [MaintenanceScheduleController::class, 'store']);
-});
+Route::middleware('auth:sanctum')->post('/maintenance/schedule', [MaintenanceController::class,'store']);
+Route::middleware('auth:sanctum')->get('/my-messages', [MaintenanceController::class,'messages']);
 
 // register route
 Route::post('/register', [RegisteredUserController::class, 'store']);
+
+// gmail api
+Route::get('/auth/google', [GoogleAuthController::class,'redirect']);
+Route::get('/auth/google/callback', [GoogleAuthController::class,'callback']);
 

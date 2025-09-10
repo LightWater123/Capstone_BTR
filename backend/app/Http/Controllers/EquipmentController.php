@@ -130,6 +130,8 @@ class EquipmentController extends Controller
             // update field and save
             $equipment->fill($validated)->save();
 
+            
+
             // return updated item to frontend
             return response()->json($equipment, 200);
 

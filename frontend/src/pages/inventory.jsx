@@ -7,7 +7,7 @@ import { useCsrf } from "../hooks/useCsrf";
 import api from "../api/api";
 
 // Modals
-import ScheduleMaintenanceModal from "../components/modals/sched_maintenance_modal.jsx";
+import ScheduleMaintenanceModal from "../components/modals/scheduleModal.jsx";
 import TypeSelectorModal from "../components/modals/typeSelectorModal.jsx";
 import AddEquipmentModal from "../components/modals/addEquipmentModal.jsx";
 import UploadPDFModal from "../components/modals/uploadPDFModal.jsx";
@@ -75,7 +75,7 @@ export default function InventoryDashboard() {
     remarks: ""
   });
 
-  // state 
+   // state 
   const [newItem, setNewItem] = useState(initialShape(category));
 
   // keep category in sync
@@ -148,6 +148,15 @@ export default function InventoryDashboard() {
     }
   };
 
+  // derive the actual equipment object
+  const selectedEquipment = inventoryData.find(eq => eq.id === selectedEquipmentIds[0]);
+
+  // opens the schedule modal for only 1 row
+  const openScheduleModal = () => {
+  if (selectedEquipmentIds.length !== 1) return;
+  setShowScheduleModal(true);
+  };
+  
   // render component UI
   return (
     <>
@@ -204,7 +213,7 @@ export default function InventoryDashboard() {
 
       <button
         disabled={selectedEquipmentIds.length === 0}
-        onClick={() => setShowScheduleModal(true)}
+        onClick={openScheduleModal}
         className={`mt-4 px-4 py-2 rounded-md font-semibold ml-4 ${
           selectedEquipmentIds.length > 0
             ? "bg-green-600 text-white hover:bg-green-700"
@@ -355,16 +364,18 @@ export default function InventoryDashboard() {
       setPdfFile={setPdfFile}
     />
 
-    <ScheduleMaintenanceModal
-      isOpen={showScheduleModal}
-      onClose={() => setShowScheduleModal(false)}
-      equipmentId={selectedEquipmentIds[0]}
-      onSuccess={() => {
-        setShowScheduleModal(false);
-        setSelectedEquipmentIds([]);
-        fetchSchedules();
-      }}
-    />
+    {showScheduleModal && selectedEquipment && (
+      <ScheduleMaintenanceModal
+        isOpen={showScheduleModal}
+        onClose={() => setShowScheduleModal(false)}
+        asset={selectedEquipment}  // whole object
+        onSuccess={() => {
+          setShowScheduleModal(false);
+          setSelectedEquipmentIds([]);
+          fetchSchedules();
+        }}
+      />
+    )}
 
     <ViewFullDetailModal
       isOpen={showDetailModal}
@@ -399,18 +410,7 @@ export default function InventoryDashboard() {
       }}
     />
 
-    {/* Maintenance Schedule Display */}
-    <div className="px-4 pt-6">
-      {maintenanceSchedules.map((schedule) => (
-        <div key={schedule.id} className="border p-3 mb-2 rounded bg-white shadow-sm">
-          <p><strong>Equipment ID:</strong> {schedule.equipment_id}</p>
-          <p><strong>Date:</strong> {schedule.scheduled_date}</p>
-          <p><strong>Contact:</strong> {schedule.contact_name} ({schedule.email})</p>
-          <p><strong>Notes:</strong> {schedule.notes}</p>
-          <p><strong>Status:</strong> {schedule.status}</p>
-        </div>
-      ))}
-    </div>
+    
   </>
   );
 }

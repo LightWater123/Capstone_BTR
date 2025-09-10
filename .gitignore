@@ -1,0 +1,48 @@
+# ---------- Laravel ----------
+vendor
+/node_modules
+/public/build
+/public/hot
+/public/storage
+/storage/*.key
+/storage/logs/*
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+.env*
+!.env.example
+.phpunit.result.cache
+Homestead.json
+Homestead.yaml
+auth.json
+
+# ---------- Lock files ----------
+composer.lock
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# ---------- Logs ----------
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ---------- Vite / React ----------
+dist
+dist-ssr
+*.local
+
+# ---------- IDE / OS ----------
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# ---------- Keep Google OAuth key ----------
+backend/storage/app/google-oauth.json
