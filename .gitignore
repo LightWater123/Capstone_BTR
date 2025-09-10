@@ -46,3 +46,4 @@ Thumbs.db
 
 # ---------- Keep Google OAuth key ----------
 backend/storage/app/google-oauth.json
+backend/storage/app/google-oath.json
