@@ -81,18 +81,22 @@ export default function Login() {
         className="relative p-6 space-y-4 w-full max-w-sm rounded-lg bg-white"
         style={{ boxShadow: "0 4px 50px rgba(0, 0, 0, 0.3)" }}
       >
+        {/* logo and title */}
         <img src={btrlogo} alt="Logo" className="mx-auto w-24 h-24" />
         <h2 className="text-xl font-bold text-gray-800 text-center">Login</h2>
 
         {/* username */}
+        
+        <div className="flex flex-col items-start space-y-2">
         <input
           type="text"
           value={identifier}
           onChange={(e) => setIdentifier(e.target.value)}
-          placeholder="Email or Username"
+          placeholder="eg. juan_dela_cruz or juan001"
           required
           className="w-full px-4 py-2 border rounded focus:outline-none focus:ring focus:ring-yellow-400"
         />
+        </div>
 
         {/* password */}
         <input

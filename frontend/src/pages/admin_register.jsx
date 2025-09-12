@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "../api/api"; 
+import btrlogo from '../assets/btrlogo.png';
+import btrlegpics from '../assets/btrlegpics.jpg';
 
 export default function AdminRegister() {
   const navigate = useNavigate();
@@ -62,9 +64,28 @@ export default function AdminRegister() {
   };
 
   return (
-    <div className="flex justify-center items-center w-dvw min-h-screen bg-gray-100">
-      <form onSubmit={handleRegister} className="bg-white p-6 rounded shadow-md w-80">
-        <h1 className="text-2xl font-bold mb-4 text-black">Admin Registration</h1>
+    <div className="min-h-screen flex items-center justify-center relative">
+
+      {/* background image */}
+      <div
+        className="absolute inset-0"
+        style={{
+          backgroundImage: `url(${btrlegpics})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+        }}
+      ></div>
+
+      {/* yellow overlay */}
+      <div className="absolute inset-0 bg-[#FCFC62] opacity-90"></div>
+      
+      <form onSubmit={handleRegister}
+        className="relative p-6 space-y-4 w-full max-w-sm rounded-lg bg-white"
+        style={{ boxShadow: "0 4px 50px rgba(0, 0, 0, 0.3)" }}
+      >
+        <img src={btrlogo} alt="Logo" className="mx-auto w-24 h-24" />
+        <h1 className="text-2xl font-bold text-center text-gray-800">Admin Registration</h1>
 
         {Object.values(errors).map((err, i) => (
           <p key={i} className="text-red-500 mb-2">{err}</p>
