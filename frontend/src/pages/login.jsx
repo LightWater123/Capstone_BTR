@@ -86,19 +86,19 @@ export default function Login() {
         <h2 className="text-xl font-bold text-gray-800 text-center">Login</h2>
 
         {/* username */}
-        
         <div className="flex flex-col items-start space-y-2">
         <input
           type="text"
           value={identifier}
           onChange={(e) => setIdentifier(e.target.value)}
-          placeholder="eg. juan_dela_cruz or juan001"
+          placeholder="Username or Email"
           required
           className="w-full px-4 py-2 border rounded focus:outline-none focus:ring focus:ring-yellow-400"
         />
         </div>
 
         {/* password */}
+        <div className="flex flex-col items-start space-y-2">
         <input
           type="password"
           value={password}
@@ -109,6 +109,7 @@ export default function Login() {
         />
 
         {error && <p className="text-red-600 text-sm">{error}</p>}
+        </div>
         
         {/* login button */}
         <button
@@ -121,7 +122,7 @@ export default function Login() {
           {loading ? "Logging in..." : "Login"}
         </button>
 
-                {/* register Link */}
+        {/* register Link */}
         <p className="text-center text-sm">
           Don’t have an account?{" "}
             <Link to="/register/admin" className="text-blue-600 hover:underline font-medium">
