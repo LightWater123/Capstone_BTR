@@ -106,6 +106,7 @@ export default function InventoryDashboard() {
       ])
     );
 
+    // add item
     try {
       await api.post("/api/inventory", payload);
       setShowModal(false);
@@ -349,7 +350,9 @@ export default function InventoryDashboard() {
       }}
     />
 
+    
     <AddEquipmentModal
+    // add equipment
       isOpen={showModal}
       category={category}
       newItem={newItem}
@@ -403,6 +406,7 @@ export default function InventoryDashboard() {
         setSelectedItem(selectedDetailItem);
         setShowEditModal(true);
       }}
+      // delete item
       onDelete={async (id) => {
         if (!window.confirm("Are you sure you want to delete this item?")) return;
         try {
@@ -418,6 +422,8 @@ export default function InventoryDashboard() {
     />
 
     <EditItemModal
+
+      // edit item
       isOpen={showEditModal}
       item={selectedItem}
       onClose={() => setShowEditModal(false)}

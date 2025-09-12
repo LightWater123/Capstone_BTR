@@ -4,7 +4,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-use App\Http\Controllers\GoogleAuthController;
+use App\Http\Controllers\EmailController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -28,11 +28,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// Google OAuth Routes
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/auth/google',        [GoogleAuthController::class, 'redirect']);
-    Route::get('/auth/google/callback', [GoogleAuthController::class, 'callback']);
-});
+
 
 
 require __DIR__.'/auth.php';

@@ -36,7 +36,11 @@ export default function ScheduleModal({ asset, onClose, onScheduled }) {
       return;
     }
     setLoading(true);
-    const payload = {
+
+    try
+    {
+      // save the maintenance record
+      const payload = {
       assetId: asset.id,
       assetName: asset.description,
       recipientEmail: form.recipientEmail,
@@ -44,11 +48,34 @@ export default function ScheduleModal({ asset, onClose, onScheduled }) {
       scheduledAt: form.scheduledAt,
       message: form.message
         .replace('{date}', form.scheduledAt.toLocaleDateString())
-        .replace('{time}', form.scheduledAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }))
-    };
-    await api.post('/api/maintenance/schedule', payload);
-    onScheduled();
-    onClose();
+        .replace('{time}', form.scheduledAt.toLocaleTimeString([], {
+          hour: '2-digit',
+          minute: '2-digit'
+        }))
+      };
+
+      // send message details to backend
+      await api.post('/api/maintenance/schedule', payload);
+
+      // send the email to the recepient
+      await api.post('api/send-email', {
+        recipientEmail: form.recipientEmail,
+        recipientName : form.recipientName,
+        scheduledAt   : form.scheduledAt.toISOString(),
+        message       : form.message
+      });
+
+      onScheduled(); // refresh schedule upon sending
+      onClose();
+
+    } catch (err) 
+    {
+      console.error(err);
+      alert(err.response?.data?.message || 'Scheduling / notification failed');
+    } finally 
+    {
+      setLoading(false);
+    }
   };
 
   

@@ -13,6 +13,7 @@
         "laravel/sanctum": "^4.2",
         "laravel/tinker": "^2.10.1",
         "mongodb/laravel-mongodb": "^5.5",
+        "resend/resend-laravel": "^0.21.0",
         "tightenco/ziggy": "^2.0"
     },
     "require-dev": {

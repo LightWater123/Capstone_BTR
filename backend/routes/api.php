@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\EquipmentController;
 use App\Http\Controllers\MaintenanceController;
 use App\Http\Controllers\PdfParserController;
+use App\Http\Controllers\EmailController;
 
 Route::post('/login', [AuthenticatedSessionController::class, 'store']);
 Route::post('/logout', [AuthenticatedSessionController::class, 'destroy']);
@@ -28,5 +29,9 @@ Route::middleware('auth:sanctum')->get('/my-messages', [MaintenanceController::c
 
 // register route
 Route::post('/register', [RegisteredUserController::class, 'store']);
+
+// Resend Routes
+Route::get('/send-email', [App\Http\Controllers\EmailController::class, 'sendEmail']);
+Route::get('/verify', [App\Http\Controllers\EmailController::class, 'verify']);
 
 

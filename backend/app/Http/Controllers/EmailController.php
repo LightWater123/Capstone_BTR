@@ -1,0 +1,47 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Resend\Resend;
+
+class EmailController extends Controller
+{
+    public function sendEmail(Request $request)
+    {
+
+        $request->validate([
+            'recepientEmail' => 'required|email',
+            'recepientName' => 'required|string|max:255',
+            'scheduledAt' => 'required|date',
+            'message' => 'required|string',
+        ]);
+
+        $when = \Carbon\Carbon::parse($request -> scheduledAt)
+            ->timezone('Asia/Manila');
+            ->format('M d, Y  g:i A');
+
+        $html = nl2br(e($request->message));
+
+        Resend::emails()->send([
+            'from'    => 'NeoTest@agriconnects.org',
+            'to'      => $request->recepientEmail,
+            'subject' => 'Maintenance Schedule Reminder',
+            'html'    => "
+                         <p>Hi {$request->receipentName},</p>
+                         {$html}
+                         <p>Scheduled at: <strong>{$when}</strong></p>
+                         <p>Reply YES to Confirm or call (xxx) xxx-xxxx</p>
+                         ", 
+        ]);
+
+        return response()->json(['status' => 'sent']);
+    }
+
+    public function verify(Request $request)
+    {
+        $resend = Resend::domains()->verify('agriconnect.org');
+        return response()->json($resend);
+    }
+}
