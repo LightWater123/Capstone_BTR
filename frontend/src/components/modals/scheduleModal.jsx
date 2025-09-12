@@ -53,14 +53,14 @@ export default function ScheduleModal({ asset, onClose, onScheduled }) {
           minute: '2-digit'
         }))
       };
-
       // send message details to backend
-      await api.post('/api/maintenance/schedule', payload);
+      //await api.post('/api/maintenance/schedule', payload);
+      console.log("form" , form)
 
       // send the email to the recepient
       await api.post('api/send-email', {
-        recipientEmail: form.recipientEmail,
-        recipientName : form.recipientName,
+        recepientEmail: form.recipientEmail,
+        recepientName : form.recipientName,
         scheduledAt   : form.scheduledAt.toISOString(),
         message       : form.message
       });

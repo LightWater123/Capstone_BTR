@@ -32,7 +32,7 @@ Route::middleware('auth:sanctum')->get('/my-messages', [MaintenanceController::c
 
 
 // Email Resend Routes
-Route::get('/send-email', [App\Http\Controllers\EmailController::class, 'sendEmail']);
+Route::post('/send-email', [App\Http\Controllers\EmailController::class, 'sendEmail']);
 Route::get('/verify', [App\Http\Controllers\EmailController::class, 'verify']);
 
 // register route

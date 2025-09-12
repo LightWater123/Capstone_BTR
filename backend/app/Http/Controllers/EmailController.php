@@ -4,19 +4,23 @@ namespace App\Http\Controllers;
 
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Resend\Resend;
+use Resend\Laravel\Facades\Resend;   // <= Resend facade
+
 
 class EmailController extends Controller
 {
     public function sendEmail(Request $request)
     {
 
+        
         $request->validate([
-            'recepientEmail' => 'required|email',
-            'recepientName' => 'required|string|max:255',
-            'scheduledAt' => 'required|date',
-            'message' => 'required|string',
+            'recepientEmail' => ['required','email'],
+            'recepientName' => ['required','string','max:255'],
+            'scheduledAt' => ['required','date'],
+            'message' => ['required','string'],
         ]);
+
+        
 
         $when = \Carbon\Carbon::parse($request -> scheduledAt)
             ->timezone('Asia/Manila')

@@ -9,21 +9,14 @@ export function useInventory(category) {
 
   useEffect(() => {
     fetchInventory();
-  }, [category]);
+  }, [category]);   
 
-  const {data} = useQuery({
-        queryKey:["getInventory"],
-        queryFn: async()=>{
-          const res = await axios.get(`/api/inventory?category=${category}`);
-          return res.data;
-        },
-        refetchInterval:10000
-      });
-  // fetch inventory, refreshes every 5 seconds
+  // fetch inventory
 
   const fetchInventory = async () => {
     try {
-
+      const res = await axios.get(`/api/inventory?category=${category}`);
+      setInventoryData(res.data);
       
 
     } catch (err) {
