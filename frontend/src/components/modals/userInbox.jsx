@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import Echo from 'laravel-echo';
 
+// SERVICE USER INBOX
+
 export default function UserInbox() {
     const [msgs, setMsgs] = useState([]);
     const userId = window.userId; // blade echo
@@ -13,7 +15,7 @@ export default function UserInbox() {
                    .listen('MaintenanceConfirmed', e => {
                        setMsgs(prev => [{...e, id:e.jobId, created_at:new Date().toISOString()}, ...prev]);
                    });
-    },[userId]);
+    },[userId]); 
 
     return (
         <div className="p-6">

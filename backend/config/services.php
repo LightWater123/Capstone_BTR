@@ -35,12 +35,5 @@ return [
         ],
     ],
 
-    'google' => [
-    'client_id'     => env('GOOGLE_CLIENT_ID'),
-    'client_secret' => env('GOOGLE_CLIENT_SECRET'),
-    'redirect'      => env('GOOGLE_REDIRECT_URI'),
-    'scopes'        => [\Google\Service\Gmail::GMAIL_SEND],
-    'credentials'   => storage_path('../storage/app/google-oath.json'),
-    ],
 
 ];

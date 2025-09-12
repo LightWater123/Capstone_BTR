@@ -5,6 +5,7 @@ import { useMaintenance } from "../hooks/useMaintenance";
 import { parsePdf } from "../hooks/usePdfParser";
 import { useCsrf } from "../hooks/useCsrf";
 import api from "../api/api";
+import { toast } from 'react-toastify'; 
 
 // Modals
 import ScheduleMaintenanceModal from "../components/modals/scheduleModal.jsx";
@@ -13,6 +14,7 @@ import AddEquipmentModal from "../components/modals/addEquipmentModal.jsx";
 import UploadPDFModal from "../components/modals/uploadPDFModal.jsx";
 import ViewFullDetailModal from "../components/modals/fullDetailModal.jsx";
 import EditItemModal from "../components/modals/editItemModal.jsx";
+import AdminSentReceipt from '../components/modals/AdminSentReceipt.jsx';
 
 export default function InventoryDashboard() {
   useCsrf();
@@ -41,6 +43,8 @@ export default function InventoryDashboard() {
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showScheduleModal, setShowScheduleModal] = useState(false);
+  const [showSentModal, setShowSentModal] = useState(false);
+  const [lastSent, setLastSent] = useState(null);
 
   // Selected items
   const [selectedItem, setSelectedItem] = useState(null);
@@ -51,10 +55,17 @@ export default function InventoryDashboard() {
   const navigate = useNavigate();
   const handleBack = () => navigate("/admin/dashboard");
 
+  // this toast displays after scheduling
+  const handleScheduled = (job) => {
+  toast.success("Maintenance scheduled & mail sent!");
+  setLastSent(job);          // the record we just created
+  setShowSentModal(true);    // pop the mini receipt
+};
+
   // view sent messages
   const handleViewMessages = () => {
     navigate("/admin/messages");
-  } ;
+  };
 
   // PDF file
   const [pdfFile, setPdfFile] = useState(null);
@@ -228,6 +239,13 @@ export default function InventoryDashboard() {
           className="mt-4 ml-4 bg-yellow-500 text-white px-4 py-2 rounded-md font-semibold hover:bg-yellow-600"
         >
           View Sent Messages
+        </button>
+
+        <button
+          onClick={() => navigate('/admin/maintenance-list')}
+          className="ml-4 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
+        >
+          Maintenance Schedule List
         </button>
     </div>
 
@@ -409,6 +427,13 @@ export default function InventoryDashboard() {
         setSelectedDetailItem(updatedItem);
       }}
     />
+
+    {showSentModal && (
+    <AdminSentReceipt
+      job={lastSent}
+      onClose={() => setShowSentModal(false)}
+    />
+    )}
 
     
   </>

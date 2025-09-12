@@ -6,7 +6,7 @@ import 'flatpickr/dist/flatpickr.css';
 import api from '../../api/api';
 
 export default function ScheduleModal({ asset, onClose, onScheduled }) {
-  /* ---------- state ---------- */
+  // holds form data
   const [form, setForm] = useState({
     recipientEmail: '',
     recipientName: '',
@@ -15,7 +15,7 @@ export default function ScheduleModal({ asset, onClose, onScheduled }) {
   });
   const [loading, setLoading] = useState(false);
 
-  /* ---------- reset form when asset changes ---------- */
+  // reset the form when asset changes
   useEffect(() => {
     if (!asset) return;
     setForm({
@@ -26,10 +26,10 @@ export default function ScheduleModal({ asset, onClose, onScheduled }) {
     });
   }, [asset]);
 
-  /* ---------- guard ---------- */
+  // this does not render if there is no asset
   if (!asset) return null;
-
-  /* ---------- handler ---------- */
+  
+  // this handles scheduling and notifies the service user
   const handleSchedule = async () => {
     if (!form.recipientEmail.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
       alert('Please enter a valid e-mail address.');
@@ -38,7 +38,7 @@ export default function ScheduleModal({ asset, onClose, onScheduled }) {
     setLoading(true);
     const payload = {
       assetId: asset.id,
-      assetName: asset.name,
+      assetName: asset.description,
       recipientEmail: form.recipientEmail,
       recipientName: form.recipientName || form.recipientEmail.split('@')[0],
       scheduledAt: form.scheduledAt,
@@ -51,7 +51,7 @@ export default function ScheduleModal({ asset, onClose, onScheduled }) {
     onClose();
   };
 
-  /* ---------- render ---------- */
+  
   return (
     <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center">
       <div className="bg-white rounded p-6 w-full max-w-md space-y-4">

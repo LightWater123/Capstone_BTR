@@ -35,6 +35,7 @@ class User extends Eloquent implements Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'google_access_token' => 'array',
         ];
     }
 }

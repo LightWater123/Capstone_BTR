@@ -11,6 +11,7 @@ export default function AdminMessages() {
     const handleBack = () => navigate("/inventory");
 
 
+    // get sent maintenance messages
     useEffect(() => {
         const fetchMessages = async () => {
         try {

@@ -6,7 +6,6 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\EquipmentController;
 use App\Http\Controllers\MaintenanceController;
 use App\Http\Controllers\PdfParserController;
-use App\Http\Controllers\GoogleAuthController;
 
 Route::post('/login', [AuthenticatedSessionController::class, 'store']);
 Route::post('/logout', [AuthenticatedSessionController::class, 'destroy']);
@@ -19,6 +18,8 @@ Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
     Route::put('/inventory/{id}', [EquipmentController::class, 'update']);
     Route::delete('/inventory/{id}', [EquipmentController::class, 'destroy']);
     Route::post('parse-pdf', [PdfParserController::class, 'parse']);
+    Route::middleware('auth:sanctum')->get('/admin/messages', [MaintenanceController::class, 'sent']);
+    Route::middleware('auth:sanctum')->get('/maintenance/schedule', [MaintenanceController::class,'index']);
 });
 
 // service user
@@ -28,8 +29,4 @@ Route::middleware('auth:sanctum')->get('/my-messages', [MaintenanceController::c
 // register route
 Route::post('/register', [RegisteredUserController::class, 'store']);
 
-// gmail api
-Route::get('/auth/google', [GoogleAuthController::class,'redirect']);
-Route::get('/auth/google/callback', [GoogleAuthController::class,'callback']);
-Route::get('/auth/google/send', [GoogleAuthController::class,'']);
 

@@ -10,7 +10,7 @@ export function useMaintenance() {
 
   const fetchSchedules = async () => {
     try {
-      const res = await axios.get("/maintenance/schedule");
+      const res = await axios.get("/api/maintenance/schedule");
       setMaintenanceSchedules(res.data);
     } catch (err) {
       console.error("Schedule fetch failed:", err);
