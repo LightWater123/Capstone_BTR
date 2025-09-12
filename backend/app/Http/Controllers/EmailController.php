@@ -19,7 +19,7 @@ class EmailController extends Controller
         ]);
 
         $when = \Carbon\Carbon::parse($request -> scheduledAt)
-            ->timezone('Asia/Manila');
+            ->timezone('Asia/Manila')
             ->format('M d, Y  g:i A');
 
         $html = nl2br(e($request->message));

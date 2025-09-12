@@ -14,7 +14,6 @@ import AddEquipmentModal from "../components/modals/addEquipmentModal.jsx";
 import UploadPDFModal from "../components/modals/uploadPDFModal.jsx";
 import ViewFullDetailModal from "../components/modals/fullDetailModal.jsx";
 import EditItemModal from "../components/modals/editItemModal.jsx";
-import AdminSentReceipt from '../components/modals/AdminSentReceipt.jsx';
 
 export default function InventoryDashboard() {
   useCsrf();
@@ -62,10 +61,7 @@ export default function InventoryDashboard() {
   setShowSentModal(true);    // pop the mini receipt
 };
 
-  // view sent messages
-  const handleViewMessages = () => {
-    navigate("/admin/messages");
-  };
+  
 
   // PDF file
   const [pdfFile, setPdfFile] = useState(null);
@@ -246,7 +242,7 @@ export default function InventoryDashboard() {
           onClick={() => navigate('/admin/maintenance-list')}
           className="ml-4 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
         >
-          Maintenance Schedule List
+          Monitor Maintenance
         </button>
     </div>
 
@@ -434,12 +430,6 @@ export default function InventoryDashboard() {
       }}
     />
 
-    {showSentModal && (
-    <AdminSentReceipt
-      job={lastSent}
-      onClose={() => setShowSentModal(false)}
-    />
-    )}
 
     
   </>

@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "../api/api";
+import { useQuery } from "@tanstack/react-query";
+import { queryClient } from "../App";
 
 export function useInventory(category) {
   const [inventoryData, setInventoryData] = useState([]);
@@ -9,10 +11,21 @@ export function useInventory(category) {
     fetchInventory();
   }, [category]);
 
+  const {data} = useQuery({
+        queryKey:["getInventory"],
+        queryFn: async()=>{
+          const res = await axios.get(`/api/inventory?category=${category}`);
+          return res.data;
+        },
+        refetchInterval:10000
+      });
+  // fetch inventory, refreshes every 5 seconds
+
   const fetchInventory = async () => {
     try {
-      const res = await axios.get(`/api/inventory?category=${category}`);
-      setInventoryData(res.data);
+
+      
+
     } catch (err) {
       console.error("Inventory fetch failed:", err);
       setInventoryData([]);

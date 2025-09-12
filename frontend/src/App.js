@@ -11,23 +11,28 @@ import Inventory from "./pages/inventory";
 import ServiceMessages from "./pages/service_messages";
 import AdminMessages from "./pages/admin_messages";
 import MaintenanceList from "./pages/maintenance_list";
+import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 
+export const queryClient = new QueryClient();
 
 export default function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/register/admin" element={<AdminRegister />} />
-        <Route path="/register/service" element={<ServiceRegister />} />
-        <Route path="/admin/dashboard" element={<AdminDashboard />} />
-        <Route path="/service/dashboard" element={<ServiceDashboard />} />
-        <Route path="/oic/dashboard" element={<DirectorDashboard />} />
-        <Route path="/inventory" element={<Inventory />} />
-        <Route path="/service/messages" element={<ServiceMessages />} />
-        <Route path="/admin/messages" element={<AdminMessages />} />
-        <Route path="/admin/maintenance-list" element={<MaintenanceList />} />
-      </Routes>
+
+    <QueryClientProvider client={queryClient}>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Login />} />
+          <Route path="/register/admin" element={<AdminRegister />} />
+          <Route path="/register/service" element={<ServiceRegister />} />
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/service/dashboard" element={<ServiceDashboard />} />
+          <Route path="/oic/dashboard" element={<DirectorDashboard />} />
+          <Route path="/inventory" element={<Inventory />} />
+          <Route path="/service/messages" element={<ServiceMessages />} />
+          <Route path="/admin/messages" element={<AdminMessages />} />
+          <Route path="/admin/maintenance-list" element={<MaintenanceList />} />
+        </Routes>
     </Router>
+    </QueryClientProvider>
   );
 }

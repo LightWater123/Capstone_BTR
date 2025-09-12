@@ -18,11 +18,11 @@ export default function ServiceMessages() {
       });
   }, []);
 
-  // Fetch messages and set up auto-refresh
+  // Fetch schedule and set up auto-refresh
   useEffect(() => {
     if (!user?.email) return;
 
-    const fetchMessages = () => {
+    const fetchSchedule = () => {
       axios.get('/maintenance/schedule', {
         withCredentials: true
       })
@@ -31,14 +31,14 @@ export default function ServiceMessages() {
           setLoading(false);
         })
         .catch(err => {
-          console.error('Failed to fetch messages:', err);
+          console.error('Failed to fetch schedule:', err);
           setLoading(false);
         });
     };
 
-    fetchMessages(); // initial fetch
+    fetchSchedule(); // initial fetch
 
-    const interval = setInterval(fetchMessages, 30000); // refresh every 30s
+    const interval = setInterval(fetchSchedule, 30000); // refresh every 30s
 
     return () => clearInterval(interval); // cleanup on unmount
   }, [user]);

@@ -23,15 +23,19 @@ Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
     Route::middleware('auth:sanctum')->get('/maintenance/schedule', [MaintenanceController::class,'index']);
 });
 
-// service user
+// MAINTENANCE SCHEDULE
+
+// admin user view - schedule modal, maintenance list, service messages,
 Route::middleware('auth:sanctum')->post('/maintenance/schedule', [MaintenanceController::class,'store']);
+// service user view - user inbox jsx
 Route::middleware('auth:sanctum')->get('/my-messages', [MaintenanceController::class,'messages']);
+
+
+// Email Resend Routes
+Route::get('/send-email', [App\Http\Controllers\EmailController::class, 'sendEmail']);
+Route::get('/verify', [App\Http\Controllers\EmailController::class, 'verify']);
 
 // register route
 Route::post('/register', [RegisteredUserController::class, 'store']);
-
-// Resend Routes
-Route::get('/send-email', [App\Http\Controllers\EmailController::class, 'sendEmail']);
-Route::get('/verify', [App\Http\Controllers\EmailController::class, 'verify']);
 
 
