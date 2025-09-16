@@ -1,12 +1,9 @@
-// resources/js/components/ScheduleModal.jsx
-import { useState, useEffect } from 'react';
-import axios from 'axios';
+import { useState, useEffect, useMemo } from 'react';
 import Flatpickr from 'react-flatpickr';
 import 'flatpickr/dist/flatpickr.css';
 import api from '../../api/api';
 
 export default function ScheduleModal({ asset, onClose, onScheduled }) {
-  // holds form data
   const [form, setForm] = useState({
     recipientEmail: '',
     recipientName: '',
@@ -15,74 +12,71 @@ export default function ScheduleModal({ asset, onClose, onScheduled }) {
   });
   const [loading, setLoading] = useState(false);
 
-  // reset the form when asset changes
+  /* -------------------------------------------------
+   * 1.  Keep form.recipientEmail / Name in sync but
+   *     do NOT store the dynamic message in state.
+   * ------------------------------------------------- */
   useEffect(() => {
     if (!asset) return;
-    setForm({
+    setForm(prev => ({
+      ...prev,
       recipientEmail: '',
       recipientName: '',
-      scheduledAt: new Date(),
-      message: `Hi, your ${asset.description} is due for maintenance on ${asset.start_date} at ${asset.end_date}. Reply YES to confirm or call (xxx) xxx-xxxx.`
-    });
+      scheduledAt: new Date()
+    }));
   }, [asset]);
 
-  // this does not render if there is no asset
+  // change the message if scheduledAT is changed or asset changes
+  const dynamicMessage = useMemo(() => {
+    if (!asset) return '';
+    const d = form.scheduledAt;
+    return (
+      `Hi, your ${asset.description} is due for maintenance ` +
+      `on ${d.toLocaleDateString()} at ${d.toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit'
+      })}. Reply YES to confirm or call (xxx) xxx-xxxx.`
+    );
+  }, [asset, form.scheduledAt]);
+
   if (!asset) return null;
-  
-  // this handles scheduling and notifies the service user
+
   const handleSchedule = async () => {
     if (!form.recipientEmail.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
       alert('Please enter a valid e-mail address.');
       return;
     }
     setLoading(true);
-
-    try
-    {
-      // save the maintenance record
+    try {
       const payload = {
-      assetId: asset.id,
-      assetName: asset.description,
-      recipientEmail: form.recipientEmail,
-      recipientName: form.recipientName || form.recipientEmail.split('@')[0],
-      scheduledAt: form.scheduledAt,
-      message: form.message
-        .replace('{date}', form.scheduledAt.toLocaleDateString())
-        .replace('{time}', form.scheduledAt.toLocaleTimeString([], {
-          hour: '2-digit',
-          minute: '2-digit'
-        }))
+        assetId: asset.id,
+        assetName: asset.description,
+        recipientEmail: form.recipientEmail,
+        recipientName: form.recipientName || form.recipientEmail.split('@')[0],
+        scheduledAt: form.scheduledAt,
+        message: dynamicMessage
       };
-      // send message details to backend
-      //await api.post('/api/maintenance/schedule', payload);
-      console.log("form" , form)
-
-      // send the email to the recepient
-      await api.post('api/send-email', {
-        recepientEmail: form.recipientEmail,
-        recepientName : form.recipientName,
-        scheduledAt   : form.scheduledAt.toISOString(),
-        message       : form.message
+      await api.post('/api/maintenance/schedule', payload);
+      await api.post('/api/send-email', {
+        recipientEmail: form.recipientEmail,
+        recipientName: form.recipientName,
+        scheduledAt: form.scheduledAt.toISOString(),
+        message: dynamicMessage
       });
-
-      onScheduled(); // refresh schedule upon sending
+      onScheduled();
       onClose();
-
-    } catch (err) 
-    {
+    } catch (err) {
       console.error(err);
       alert(err.response?.data?.message || 'Scheduling / notification failed');
-    } finally 
-    {
+    } finally {
       setLoading(false);
     }
   };
 
-  
   return (
     <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center">
       <div className="bg-white rounded p-6 w-full max-w-md space-y-4">
-        <h2 className="text-lg font-semibold">Schedule maintenance for {asset.name}</h2>
+        <h2 className="text-lg font-semibold">Schedule maintenance for {asset.description}</h2>
 
         <label>Service-User E-mail</label>
         <input
@@ -109,17 +103,16 @@ export default function ScheduleModal({ asset, onClose, onScheduled }) {
           options={{ enableTime: true, dateFormat: 'Y-m-d H:i' }}
         />
 
-        <label>Message</label>
+        <label>Message (preview)</label>
         <textarea
           className="w-full border rounded p-2"
           rows="4"
-          value={form.message}
-          onChange={(e) => setForm({ ...form, message: e.target.value })}
+          value={dynamicMessage}
+          readOnly /* let the user see it update live */
         />
 
         <div className="flex justify-end gap-2">
           <button onClick={onClose} className="btn btn-secondary">Cancel</button>
-
           <button onClick={handleSchedule} disabled={loading} className="btn btn-primary">
             {loading ? 'Scheduling...' : 'Schedule & Notify'}
           </button>

@@ -33,7 +33,7 @@ class EmailController extends Controller
             'to'      => $request->recepientEmail,
             'subject' => 'Maintenance Schedule Reminder',
             'html'    => "
-                         <p>Hi {$request->receipentName},</p>
+                         <p>Hi {$request->recepientName},</p>
                          {$html}
                          <p>Scheduled at: <strong>{$when}</strong></p>
                          <p>Reply YES to Confirm or call (xxx) xxx-xxxx</p>
@@ -43,9 +43,10 @@ class EmailController extends Controller
         return response()->json(['status' => 'sent']);
     }
 
+    // verify domain name
     public function verify(Request $request)
     {
-        $resend = Resend::domains()->verify('agriconnect.org');
+        $resend = Resend::domains()->verify('agriconnects.org');
         return response()->json($resend);
     }
 }
