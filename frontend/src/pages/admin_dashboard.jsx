@@ -1,6 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import "../index.css";
 import LogoutButton from "../components/modals/LogoutButton";
+import BTRheader from "../components/modals/btrHeader";
+
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
@@ -15,7 +17,8 @@ export default function AdminDashboard() {
   
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
+      <div className="min-h-screen bg-gray-50 relative">
+      <BTRheader/>
       <h1 className="text-2xl font-bold mb-6 text-black">Admin Dashboard</h1>
       <LogoutButton className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition" />
 
@@ -36,5 +39,6 @@ export default function AdminDashboard() {
 
       </div>
     </div>
+    
   );
 }
