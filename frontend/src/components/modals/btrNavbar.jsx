@@ -2,6 +2,7 @@ import Bell from '../../assets/notification.png';
 import profileuser from '../../assets/profile-user.png';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import LogoutButton from './LogoutButton';
 
 export default function BTRNavbar() {
   const [isDropOpen, setIsDropOpen] = useState(false);
@@ -55,16 +56,19 @@ export default function BTRNavbar() {
 
             {isDropOpen && (
               <div className="absolute right-0 top-full mt-2 w-40 rounded-lg border bg-white shadow-lg py-1 z-50">
-                
-                <a onClick={handleCreateServiceAccount} href="#" className="block px-4 py-2 hover:bg-gray-100">
+                <a
+                  onClick={handleCreateServiceAccount}
+                  href="#"
+                  className="block px-4 py-2 hover:bg-gray-100"
+                >
                   Create Service User Account
                 </a>
                 <a href="#" className="block px-4 py-2 hover:bg-gray-100">
                   Settings
                 </a>
-                <a href="#" className="block px-4 py-2 hover:bg-gray-100">
-                  Sign Out
-                </a>
+
+                
+                <LogoutButton className="block w-full text-left px-4 py-2 hover:bg-gray-100" />
               </div>
             )}
           </div>
