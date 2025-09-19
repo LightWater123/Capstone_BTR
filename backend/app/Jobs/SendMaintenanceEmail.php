@@ -13,7 +13,8 @@ use App\Mail\MaintenanceScheduled;
 // This queued job handles sending a maintenance notification email.
 class SendMaintenanceEmail implements ShouldQueue
 {
-    use Queueable;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
 
     /**
      * Create a new job instance.

@@ -29,6 +29,8 @@ Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
 Route::middleware('auth:sanctum')->post('/maintenance/schedule', [MaintenanceController::class,'store']);
 // service user view - user inbox jsx
 Route::middleware('auth:sanctum')->get('/my-messages', [MaintenanceController::class,'messages']);
+// update equipment status for service user
+Route::middleware('auth:sanctum')->patch('/maintenance-jobs/{job}/status',[MaintenanceController::class, 'updateStatus']);
 
 
 // Email Resend Routes

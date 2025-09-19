@@ -4,122 +4,103 @@ namespace App\Http\Controllers;
 
 use App\Models\MaintenanceJob;
 use App\Models\Message;
+use App\Jobs\SendMaintenanceEmail;
+use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use MongoDB\Client;
+use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
+use MongoDB\BSON\ObjectId;
 
 class MaintenanceController extends Controller
 {
     /**
      * Schedule maintenance:
      * 1. create job
-     * 2. send e-mail via Resend
+     * 2. queue e-mail job
      * 3. store in-app message
      */
     public function store(Request $req)
     {
+        // validate incoming request
         $req->validate([
-        'assetId'        => 'required|string',
-        'assetName'      => 'required|string',
-        'recipientEmail' => 'required|email',
-        'recipientName'  => 'nullable|string',
-        'scheduledAt'    => 'required|date',
-        'message'        => 'required|string',
-    ]);
+            'assetId'        => 'required|string',
+            'assetName'      => 'required|string',
+            'recipientEmail' => 'required|email',
+            'recipientName'  => 'nullable|string',
+            'scheduledAt'    => 'required|date',
+            'message'        => 'required|string',
+        ]);
 
-        /* -----------------------------------------------------------------
-        * 1.  Create MongoDB client (Laravel already has it in the container)
-        * ----------------------------------------------------------------- */
-        $client = new Client(config('database.mongodb.uri'));   // adjust if you use a different key
+        /* ---------- 1.  create job ---------- */
+        $job = MaintenanceJob::create([
+            'asset_id'    => $req->assetId,
+            'asset_name'  => $req->assetName,
+            'user_email'  => $req->recipientEmail,
+            'scheduled_at'=> Carbon::parse($req->scheduledAt),
+            'status'      => 'pending',
+        ]);
 
-        /* -----------------------------------------------------------------
-        * 2.  Build the callback that will run inside the transaction
-        * ----------------------------------------------------------------- */
-        $callback = function (\MongoDB\Driver\Session $session) use ($req) {
-            /* ---------------------------------------------------------
-            * 2a.  Create job
-            * --------------------------------------------------------- */
-            $job = MaintenanceJob::create([
-                'assetId'     => $req->assetId,
-                'assetName'   => $req->assetName,
-                'userEmail'   => $req->recipientEmail,
-                'scheduledAt' => $req->scheduledAt,
-                'status'      => 'pending',
-            ]);
+        /* ---------- 2.  queue e-mail ---------- */
+        SendMaintenanceEmail::dispatch($job, $req->message);
 
-            /* ---------------------------------------------------------
-            * 2b.  Send Resend e-mail
-            * --------------------------------------------------------- */
-            $subject  = "[Maint Due] {$req->assetName} – ".$job->scheduledAt->format('d M Y');
-            $resendId = Resend::emails()->send([
-                'from'    => config('services.resend.from'),
-                'to'      => $req->recipientEmail,
-                'subject' => $subject,
-                'html'    => nl2br(e($req->message)),
-            ])['id'];
+        /* ---------- 3.  inbox message ---------- */
+        Message::create([
+            'sender_id'       => Auth::id(),
+            'recipient_email' => $req->recipientEmail,
+            'subject'         => "[Maint Due] {$req->assetName} – ".$job->scheduled_at->format('d M Y'),
+            'body_html'       => nl2br(e($req->message)),
+            'maint_job_id'    => $job->_id,
+            'read_at'         => null,
+        ]);
 
-            Log::debug('Maintenance scheduled', [
-                'job_id'    => $job->id,
-                'resend_id' => $resendId,
-            ]);
-
-            /* ---------------------------------------------------------
-            * 2c.  Create in-app message
-            * --------------------------------------------------------- */
-            Message::create([
-                'senderId'       => auth()->id(),
-                'recipientEmail' => $req->recipientEmail,
-                'subject'        => $subject,
-                'bodyHtml'       => $req->message,
-                'resendMsgId'    => $resendId,
-                'jobId'          => $job->_id,
-                'status'         => ['read' => false],
-            ]);
-
-            return $job;   // returned value becomes the result of with_transaction
-        };
-
-        /* -----------------------------------------------------------------
-        * 3.  Start session and run the transaction
-        * ----------------------------------------------------------------- */
-        $session = $client->startSession();
-
-        try {
-            $job = \MongoDB\with_transaction($session, $callback);
-        } catch (\Exception $e) {
-            Log::error('Maintenance scheduling failed', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
-
-            return response()->json([
-                'error'   => 'Maintenance scheduling failed',
-                'message' => $e->getMessage(),
-            ], 500);
-        }
-
-        return response()->json(['job' => $job], 201);   
+        return response()->json(['job' => $job], 201);
     }
 
+    /* service-user inbox 
+        returns sent messages to service user inbox
+    */
     public function messages(Request $req)
     {
-        return Message::where('recipientEmail', auth()->user()->email)
-                      ->orderBy('created_at', 'desc')
-                      ->get();
+        return Message::with('job:id,_id,asset_id,asset_name,user_email,scheduled_at,status,created_at')
+            ->where('recipient_email', Auth::user()->email)
+            ->orderBy('created_at', 'desc')
+            ->get(['_id','sender_id','recipient_email','subject','body_html','maint_job_id','created_at']);
     }
 
+    /* admin: messages he sent */
     public function sent(Request $req)
     {
-        return Message::where('senderId', auth()->id())
+        return Message::where('sender_id', Auth::id())
                       ->orderBy('created_at', 'desc')
                       ->get();
     }
 
-    // admin monitor maintenance
+    /* admin: maintenance monitor list 
+        returns the messages sent by the admin to admin monitor list
+    */
     public function index(Request $req)
     {
-        return Message::where('senderId', auth()->id())
-                      ->orderBy('created_at','desc')
+        return MaintenanceJob::query()
+                      ->orderBy('created_at', 'desc')
                       ->get();
+    }
+
+    // update status of equipment maintenance
+    public function updateStatus(Request $request, $job)   // <-- no type-hint
+    {
+        $request->validate(['status' => 'required|in:pending,in-progress,done']);
+
+        // convert the string segment to ObjectId
+        $job = MaintenanceJob::findOrFail(new ObjectId($job));
+
+        // authorisation
+        if (!auth()->user()->hasRole('admin') &&
+            $job->user_email !== auth()->user()->email) {
+            abort(403);
+        }
+
+        $job->update(['status' => $request->status]);
+
+        return response()->json($job);
     }
 }
