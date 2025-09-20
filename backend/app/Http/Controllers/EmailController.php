@@ -14,8 +14,8 @@ class EmailController extends Controller
 
         
         $request->validate([
-            'recepientEmail' => ['required','email'],
-            'recepientName' => ['required','string','max:255'],
+            'recipientEmail' => ['required','email'],
+            'recipientName' => ['required','string','max:255'],
             'scheduledAt' => ['required','date'],
             'message' => ['required','string'],
         ]);
@@ -30,10 +30,10 @@ class EmailController extends Controller
 
         Resend::emails()->send([
             'from'    => 'NeoTest@agriconnects.org',
-            'to'      => $request->recepientEmail,
+            'to'      => $request->recipientEmail,
             'subject' => 'Maintenance Schedule Reminder',
             'html'    => "
-                         <p>Hi {$request->recepientName},</p>
+                         <p>Hi {$request->recipientName},</p>
                          {$html}
                          <p>Scheduled at: <strong>{$when}</strong></p>
                          <p>Reply YES to Confirm or call (xxx) xxx-xxxx</p>

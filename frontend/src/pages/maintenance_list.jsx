@@ -17,6 +17,7 @@ export default function MaintenanceList() {
     try {
       const { data } = await api.get('/api/maintenance/schedule');
       setSchedules(data);
+      console.log(data);
     } catch (err) {
       console.error(err);
       setError('Failed to fetch maintenance schedules. Please try again later.');
@@ -53,32 +54,32 @@ export default function MaintenanceList() {
         {!loading && schedules.length > 0 && (
           <div className="bg-white rounded shadow divide-y divide-gray-200">
             {schedules.map((s) => (
-              <div key={s._id} className="cursor-pointer">
+              <div key={s.asset_id} className="cursor-pointer">
                 {/* Visible bar – click to expand */}
                 <div
-                  onClick={() => toggle(s._id)}
+                  onClick={() => toggle(s.asset_id)}
                   className="flex items-center justify-between px-4 py-3 hover:bg-gray-50"
                 >
-                  <span className="font-medium text-gray-800">{s.assetName}</span>
+                  <span className="font-medium text-gray-800">{s.asset_name}</span>
                   <span className="text-xs text-gray-500">
-                    {openId === s._id ? '▲' : '▼'}
+                    {openId === s.asset_id ? '▲' : '▼'}
                   </span>
                 </div>
 
                 {/* Expandable details */}
-                {openId === s._id && (
+                {openId === s.asset_id && (
                   <div className="px-4 pb-4 text-sm text-gray-700 grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                       <span className="text-gray-500">Asset:</span>
-                      <p className="font-medium">{s.assetName}</p>
+                      <p className="font-medium">{s.asset_name}</p>
                     </div>
                     <div>
                       <span className="text-gray-500">Recipient:</span>
-                      <p className="font-medium">{s.userEmail}</p>
+                      <p className="font-medium">{s.user_email}</p>
                     </div>
                     <div>
                       <span className="text-gray-500">Scheduled:</span>
-                      <p className="font-medium">{formatDate(s.scheduledAt)}</p>
+                      <p className="font-medium">{formatDate(s.scheduled_at)}</p>
                     </div>
                     <div>
                       <span className="text-gray-500">Status:</span>
@@ -96,7 +97,7 @@ export default function MaintenanceList() {
                     </div>
                     <div>
                       <span className="text-gray-500">Sender e-mail:</span>
-                      <p className="font-mono text-gray-600">{s.userEmail ? 'Sent' : '-'}</p>
+                      <p className="font-mono text-gray-600">{s.user_email ? 'Sent' : '-'}</p>
                     </div>
                   </div>
                 )}
