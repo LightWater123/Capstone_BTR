@@ -7,15 +7,21 @@ export default function BTRNavbar() {
   const [isDropOpen, setIsDropOpen] = useState(false);
   const navigate = useNavigate();
   const handleCreateServiceAccount = () => navigate("/register/service");
+  const handleBack = () => navigate("/admin/dashboard");
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 mt-4">
       <nav className="w-full bg-white shadow-sm rounded-xl mb-4 flex items-center justify-between px-5 py-3 text-sm">
         {/* LEFT */}
         <div className="flex items-center gap-3">
+          <button
+        onClick={handleBack}
+        className="text-sm bg-white  px-3 py-1 rounded"
+      >
           <span className="grid h-9 w-9 place-items-center rounded-lg text-black font-bold">
             Dashboard
           </span>
+      </button>
         </div>
 
         {/* RIGHT */}

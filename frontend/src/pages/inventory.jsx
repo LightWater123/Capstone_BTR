@@ -6,6 +6,8 @@ import { parsePdf } from "../hooks/usePdfParser";
 import { useCsrf } from "../hooks/useCsrf";
 import api from "../api/api";
 import { toast } from 'react-toastify'; 
+import BTRheader from "../components/modals/btrHeader";
+import BTRNavbar from "../components/modals/btrNavbar.jsx";
 
 // Modals
 import ScheduleMaintenanceModal from "../components/modals/scheduleModal.jsx";
@@ -168,29 +170,21 @@ export default function InventoryDashboard() {
   // render component UI
   return (
     <>
-    {/* Header */}
-    <div className="header px-4 py-3 border-b bg-white">
-      <h1 className="text-2xl font-bold text-gray-800">
-        Preventive Maintenance - Inventory
-      </h1>
-       
-    </div>
-
+    <div className="min-h-screen bg-gray-50 relative">
+    
+          {/* 1.  Government banner */}
+          <BTRheader />
+          <BTRNavbar />
+          
     {/* Category Tabs */}
     <div className="flex gap-4 px-4 pt-4">
       
-      <button
-        onClick={handleBack}
-        className="text-sm bg-gray-200 text-gray-700 px-3 py-1 rounded hover:bg-gray-300 transition"
-      >
-        Back to Dashboard
-      </button>
-
+     
       {["PPE", "RPCSP"].map((type) => (
         <button
           key={type}
           className={`px-4 py-2 rounded-md ${
-            category === type ? "bg-blue-600 text-white" : "bg-gray-200"
+            category === type ? "bg-gray-200 text-black" : "bg-gray-200"
           }`}
           onClick={() => setCategory(type)}
         >
@@ -199,8 +193,10 @@ export default function InventoryDashboard() {
       ))}
     </div>
 
-    {/* Search Field */}
-    <div className="px-4 pt-4">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 mt-4">
+      <nav className="w-full bg-white shadow-md rounded-xl mb-4 flex items-center justify-between py-4 px-4 sm:px-6 relative">
+
+      <div className="px-4 pt-4">
       <input
         type="text"
         placeholder={`Search ${category} items...`}
@@ -210,8 +206,7 @@ export default function InventoryDashboard() {
       />
     </div>
 
-    {/* Action Buttons */}
-    <div className="px-4 pt-4">
+      <div className="px-4 pt-4">
       <button
         className="bg-yellow-500 text-white px-4 py-2 rounded-md font-semibold hover:bg-yellow-600"
         onClick={() => setShowTypeSelector(true)}
@@ -239,7 +234,10 @@ export default function InventoryDashboard() {
         </button>
     </div>
 
-    {/* Inventory Table */}
+
+      </nav>
+    </div>
+
     <div className="px-4 pt-6">
       {filteredData.length === 0 ? (
         <p className="text-gray-500">No equipment found in {category}.</p>
@@ -423,8 +421,7 @@ export default function InventoryDashboard() {
       }}
     />
 
-
-    
+    </div>
   </>
   );
 }
