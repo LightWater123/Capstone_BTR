@@ -10,6 +10,7 @@ class MaintenanceJob extends Model
     protected $collection = 'maintenance_jobs';
 
     protected $fillable = [
+        '_id',
         'asset_id',
         'asset_name',
         'user_email',
@@ -19,7 +20,7 @@ class MaintenanceJob extends Model
 
     protected $dates = ['scheduled_at'];
 
-    protected $visible = [
-        '_id', 'asset_id', 'asset_name', 'user_email', 'scheduled_at', 'status', 'created_at'
-    ];
+    //protected $visible = [
+    //    '_id', 'asset_id', 'asset_name', 'user_email', 'scheduled_at', 'status', 'created_at'
+    //];
 }
