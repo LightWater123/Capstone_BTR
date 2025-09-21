@@ -1,26 +1,36 @@
 import { useNavigate } from "react-router-dom";
 import "../index.css";
-import LogoutButton from "../components/modals/LogoutButton";
+import BTRheader from "../components/modals/btrHeader";
+import Navbar from "../components/modals/serviceNavbar.jsx";
 
-export default function ServiceDashboard() {
+export default function AdminDashboard() {
   const navigate = useNavigate();
 
-  const viewMessages = () => {
-    navigate("/service/messages");
-  };
+  const handleCreateServiceAccount = () => navigate("/register/service");
+  const handleInventoryList = () => navigate("/service/inventory");
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
-      <h1 className="text-2xl font-bold mb-6 text-black">Service Dashboard</h1>
-      <LogoutButton className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition" />
-      <div className="space-y-4">
-        <button
-          onClick={viewMessages}
-          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition w-full max-w-sm"
-        >
-          Messages
-        </button>
-      </div>
+    <div className="min-h-screen bg-gray-50 relative">
+
+      {/* 1.  Government banner */}
+      <BTRheader />
+      <Navbar />
+      <div className="flex flex-wrap gap-6 justify-center max-w-6xl mx-auto">
+          {/* Preventive Maintenance */}
+          <button
+            onClick={handleInventoryList}
+            className="w-[1000px] md:w-[67%] h-[400px] bg-gray-100 rounded-xl text-gray-800 hover:bg-[#FCFC62] font-medium shadow-md text-3xl flex items-center justify-center space-x-4 transition-colors p-4 min-w-[200px]">
+             Maintenance
+          </button>
+      <div className="w-full min-w-[300px] h-[350px] bg-gray-100 rounded-xl shadow-md p-4 flex flex-col">
+            <h2 className="text-xl font-bold mb-4">Reminders</h2>
+            <ul className="flex-1 overflow-y-auto space-y-2">
+              <li className="bg-white p-2 rounded shadow-sm">Maintenance</li>
+              <li className="bg-white p-2 rounded shadow-sm">Maintenance</li>
+            </ul>
+          </div>
+     
+    </div>
     </div>
   );
 }
