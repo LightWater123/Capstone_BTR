@@ -4,11 +4,10 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import LogoutButton from './LogoutButton';
 
-export default function BTRNavbar() {
+export default function Navbar() {
   const [isDropOpen, setIsDropOpen] = useState(false);
   const navigate = useNavigate();
-  const handleCreateServiceAccount = () => navigate("/register/service");
-  const handleBack = () => navigate("/admin/dashboard");
+  const handleBack = () => navigate("/service/dashboard");
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 mt-4">
@@ -62,13 +61,7 @@ export default function BTRNavbar() {
 
             {isDropOpen && (
               <div className="absolute right-0 top-full mt-2 w-40 rounded-lg border bg-white shadow-lg py-1 z-50">
-                <a
-                  onClick={handleCreateServiceAccount}
-                  href="#"
-                  className="block px-4 py-2 hover:bg-gray-100"
-                >
-                  Create Service User Account
-                </a>
+                
                 <a href="#" className="block px-4 py-2 hover:bg-gray-100">
                   Settings
                 </a>
