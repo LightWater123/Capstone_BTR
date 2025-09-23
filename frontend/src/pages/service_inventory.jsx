@@ -16,6 +16,8 @@ export default function ServiceInventory() {
       <BTRheader />
       <Navbar />
 
+
+            
        </div>
   );
 }
