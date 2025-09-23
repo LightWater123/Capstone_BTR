@@ -61,10 +61,20 @@ class MaintenanceController extends Controller
     */
     public function messages(Request $req)
     {
-        return Message::with('job:id,_id,asset_id,asset_name,user_email,scheduled_at,status,created_at')
-            ->where('recipient_email', Auth::user()->email)
-            ->orderBy('created_at', 'desc')
-            ->get(['_id','sender_id','recipient_email','subject','body_html','maint_job_id','created_at']);
+        \Log::info('messages() called – raw query result');
+
+        $data = Message::with('job')
+                    ->where('recipient_email', Auth::user()->email)
+                    ->orderBy('created_at', 'desc')
+                    ->get();
+
+        // dump the very first job._id we find
+        if ($data->isNotEmpty() && $data->first()->job) {
+            \Log::info('first job raw', $data->first()->job->toArray());
+        }
+
+        return $data;
+
     }
 
     /* admin: messages he sent */
@@ -86,15 +96,12 @@ class MaintenanceController extends Controller
     }
 
     // update status of equipment maintenance
-    public function updateStatus(Request $request, $job)   // <-- no type-hint
+    public function updateStatus(Request $request, MaintenanceJob $job) // <-- type-hint
     {
         $request->validate(['status' => 'required|in:pending,in-progress,done']);
 
-        // convert the string segment to ObjectId
-        $job = MaintenanceJob::findOrFail(new ObjectId($job));
-
         // authorisation
-        if (!auth()->user()->hasRole('admin') &&
+        if (! auth()->user()->email === 'admin@yourdomain.com' &&   // or any admin check you use
             $job->user_email !== auth()->user()->email) {
             abort(403);
         }

@@ -30,7 +30,9 @@ Route::middleware('auth:sanctum')->post('/maintenance/schedule', [MaintenanceCon
 // service user view - user inbox jsx
 Route::middleware('auth:sanctum')->get('/my-messages', [MaintenanceController::class,'messages']);
 // update equipment status for service user
-Route::middleware('auth:sanctum')->patch('/maintenance-jobs/{job}/status',[MaintenanceController::class, 'updateStatus']);
+Route::middleware('auth:sanctum')
+     ->patch('/maintenance-jobs/{job}/status', [MaintenanceController::class, 'updateStatus'])
+     ->where('job', '[0-9a-fA-F]{24}');
 
 
 // Email Resend Routes

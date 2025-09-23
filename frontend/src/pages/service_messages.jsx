@@ -34,7 +34,7 @@ export default function ServiceMessages() {
           </thead>
           <tbody>
             {messages.map((msg) => (
-              <tr key={msg._id} className="border-t">
+              <tr key={msg.id} className="border-t">
                 <td className="px-4 py-2">{msg.job.asset_name}</td>
                 <td className="px-4 py-2">
                   {new Date(msg.job.scheduled_at).toLocaleString()}
@@ -47,7 +47,7 @@ export default function ServiceMessages() {
                     value={msg.job.status}
                     onChange={(e) => {
                       //console.log('msg.job._id in onChange:', msg.job._id);
-                      updateStatus(msg.job._id, e.target.value)}}
+                      updateStatus(msg.job.id, e.target.value)}}
                   >
                     {['pending','in-progress','done'].map(s => (
                       <option key={s} value={s}>{statusLabel(s)}</option>

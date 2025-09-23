@@ -23,9 +23,9 @@ class Message extends Model
         'read_at' => 'datetime',
     ];
 
-    protected $visible = [
-        '_id', 'sender_id', 'recipient_email', 'subject', 'body_html', 'maint_job_id', 'job', 'created_at'
-    ];
+    //protected $visible = [
+    //    '_id', 'sender_id', 'recipient_email', 'subject', 'body_html', 'maint_job_id', 'job', 'created_at'
+    //];
 
     /* optional: quick relationship */
     public function job()
