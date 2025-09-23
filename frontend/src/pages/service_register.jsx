@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "../api/api";
+import BTRheader from "../components/modals/btrHeader";
+
 
 export default function ServiceRegister() {
   const navigate = useNavigate();
@@ -56,7 +58,7 @@ export default function ServiceRegister() {
         mobile_number: formData.mobile_number,
         address: formData.address,
         service_type: formData.service_type,
-        role:'service_user',
+        role: 'service_user',
       });
 
       console.log("Registered user:", response.data.user);
@@ -76,56 +78,85 @@ export default function ServiceRegister() {
   return (
     <>
 
-    <div className="flex justify-center items-center w-dvw min-h-screen bg-gray-100">
-      <button
-          onClick={handleBack}
-          className="absolute top-6 left-6 text-sm bg-gray-200 text-gray-700 px-3 py-1 rounded hover:bg-gray-300 transition"
-        >
-          Back to Dashboard
-        </button>
-      <form onSubmit={handleRegister} className="bg-white p-6 rounded shadow-md w-80">
-        <h1 className="text-2xl font-bold mb-4 text-black">Service User Registration</h1>
+      <div className="min-h-screen bg-gray-50 relative">
+        <BTRheader />
+        <div className="flex justify-center items-center w-dvw p-10">
 
-        {Object.values(errors).map((err, i) => (
-          <p key={i} className="text-red-500 mb-2">{err}</p>
-        ))}
+          <div className="flex flex-col items-center w-full max-w-sm">
+            <button
+              onClick={handleBack}
+              className="w-full px-4 py-2 bg-yellow-400 hover:bg-yellow-500 text-white font-bold rounded mb-6"
+               style={{ boxShadow: "0 4px 50px rgba(255, 255, 255, 0.3)" }}
+            >
+              Back to Dashboard
+            </button>
 
-        <input name="name" placeholder="Name" value={formData.name} onChange={handleChange}
-          className="border p-2 w-full mb-3 rounded text-black" required />
+            <div className="relative p-6 space-y-4 w-full max-w-xl rounded-lg shadow-md bg-white"
+              style={{ boxShadow: "0 4px 50px rgba(0, 0, 0, 0.3)" }}>
+              <form onSubmit={handleRegister} className="space-y-4">
 
-        <input name="username" placeholder="Username" value={formData.username} onChange={handleChange}
-          className="border p-2 w-full mb-3 rounded text-black" required />
 
-        <input name="email" type="email" placeholder="Email" value={formData.email} onChange={handleChange}
-          className="border p-2 w-full mb-3 rounded text-black" required />
+                <h1 className="text-2xl font-bold mb-4 text-black text-center">Service User Registration</h1>
 
-        <input name="mobile_number" placeholder="Mobile Number" value={formData.mobile_number} onChange={handleChange}
-          className="border p-2 w-full mb-3 rounded text-black" required />
+                {Object.values(errors).map((err, i) => (
+                  <p key={i} className="text-red-500 mb-2">{err}</p>
+                ))}
 
-        <input name="address" placeholder="Address" value={formData.address} onChange={handleChange}
-          className="border p-2 w-full mb-3 rounded text-black" required />
+                
+                <div className="flex flex-col items-start space-y-2">
+                  <input name="name" placeholder="Company Name" value={formData.name} onChange={handleChange}
+                    className="w-full px-4 py-2 border rounded focus:outline-none focus:ring focus:ring-yellow-400" required />
+                </div>
+                <div className="flex flex-col items-start space-y-2">
+                  <input name="username" placeholder="Username" value={formData.username} onChange={handleChange}
+                    className="w-full px-4 py-2 border rounded focus:outline-none focus:ring focus:ring-yellow-400" required />
+                </div>
 
-        <select name="service_type" value={formData.service_type} onChange={handleChange}
-          className="border p-2 w-full mb-3 rounded text-black" required>
-          <option value="">Select Service Type</option>
-          {serviceTypes.map(type => (
-            <option key={type.value} value={type.value}>{type.label}</option>
-          ))}
-        </select>
+                <div className="flex flex-col items-start space-y-2">
+                  <input name="email" type="email" placeholder="Email" value={formData.email} onChange={handleChange}
+                    className="w-full px-4 py-2 border rounded focus:outline-none focus:ring focus:ring-yellow-400" required />
+                </div>
 
-        <input name="password" type="password" placeholder="Password" value={formData.password} onChange={handleChange}
-          className="border p-2 w-full mb-3 rounded text-black" required />
+                <div className="flex flex-col items-start space-y-2">
+                  <input name="mobile_number" placeholder="Mobile Number" value={formData.mobile_number} onChange={handleChange}
+                    className="w-full px-4 py-2 border rounded focus:outline-none focus:ring focus:ring-yellow-400" required />
+                </div>
 
-        <input name="confirm_password" type="password" placeholder="Confirm Password" value={formData.confirm_password} onChange={handleChange}
-          className="border p-2 w-full mb-4 rounded text-black" required />
+                <div className="flex flex-col items-start space-y-2">
+                  <input name="address" placeholder="Address" value={formData.address} onChange={handleChange}
+                    className="w-full px-4 py-2 border rounded focus:outline-none focus:ring focus:ring-yellow-400" required />
+                </div>
 
-        <button type="submit" disabled={loading}
-          className="bg-blue-600 text-white py-2 rounded w-full hover:bg-blue-700">
-          {loading ? "Registering..." : "Register"}
-        </button>
-      </form>
-    </div>
+                <div className="flex flex-col items-start space-y-2">
+                  <select name="service_type" value={formData.service_type} onChange={handleChange}
+                    className="w-full px-4 py-2 border rounded focus:outline-none focus:ring focus:ring-yellow-400" required>
+                    <option value="">Select Service Type</option>
+                    {serviceTypes.map(type => (
+                      <option key={type.value} value={type.value}>{type.label}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="flex flex-col items-start space-y-2">
+                  <input name="password" type="password" placeholder="Password" value={formData.password} onChange={handleChange}
+                    className="w-full px-4 py-2 border rounded focus:outline-none focus:ring focus:ring-yellow-400" required />
+                </div>
+
+                <div className="flex flex-col items-start space-y-2">
+                  <input name="confirm_password" type="password" placeholder="Confirm Password" value={formData.confirm_password} onChange={handleChange}
+                    className="w-full px-4 py-2 border rounded focus:outline-none focus:ring focus:ring-yellow-400" required />
+                </div>
+
+                <button type="submit" disabled={loading}
+                  className="w-full px-4 py-2 bg-yellow-400 hover:bg-yellow-500 text-white font-bold rounded">
+                  {loading ? "Registering..." : "Register Account"}
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
     </>
-    
+
   );
 }

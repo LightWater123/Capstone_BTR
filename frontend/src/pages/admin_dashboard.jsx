@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "../index.css";
 import BTRheader from "../components/modals/btrHeader";
 import BTRNavbar from "../components/modals/btrNavbar.jsx";
+import wrenchicon from '../assets/wrench.png';
 import CalendarModal from "../components/modals/calendar.jsx";
 
 export default function AdminDashboard() {
@@ -24,8 +25,9 @@ export default function AdminDashboard() {
           <div className="lg:col-span-2">
             <button
               onClick={handleInventoryList}
-              className="w-full h-[350px] bg-white rounded-xl text-gray-800 hover:bg-yellow-300 font-medium shadow-md text-3xl flex items-center justify-center transition-colors"
+              className="w-full h-[350px] bg-white rounded-xl text-gray-800 hover:bg-[#FCFC62] font-medium shadow-md text-3xl flex items-center justify-center transition-colors"
             >
+              <img src={wrenchicon} alt="Wrench Icon" className="w-14 h-14 opacity-50 p-3" />
               Preventive Maintenance
             </button>
           </div>
