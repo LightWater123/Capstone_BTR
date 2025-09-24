@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "../api/api";
 import BTRheader from "../components/modals/btrHeader";
-import BTRNavbar from "../components/modals/btrNavbar.jsx";
+
 
 export default function ServiceRegister() {
   const navigate = useNavigate();
@@ -58,7 +58,7 @@ export default function ServiceRegister() {
         mobile_number: formData.mobile_number,
         address: formData.address,
         service_type: formData.service_type,
-        role:'service_user',
+        role: 'service_user',
       });
 
       console.log("Registered user:", response.data.user);
@@ -75,60 +75,59 @@ export default function ServiceRegister() {
     }
   };
 
- return (
-  <>
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center relative">
-      <div className="absolute top-0 left-0 w-full">
-        <BTRheader />
-        <BTRNavbar />
-      </div>
+  return (
+    <>
 
-      <form onSubmit={handleRegister} className="bg-[#FCFC62] p-6 rounded shadow-md w-full max-w-4xl mx-auto mt-24">
+    <div className="flex justify-center items-center w-dvw min-h-screen bg-gray-100">
+      <button
+          onClick={handleBack}
+          className="absolute top-6 left-6 text-sm bg-gray-200 text-gray-700 px-3 py-1 rounded hover:bg-gray-300 transition"
+        >
+          Back to Dashboard
+        </button>
+      <form onSubmit={handleRegister} className="bg-white p-6 rounded shadow-md w-80">
+        <h1 className="text-2xl font-bold mb-4 text-black">Service User Registration</h1>
 
-      <h1 className="text-2xl font-bold mb-6 text-[#2F549A] text-center">Service User Registration</h1>
+        {Object.values(errors).map((err, i) => (
+          <p key={i} className="text-red-500 mb-2">{err}</p>
+        ))}
 
-      {Object.values(errors).map((err, i) => (
-      <p key={i} className="text-red-500 mb-2">{err}</p>
-  ))}
+        <input name="name" placeholder="Name" value={formData.name} onChange={handleChange}
+          className="border p-2 w-full mb-3 rounded text-black" required />
 
-       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-       <input name="name" placeholder="Name" value={formData.name} onChange={handleChange}
-       className="border p-2 w-full rounded text-black" required />
+        <input name="username" placeholder="Username" value={formData.username} onChange={handleChange}
+          className="border p-2 w-full mb-3 rounded text-black" required />
 
-       <input name="username" placeholder="Username" value={formData.username} onChange={handleChange}
-       className="border p-2 w-full rounded text-black" required />
+        <input name="email" type="email" placeholder="Email" value={formData.email} onChange={handleChange}
+          className="border p-2 w-full mb-3 rounded text-black" required />
 
-       <input name="email" type="email" placeholder="Email" value={formData.email} onChange={handleChange}
-       className="border p-2 w-full rounded text-black" required />
+        <input name="mobile_number" placeholder="Mobile Number" value={formData.mobile_number} onChange={handleChange}
+          className="border p-2 w-full mb-3 rounded text-black" required />
 
-       <input name="mobile_number" placeholder="Mobile Number" value={formData.mobile_number} onChange={handleChange}
-       className="border p-2 w-full rounded text-black" required />
+        <input name="address" placeholder="Address" value={formData.address} onChange={handleChange}
+          className="border p-2 w-full mb-3 rounded text-black" required />
 
-      <input name="address" placeholder="Address" value={formData.address} onChange={handleChange}
-       className="border p-2 w-full rounded text-black" required />
+        <select name="service_type" value={formData.service_type} onChange={handleChange}
+          className="border p-2 w-full mb-3 rounded text-black" required>
+          <option value="">Select Service Type</option>
+          {serviceTypes.map(type => (
+            <option key={type.value} value={type.value}>{type.label}</option>
+          ))}
+        </select>
 
-       <select name="service_type" value={formData.service_type} onChange={handleChange}
-        className="border p-2 w-full rounded text-black" required>
-        <option value="">Select Service Type</option>
-        {serviceTypes.map(type => (
-        <option key={type.value} value={type.value}>{type.label}</option>
-      ))}
-     </select>
-
-         <input name="password" type="password" placeholder="Password" value={formData.password} onChange={handleChange}
-         className="border p-2 w-full rounded text-black" required />
+        <input name="password" type="password" placeholder="Password" value={formData.password} onChange={handleChange}
+          className="border p-2 w-full mb-3 rounded text-black" required />
 
         <input name="confirm_password" type="password" placeholder="Confirm Password" value={formData.confirm_password} onChange={handleChange}
-        className="border p-2 w-full rounded text-black" required />
-  </div>
+          className="border p-2 w-full mb-4 rounded text-black" required />
 
         <button type="submit" disabled={loading}
-        className="bg-blue-600 text-white py-2 rounded w-full mt-6 hover:bg-blue-700">
-        {loading ? "Registering..." : "Register"}
-  </button>
-</form>
-
+          className="bg-blue-600 text-white py-2 rounded w-full hover:bg-blue-700">
+          {loading ? "Registering..." : "Register"}
+        </button>
+      </form>
     </div>
-  </>
-);
+    </>
+    
+  );
 }

@@ -17,9 +17,9 @@ export default function BTRNavbar() {
         <div className="flex items-center gap-3">
           <button
         onClick={handleBack}
-        className="text-sm bg-white  px-3 py-1 rounded"
+        className="text-sm bg-white px-3 py-1 rounded"
       >
-          <span className="grid h-9 w-9 place-items-center rounded-lg text-black font-bold">
+          <span className="grid h-10 w-10 place-items-center rounded-lg text-gray-500 font-bold text-lg">
             Dashboard
           </span>
       </button>
@@ -42,7 +42,7 @@ export default function BTRNavbar() {
                 alt="User"
                 className="h-7 w-7 rounded-full object-cover"
               />
-              <span className="hidden sm:inline">Username</span>
+              <span className="hidden sm:inline text-lg">Username</span>
               <svg
                 className={`h-4 w-4 transition ${
                   isDropOpen ? 'rotate-180' : ''

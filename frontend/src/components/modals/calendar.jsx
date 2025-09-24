@@ -12,7 +12,7 @@ export default function CalendarModal() {
     date1.getFullYear() === date2.getFullYear();
 
   return (
-    <div className="bg-white rounded-xl shadow-md p-4 w-[378px] h-[350px]">
+    <div className="bg-white rounded-xl shadow-md p-4 w-[378px] h-[350px]">    
       <h2 className="text-xl font-bold text-gray-700 mb-3">Calendar</h2>
       <DatePicker
         selected={selectedDate}
