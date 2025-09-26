@@ -42,7 +42,7 @@ export default function BTRNavbar() {
                 alt="User"
                 className="h-7 w-7 rounded-full object-cover"
               />
-              <span className="hidden sm:inline text-lg">Username</span>
+              <span className="hidden sm:inline text-lg p-2">Username</span>
               <svg
                 className={`h-4 w-4 transition ${
                   isDropOpen ? 'rotate-180' : ''
