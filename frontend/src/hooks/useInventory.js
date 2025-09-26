@@ -35,6 +35,7 @@ export function useInventory(category) {
     }
   };
 
+  // search function
   const filteredData = inventoryData.filter(item => {
     const query = searchQuery.toLowerCase();
     return item.article?.toLowerCase().includes(query) || item.description?.toLowerCase().includes(query);

@@ -180,4 +180,63 @@ class EquipmentController extends Controller
             ], 500);
         }
     }
+
+    /**
+ * GET /api/service/inventory?category=PPE|RPCSP
+ * Service-user list: only the 4 allowed columns
+ */
+    public function serviceIndex(Request $request)
+    {
+        $category = $request->query('category');
+
+        $query = Equipment::query()
+            ->select(
+                'id',                                      // needed for the “click” link
+                'category',
+                'article',
+                'description',
+                'property_ro',
+                'property_co',
+                'semi_expendable_property_no'
+            );
+
+        if ($category) {
+            $query->where('category', $category);
+        }
+
+        // tidy up the JSON so the frontend always sees the same keys
+        return $query->cursor()->map(fn ($i) => [
+            'id'            => $i->id,
+            'article'       => $i->article,
+            'description'   => $i->description,
+            'property_ro'   => $i->property_ro,
+            'property_co'   => $i->property_co,
+            'semi_expendable_property_no' => $i->semi_expendable_property_no,
+        ]);
+    }
+
+    /**
+     * GET /api/service/inventory/{id}/maintenance
+     * Maintenance progress timeline for the clicked item
+    */
+    public function serviceMaintenance($id)
+    {
+        $equipment = Equipment::findOrFail($id);
+
+        // Example: if you store maintenance logs in a separate table
+        // $logs = $equipment->maintenanceLogs()->orderBy('created_at')->get();
+
+        // For now we simply return the dates already in the equipment row
+        // (replace with real maintenance relationship when you have it)
+        return response()->json([
+            'article'       => $equipment->article,
+            'description'   => $equipment->description,
+            'maintenance'   => [
+                'start_date' => $equipment->start_date,
+                'end_date'   => $equipment->end_date,
+                'condition'  => $equipment->condition,
+                'remarks'    => $equipment->remarks,
+            ],
+        ]);
+        }
 }

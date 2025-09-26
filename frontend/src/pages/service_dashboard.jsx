@@ -22,6 +22,8 @@ export default function AdminDashboard() {
             className="w-[1000px] md:w-[67%] h-[400px] bg-gray-100 rounded-xl text-gray-800 hover:bg-[#FCFC62] font-medium shadow-md text-3xl flex items-center justify-center space-x-4 transition-colors p-4 min-w-[200px]">
              Maintenance
           </button>
+
+          
       <div className="w-full min-w-[300px] h-[350px] bg-gray-100 rounded-xl shadow-md p-4 flex flex-col">
             <h2 className="text-xl font-bold mb-4">Reminders</h2>
             <ul className="flex-1 overflow-y-auto space-y-2">
