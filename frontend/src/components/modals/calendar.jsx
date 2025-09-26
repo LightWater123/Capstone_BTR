@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
 export default function CalendarModal() {
   const [selectedDate, setSelectedDate] = useState(null);
+  const navigate = useNavigate();
 
   const today = new Date();
   const isSameDay = (date1, date2) =>
@@ -12,8 +14,17 @@ export default function CalendarModal() {
     date1.getFullYear() === date2.getFullYear();
 
   return (
-    <div className="bg-white rounded-xl shadow-md p-4 w-[378px] h-[350px]">    
-      <h2 className="text-xl font-bold text-gray-700 mb-3">Calendar</h2>
+    <div className="bg-white rounded-xl shadow-md p-4 w-[378px] h-[350px]">
+      <div className="flex items-center justify-between mb-3">
+        <h2 className="text-xl font-bold text-gray-700">Calendar</h2>
+        <button
+          onClick={() => navigate('/calendar-full')}
+          className="text-sm text-blue-600 hover:underline"
+        >
+          View Full Calendar
+        </button>
+      </div>
+
       <DatePicker
         selected={selectedDate}
         onChange={(date) => setSelectedDate(date)}
