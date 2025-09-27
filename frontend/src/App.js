@@ -35,6 +35,8 @@ export default function App() {
           <Route path="/admin/messages" element={<AdminMessages />} />
           <Route path="/admin/maintenance-list" element={<MaintenanceList />} />
           <Route path="/service/inventory" element={<ServiceInventory />} />
+          <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/calendar-full" element={<CalendarFullPage />} />
         </Routes>
     </Router>
     </QueryClientProvider>
