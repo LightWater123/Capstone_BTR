@@ -2,60 +2,40 @@
 
 namespace App\Models;
 
-use MongoDB\Laravel\Auth\User as Authenticatable; // mongodb support for Eloquent
-use Laravel\Sanctum\HasApiTokens; //enables API token support for user authentication via Sanctum
-use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
-
+use MongoDB\Laravel\Auth\User as Authenticatable;
+use Laravel\Sanctum\HasApiTokens;
 
 class ServiceUser extends Authenticatable
 {
-    
-    // contains service_user's username, email, and password
+    use HasApiTokens;
 
-    use HasApiTokens; // handles login credentials
-
-    // declare collection and connection
     protected $connection = 'mongodb';
     protected $collection = 'service_users';
+    protected $primaryKey = '_id';
+    public $incrementing = false;
+    protected $keyType = 'string';
+
+    protected $fillable = [
+        'username', 'email', 'password', 'mobile_number',
+        'address', 'service_type',
+    ];
+
+    protected $hidden = ['password', 'remember_token'];
     protected $appends = ['role'];
 
-    public function getRoleAttribute()
+    public const SERVICE_TYPES = ['Vehicle', 'Appliances', 'ICT Equipment'];
+
+    public function getRoleAttribute(): string
     {
         return 'service_user';
     }
-    // declare valid service types
-    public const SERVICE_TYPES = [
-        'Vehicle',
-        'Appliances',
-        'ICT Equipment'
-    ];
 
-    // columns for service user's credentials and fillable field for mass assignment
-    protected $fillable = 
-    [
-        'username', 
-        'email', 
-        'password', 
-        'mobile_number',
-        'address', 
-        'service_type',
-    ];
-    
-    // hidden attribute
-    protected $hidden = 
-    [
-        'password',
-        'remember_token',
-    ];
-
-    // get all service types
-    public function getServiceTypes()
+    public function getServiceTypes(): array
     {
         return self::SERVICE_TYPES;
     }
 
-    // check if user has a specific service type
-    public function hasServiceType($type)
+    public function hasServiceType($type): bool
     {
         return $this->service_type === $type;
     }

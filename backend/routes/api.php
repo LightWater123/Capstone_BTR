@@ -1,59 +1,59 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
-use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\EquipmentController;
 use App\Http\Controllers\MaintenanceController;
 use App\Http\Controllers\PdfParserController;
 use App\Http\Controllers\EmailController;
+use App\Http\Controllers\PasswordController;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Auth\Events\PasswordReset;
 
-Route::post('/login', [AuthenticatedSessionController::class, 'store']);
-Route::post('/logout', [AuthenticatedSessionController::class, 'destroy']);
+// PUBLIC   
+Route::post('/login',    [AuthenticatedSessionController::class, 'store']);
+Route::post('/logout',   [AuthenticatedSessionController::class, 'destroy']);
 Route::post('/register', [RegisteredUserController::class, 'store']);
+Route::post('/forgot-password',  fn(Request $r) => … );
+Route::post('/reset-password',   fn(Request $r) => … );
 
+// AUTHENTICATED
+Route::middleware(['auth:admin'])->group(function () {
 
-// admin user
-Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
-    Route::get('/inventory', [EquipmentController::class, 'index']);
-    Route::post('/inventory', [EquipmentController::class, 'store']);
-    Route::put('/inventory/{id}', [EquipmentController::class, 'update']);
-    Route::delete('/inventory/{id}', [EquipmentController::class, 'destroy']);
+    // user & password
+    Route::get('/user', fn(Request $r) => $r->user());
+    Route::post('/admin/change-password', [PasswordController::class, 'change']);
+
+    // inventory
+    Route::apiResource('inventory', EquipmentController::class)
+         ->only(['index','store','update','destroy']);
+
     Route::post('parse-pdf', [PdfParserController::class, 'parse']);
-    Route::middleware('auth:sanctum')->get('/admin/messages', [MaintenanceController::class, 'sent']);
-    Route::middleware('auth:sanctum')->get('/maintenance/schedule', [MaintenanceController::class,'index']);
+
+    // maintenance
+    Route::prefix('maintenance')->group(function () {
+        Route::get('/schedule',      [MaintenanceController::class, 'index']);
+        Route::post('/schedule',     [MaintenanceController::class, 'store']);
+        Route::get('/admin/messages',[MaintenanceController::class, 'sent']);
+    });
 });
 
-// MAINTENANCE SCHEDULE
+// SERVICE USER (service guard)
+Route::middleware(['auth:service'])->group(function () {
+    Route::post('/service/change-password', [PasswordController::class, 'change']);
+    Route::get('/my-messages', [MaintenanceController::class,'messages']);
+    Route::patch('/maintenance-jobs/{job}/status', [MaintenanceController::class, 'updateStatus'])
+         ->where('job', '[0-9a-fA-F]{24}');
+});
 
-// admin user view - schedule modal, maintenance list, service messages,
-Route::middleware('auth:sanctum')->post('/maintenance/schedule', [MaintenanceController::class,'store']);
-// service user view - user inbox jsx
-Route::middleware('auth:sanctum')->get('/my-messages', [MaintenanceController::class,'messages']);
-// service user inventory view
+// SERVICE-ONLY INVENTORY VIEWS (no auth required, or add auth:service if you want)
 Route::prefix('service')->group(function () {
-    Route::get('inventory', [EquipmentController::class, 'serviceIndex']);
-    Route::get('inventory/{id}/maintenance', [EquipmentController::class, 'serviceMaintenance']);
+    Route::get('inventory',                    [EquipmentController::class, 'serviceIndex']);
+    Route::get('inventory/{id}/maintenance',   [EquipmentController::class, 'serviceMaintenance']);
 });
-// update equipment status for service user
-Route::middleware('auth:sanctum')
-     ->patch('/maintenance-jobs/{job}/status', [MaintenanceController::class, 'updateStatus'])
-     ->where('job', '[0-9a-fA-F]{24}');
 
-
-// Email Resend Routes
-Route::post('/send-email', [App\Http\Controllers\EmailController::class, 'sendEmail']);
-Route::get('/verify', [App\Http\Controllers\EmailController::class, 'verify']);
-
-// register route
-Route::post('/register', [RegisteredUserController::class, 'store']);
-
-// change password for admin and service user
-Route::middleware('auth:admin')->post('/admin/change-password',  [PasswordController::class, 'change']);
-Route::middleware('auth:service')->post('/service/change-password', [PasswordController::class, 'change']);
-
-// fetch user
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
+// EMAIL
+Route::post('/send-email', [EmailController::class, 'sendEmail']);
+Route::get('/verify',      [EmailController::class, 'verify']);

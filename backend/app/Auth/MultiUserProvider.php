@@ -11,6 +11,10 @@ use App\Models\User;
 
 class MultiUserProvider implements UserProvider
 {
+    public function __construct(
+        private \Illuminate\Contracts\Hashing\Hasher $hasher
+    ) {}
+
     public function retrieveById($identifier): ?Authenticatable
     {
         return AdminUser::find($identifier)
@@ -21,7 +25,7 @@ class MultiUserProvider implements UserProvider
     public function retrieveByToken($identifier, $token): ?Authenticatable
     {
         $user = $this->retrieveById($identifier);
-        return ($user && $user->getRememberToken() === $token) ? $user : null;
+        return $user && $user->getRememberToken() === $token ? $user : null;
     }
 
     public function updateRememberToken(Authenticatable $user, $token): void
@@ -30,22 +34,29 @@ class MultiUserProvider implements UserProvider
         $user->save();
     }
 
-    public function retrieveByCredentials(array $credentials): ?Authenticatable
+    public function retrieveByCredentials(array $credentials)
     {
-        $loginType = filter_var($credentials['login'], FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+        $model = $this->createModel();
+        $query = $model->newQuery();
 
-        return AdminUser::where($loginType, $credentials['login'])->first()
-            ?? ServiceUser::where($loginType, $credentials['login'])->first()
-            ?? User::where($loginType, $credentials['login'])->first();
+        if (!empty($credentials['login'])) {
+            $regex = '^' . preg_quote($credentials['login']) . '$';
+            $query->whereRaw(['username' => ['$regex' => $regex, '$options' => 'i']]);
+        }
+
+        // ----  TEMP  ----
+        \Log::info('MONGO FILTER', $query->getQuery()->toMql());
+
+        return $query->first();
     }
 
     public function validateCredentials(Authenticatable $user, array $credentials): bool
     {
-        return Hash::check($credentials['password'], $user->getAuthPassword());
+        return $this->hasher->check($credentials['password'], $user->getAuthPassword());
     }
 
     public function rehashPasswordIfRequired(Authenticatable $user, array $credentials, bool $force = false): void
     {
-        // Optional: implement password rehashing if needed
+        
     }
 }

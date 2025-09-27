@@ -31,15 +31,12 @@ class LoginRequest extends FormRequest
      */
     public function authenticate(): void
     {
-        $this->ensureIsNotRateLimited();
+        // pick guard that owns the credentials
+        $guard = $this->has('login') && filter_var($this->input('login'), FILTER_VALIDATE_EMAIL)
+                ? 'web'
+                : 'admin';                 // username → admin collection
 
-        // Hand the credentials to the guard; our MultiUserProvider will find the user.
-        $credentials = [
-            'login'    => $this->input('login'),
-            'password' => $this->input('password'),
-        ];
-
-        if (! Auth::guard('web')->attempt($credentials, $this->boolean('remember'))) {
+        if (! Auth::guard($guard)->attempt($this->only('login', 'password'), $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
@@ -81,5 +78,20 @@ class LoginRequest extends FormRequest
         return Str::transliterate(
             Str::lower($this->input('login')).'|'.$this->ip()
         );
+    }
+
+    public function retrieveByCredentials(array $credentials): ?Authenticatable
+    {
+        $type = filter_var($credentials['login'], FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+
+        \Log::debug('Mongo lookup', [
+            'collection' => 'admins',   // or services / users
+            'field'      => $type,
+            'value'      => $credentials['login'],
+        ]);
+
+        return AdminUser::whereRaw([$type => ['$regex' => '^' . preg_quote($credentials['login']) . '$', '$options' => 'i']])->first()
+            ?? ServiceUser::whereRaw([$type => ['$regex' => '^' . preg_quote($credentials['login']) . '$', '$options' => 'i']])->first()
+            ?? User::whereRaw([$type => ['$regex' => '^' . preg_quote($credentials['login']) . '$', '$options' => 'i']])->first();
     }
 }

@@ -15,6 +15,8 @@ import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import ServiceInventory from "./pages/service_inventory";
 import SettingsPage from './pages/settings_page';
 import CalendarFullPage from "./pages/full_calendar";
+import ForgotPassword from "./pages/forgot_password";
+import ResetPassword from "./pages/reset_password";
 
 export const queryClient = new QueryClient();
 
@@ -37,6 +39,8 @@ export default function App() {
           <Route path="/service/inventory" element={<ServiceInventory />} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/calendar-full" element={<CalendarFullPage />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
         </Routes>
     </Router>
     </QueryClientProvider>
