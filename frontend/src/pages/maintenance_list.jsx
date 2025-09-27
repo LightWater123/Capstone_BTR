@@ -1,13 +1,18 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/api';
+import BTRheader from "../components/modals/btrHeader";
+import Navbar from "../components/modals/serviceNavbar.jsx";
+import BTRNavbar from '../components/modals/btrNavbar.jsx';
 
 export default function MaintenanceList() {
   const navigate = useNavigate();
   const [schedules, setSchedules] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [openId, setOpenId] = useState(null); // which row is expanded
+  const [openId, setOpenId] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  
 
   useEffect(() => {
     fetchSchedules();
@@ -26,22 +31,41 @@ export default function MaintenanceList() {
     }
   };
 
+  const filteredSchedules = schedules.filter(
+    (s) =>
+      s.asset_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (s.user_email && s.user_email.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
+
   const formatDate = (d) => new Date(d).toLocaleString();
 
   const toggle = (id) => setOpenId((prev) => (prev === id ? null : id));
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-gray-50 relative">
+      <BTRheader/>
+      <BTRNavbar/>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 mt-4">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-gray-800">Monitor</h1>
+          <h1 className="text-2xl font-semibold text-gray-400">Monitor Maintenance</h1>
           <button
             onClick={() => navigate('/inventory')}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            className="px-4 py-2 bg-yellow-400 text-white rounded font-semibold hover:bg-yellow-500"
           >
             Back to Inventory
           </button>
+        </div>
+
+        {/* Search Bar */}
+        <div className="mb-4">
+          <input
+            type="text"
+            placeholder="Search by asset or email..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-yellow-400"
+          />
         </div>
 
         {loading && <p className="text-gray-600">Loading schedules…</p>}

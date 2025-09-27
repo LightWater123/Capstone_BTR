@@ -7,9 +7,11 @@ use App\Http\Controllers\EquipmentController;
 use App\Http\Controllers\MaintenanceController;
 use App\Http\Controllers\PdfParserController;
 use App\Http\Controllers\EmailController;
+use Illuminate\Http\Request;
 
 Route::post('/login', [AuthenticatedSessionController::class, 'store']);
 Route::post('/logout', [AuthenticatedSessionController::class, 'destroy']);
+Route::post('/register', [RegisteredUserController::class, 'store']);
 
 
 // admin user
@@ -47,4 +49,11 @@ Route::get('/verify', [App\Http\Controllers\EmailController::class, 'verify']);
 // register route
 Route::post('/register', [RegisteredUserController::class, 'store']);
 
+// change password for admin and service user
+Route::middleware('auth:admin')->post('/admin/change-password',  [PasswordController::class, 'change']);
+Route::middleware('auth:service')->post('/service/change-password', [PasswordController::class, 'change']);
 
+// fetch user
+Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+    return $request->user();
+});

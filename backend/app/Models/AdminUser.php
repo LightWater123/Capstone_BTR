@@ -4,6 +4,7 @@ namespace App\Models;
 
 use MongoDB\Laravel\Auth\User as Authenticatable; // mongodb support for Eloquent
 use Laravel\Sanctum\HasApiTokens; //enables API token support for user authentication via Sanctum
+use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 
 
 class AdminUser extends Authenticatable
@@ -31,6 +32,7 @@ class AdminUser extends Authenticatable
     // hidden attribute
     protected $hidden = 
     [
-        'password'
+        'password',
+        'remember_token',
     ];
 }

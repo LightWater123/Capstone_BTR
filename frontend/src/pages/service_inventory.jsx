@@ -82,7 +82,7 @@ export default function ServiceInventory() {
           </div>
         </div>
 
-        {/* inventory table (unchanged) */}
+        {/* inventory table */}
         {loading ? (
           <p className="text-gray-500">Loading…</p>
         ) : (

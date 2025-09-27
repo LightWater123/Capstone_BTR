@@ -4,25 +4,45 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
 
 class AuthenticatedSessionController extends Controller
 {
-    public function store(LoginRequest $request): JsonResponse
+    /**
+     * Display the login view.
+     */
+    public function create(): View
     {
-        $request->authenticate(); // checks credentials
-        $request->session()->regenerate(); // changes session ID after logging in
-
-        return response()->json(null, 204); // Always return JsonResponse
+        return view('auth.login');
     }
 
-    public function destroy(Request $request): JsonResponse
+    /**
+     * Handle an incoming authentication request.
+     */
+    /**
+     * Handle an incoming authentication request.
+     * RETURNS JSON – no redirect
+     */
+    public function store(LoginRequest $request)
     {
-        Auth::logout(); // remove user from the auth guard
-        $request->session()->invalidate(); // delete current session
-        $request->session()->regenerateToken(); // Generate a new CSRF token so the old one can’t be reused
+        $request->authenticate();
+        $request->session()->regenerate();
+
+        return response()->json(['user' => Auth::user()]);
+    }
+
+    /**
+     * Destroy an authenticated session.
+     * ALSO JSON – no redirect
+     */
+    public function destroy(Request $request)
+    {
+        Auth::guard('web')->logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
 
         return response()->json(['message' => 'Logged out']);
     }

@@ -40,6 +40,16 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+
+        'admin' => [
+            'driver' => 'session',
+            'providers' => 'admins',
+        ],
+
+        'service' => [
+            'driver' => 'session',
+            'provider' => 'services'
+        ],
     ],
 
     /*
@@ -65,10 +75,14 @@ return [
             'model' => env('AUTH_MODEL', App\Models\User::class),
         ],
 
-        // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
-        // ],
+       'admins' => [
+            'driver' => 'mongodb',
+            'model'  => 'App\Models\AdminUser::class',
+       ],
+       'services' => [
+            'driver' => 'mongodb',
+            'model'  => 'App\Model\ServiceUser::class',
+       ],
     ],
 
     /*

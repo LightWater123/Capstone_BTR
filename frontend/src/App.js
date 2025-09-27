@@ -13,6 +13,7 @@ import AdminMessages from "./pages/admin_messages";
 import MaintenanceList from "./pages/maintenance_list";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import ServiceInventory from "./pages/service_inventory";
+import SettingsPage from './pages/settings_page';
 
 export const queryClient = new QueryClient();
 
@@ -33,6 +34,7 @@ export default function App() {
           <Route path="/admin/messages" element={<AdminMessages />} />
           <Route path="/admin/maintenance-list" element={<MaintenanceList />} />
           <Route path="/service/inventory" element={<ServiceInventory />} />
+          <Route path="/settings" element={<SettingsPage />} />
         </Routes>
     </Router>
     </QueryClientProvider>

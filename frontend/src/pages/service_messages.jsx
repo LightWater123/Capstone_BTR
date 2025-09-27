@@ -31,7 +31,7 @@ export default function ServiceMessages() {
               <th className="px-4 py-2 text-left">Equipment</th>
               <th className="px-4 py-2 text-left">Scheduled At</th>
               <th className="px-4 py-2 text-left">Status</th>
-              <th className="px-4 py-2 text-left">Notes</th>
+              <th className="px-4 py-2 text-left">Message from Admin</th>
             </tr>
           </thead>
           <tbody>
