@@ -41,11 +41,10 @@ Route::middleware(['auth:admin'])->group(function () {
 });
 
 // SERVICE USER (service guard)
-Route::middleware(['auth:service'])->group(function () {
-    Route::post('/service/change-password', [PasswordController::class, 'change']);
+Route::middleware(['auth:admin'])->group(function () {
     Route::get('/my-messages', [MaintenanceController::class,'messages']);
-    Route::patch('/maintenance-jobs/{job}/status', [MaintenanceController::class, 'updateStatus'])
-         ->where('job', '[0-9a-fA-F]{24}');
+    Route::patch('/maintenance-jobs/{job}/status', [MaintenanceController::class, 'updateStatus']);
+    Route::post('/service/change-password', [PasswordController::class, 'change']);
 });
 
 // SERVICE-ONLY INVENTORY VIEWS (no auth required, or add auth:service if you want)

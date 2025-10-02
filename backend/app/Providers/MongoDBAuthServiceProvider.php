@@ -6,6 +6,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Auth\EloquentUserProvider;
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Contracts\Auth\Authenticatable;
+use App\Auth\MultiUserProvider;
 
 class MongoDBAuthServiceProvider extends ServiceProvider
 {
@@ -64,5 +65,10 @@ class MongoDBAuthServiceProvider extends ServiceProvider
                 }
             };
         });
+
+        // new driver
+        $this->app['auth']->provider('multi', fn($app, $config) =>
+            new MultiUserProvider($app['hash'])
+        );
     }
 }
