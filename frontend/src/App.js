@@ -8,7 +8,7 @@ import AdminDashboard from "./pages/admin_dashboard";
 import ServiceDashboard from "./pages/service_dashboard";
 import DirectorDashboard from "./pages/director_dashboard";
 import Inventory from "./pages/inventory";
-import ServiceMessages from "./pages/service_messages";
+import ServiceArchive from "./pages/service_archive";
 import AdminMessages from "./pages/admin_messages";
 import MaintenanceList from "./pages/maintenance_list";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
@@ -33,7 +33,7 @@ export default function App() {
           <Route path="/service/dashboard" element={<ServiceDashboard />} />
           <Route path="/oic/dashboard" element={<DirectorDashboard />} />
           <Route path="/inventory" element={<Inventory />} />
-          <Route path="/service/messages" element={<ServiceMessages />} />
+          <Route path="/service/archive" element={<ServiceArchive />} />
           <Route path="/admin/messages" element={<AdminMessages />} />
           <Route path="/admin/maintenance-list" element={<MaintenanceList />} />
           <Route path="/service/inventory" element={<ServiceInventory />} />
