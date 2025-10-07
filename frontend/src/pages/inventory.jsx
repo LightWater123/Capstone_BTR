@@ -27,12 +27,7 @@ export default function InventoryDashboard() {
   //Sort
   const [showSortOptions, setShowSortOptions] = useState(false);
 
-  //Sort Handler
-  const handleSort = (type) => {
-    console.log("Sorting by:", type);
-    setShowSortOptions(false); // close after picking
-  };
-
+  
   // Inventory hook
   const {
     inventoryData,
@@ -41,12 +36,19 @@ export default function InventoryDashboard() {
     setSearchQuery,
     fetchInventory,
     handleDelete,
+    setSortBy,
     setInventoryData
   } = useInventory(category);
-
+  
   // Maintenance hook
   const { maintenanceSchedules, fetchSchedules } = useMaintenance();
-
+  
+  //Sort Handler
+  const handleSort = (type) => {
+    console.log("Sorting by:", type);
+    setSortBy(type)
+    setShowSortOptions(false); // close after picking
+  };
   // Modals
   const [showTypeSelector, setShowTypeSelector] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -193,7 +195,7 @@ export default function InventoryDashboard() {
           {["PPE", "RPCSP"].map((type) => (
             <button
               key={type}
-              className={`px-4 py-2 rounded-md ${category === type ? "bg-gray-200 text-black hover:bg-gray-300" : "bg-gray-200 text-black hover:bg-gray-300"
+              className={`px-4 py-2 rounded-md ${category === type ? "bg-gray-200 text-black hover:bg-yellow-500" : "bg-gray-200 text-black hover:bg-yellow-500"
                 }`}
               onClick={() => setCategory(type)}
             >
@@ -235,10 +237,10 @@ export default function InventoryDashboard() {
                       Name
                     </button>
                     <button
-                      onClick={() => handleSort("date")}
+                      onClick={() => handleSort("price")}
                       className="block w-full text-left px-4 py-2 hover:bg-gray-100"
                     >
-                      Date
+                      Price (Highest to lowest)
                     </button>
                     <button
                       onClick={() => handleSort("category")}
@@ -336,10 +338,10 @@ export default function InventoryDashboard() {
                       <td className="border px-2 py-1 text-center">{item.semi_expendable_property_no}</td>
                     )}
                     <td className="border px-2 py-1 text-center">{item.unit}</td>
-                    <td className="border px-2 py-1 text-center">₱{Number(item.unit_value).toLocaleString()}</td>
+                    <td className="border px-2 py-1 text-center">₱{Number(item.unit_value).toFixed(2)}</td>
                     <td className="border px-2 py-1 text-center space-x-2">
                       <button
-                        className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
+                        className="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600"
                         onClick={() => {
                           setSelectedDetailItem(item);
                           setShowDetailModal(true);

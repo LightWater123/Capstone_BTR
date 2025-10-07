@@ -6,6 +6,7 @@ import { queryClient } from "../App";
 export function useInventory(category) {
   const [inventoryData, setInventoryData] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState("name");
 
   useEffect(() => {
     fetchInventory();
@@ -41,6 +42,18 @@ export function useInventory(category) {
     return item.article?.toLowerCase().includes(query) || item.description?.toLowerCase().includes(query);
   });
 
+  if(sortBy === "name") {
+    filteredData.sort((a,b) => {
+      const aItem = a.article.toLowerCase().trim()
+      const bItem = b.article.toLowerCase().trim()
+      if(aItem < bItem) return -1
+      if(aItem > bItem) return 1
+      return 0
+    })
+  } else if(sortBy === "price") {
+    filteredData.sort((a,b) => b.unit_value - a.unit_value)
+  }
+
   return {
     inventoryData,
     filteredData,
@@ -48,6 +61,7 @@ export function useInventory(category) {
     setSearchQuery,
     fetchInventory,
     handleDelete,
-    setInventoryData
+    setInventoryData,
+    setSortBy
   };
 }
