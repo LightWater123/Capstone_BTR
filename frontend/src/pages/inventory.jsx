@@ -338,7 +338,7 @@ export default function InventoryDashboard() {
                       <td className="border px-2 py-1 text-center">{item.semi_expendable_property_no}</td>
                     )}
                     <td className="border px-2 py-1 text-center">{item.unit}</td>
-                    <td className="border px-2 py-1 text-center">₱{Number(item.unit_value).toFixed(2)}</td>
+                    <td className="border px-2 py-1 text-center">₱{Number(item.unit_value).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                     <td className="border px-2 py-1 text-center space-x-2">
                       <button
                         className="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600"
