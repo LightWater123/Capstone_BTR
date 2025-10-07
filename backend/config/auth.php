@@ -15,10 +15,13 @@ return [
 
         'admin' => [          //only guard you need for username logins
             'driver'   => 'session',
-            'provider' => 'admins',   // uses the “multi” driver
+            'provider' => 'admins',   // uses the "multi" driver
         ],
 
-        
+        'service' => [
+            'driver'   => 'session',
+            'provider' => 'admins',   // uses the same provider as admin
+        ],
     ],
 
     'providers' => [

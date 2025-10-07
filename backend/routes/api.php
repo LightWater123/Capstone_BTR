@@ -29,10 +29,10 @@ Route::middleware(['auth:admin'])->group(function () {
     // inventory
     Route::apiResource('inventory', EquipmentController::class)
          ->only(['index','store','update','destroy']);
-
+    // pdf parse
     Route::post('parse-pdf', [PdfParserController::class, 'parse']);
 
-    // maintenance
+    // admin maintenance
     Route::prefix('maintenance')->group(function () {
         Route::get('/schedule',      [MaintenanceController::class, 'index']);
         Route::post('/schedule',     [MaintenanceController::class, 'store']);
@@ -49,7 +49,7 @@ Route::middleware(['auth:admin'])->group(function () {
 
 // SERVICE-ONLY INVENTORY VIEWS (no auth required, or add auth:service if you want)
 Route::prefix('service')->group(function () {
-    Route::get('inventory',                    [EquipmentController::class, 'serviceIndex']);
+    Route::get('inventory',                    [MaintenanceController::class, 'serviceIndex']);
     Route::get('inventory/{id}/maintenance',   [EquipmentController::class, 'serviceMaintenance']);
 });
 

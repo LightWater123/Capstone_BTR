@@ -56,17 +56,26 @@ class MaintenanceController extends Controller
         return response()->json(['job' => $job], 201);
     }
 
-    /* service-user inbox 
+    /* service-user inbox
         returns sent messages to service user inbox
+        filters by status if provided
     */
     public function messages(Request $req)
     {
         \Log::info('messages() called – raw query result');
 
-        $data = Message::with('job')
+        $query = Message::with('job')
                     ->where('recipient_email', Auth::user()->email)
-                    ->orderBy('created_at', 'desc')
-                    ->get();
+                    ->orderBy('created_at', 'desc');
+
+        // Filter by status if provided
+        if ($req->has('status') && in_array($req->status, ['pending', 'in-progress', 'done'])) {
+            $query->whereHas('job', function($q) use ($req) {
+                $q->where('status', $req->status);
+            });
+        }
+
+        $data = $query->get();
 
         // dump the very first job._id we find
         if ($data->isNotEmpty() && $data->first()->job) {
@@ -93,6 +102,17 @@ class MaintenanceController extends Controller
         return MaintenanceJob::query()
                       ->orderBy('created_at', 'desc')
                       ->get();
+    }
+
+    // service user maintenance list
+    public function serviceIndex()
+    {
+        // fetch jobs that are pending or in-progress
+        $jobs = MaintenanceJob::whereIn('status', ['pending', 'in-progress'])
+                          ->orderBy('created_at', 'desc')
+                          ->get();
+        
+        return response()->json($jobs);
     }
 
     // update status of equipment maintenance

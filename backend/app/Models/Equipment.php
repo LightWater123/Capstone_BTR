@@ -15,6 +15,7 @@ class Equipment extends Model
 
     // Fields that can be mass-assigned through controller
     protected $fillable = [
+        '_id',
         'category',  // PPE or RPCSP
         'article',
         'description',

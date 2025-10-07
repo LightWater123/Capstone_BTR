@@ -7,6 +7,8 @@ use App\Models\Equipment;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
+use App\Models\MaintenanceJob;
+use MongoDB\BSON\ObjectId;
 
 class EquipmentController extends Controller
 {
@@ -221,22 +223,31 @@ class EquipmentController extends Controller
     */
     public function serviceMaintenance($id)
     {
-        $equipment = Equipment::findOrFail($id);
+        // Find the equipment by id (MongoDB _id)
+        // $equipment = Equipment::find($id);
+        $equipment = Equipment::where("id", $id)->first();
+        
+        // // Find maintenance jobs related to this equipment using the equipment's id
+        $maintenanceJobs = MaintenanceJob::where('equipment_id', $id)->get();
+        // return response()->json($equipment);
 
-        // Example: if you store maintenance logs in a separate table
-        // $logs = $equipment->maintenanceLogs()->orderBy('created_at')->get();
-
-        // For now we simply return the dates already in the equipment row
-        // (replace with real maintenance relationship when you have it)
+        // // Return equipment details and maintenance history
         return response()->json([
+            'id'            => $equipment->id,
             'article'       => $equipment->article,
             'description'   => $equipment->description,
-            'maintenance'   => [
-                'start_date' => $equipment->start_date,
-                'end_date'   => $equipment->end_date,
-                'condition'  => $equipment->condition,
-                'remarks'    => $equipment->remarks,
-            ],
+            'asset_id'      => $equipment->asset_id ?? $equipment->id, // Use asset_id if available, otherwise use id
+            'maintenance'   => $maintenanceJobs->map(function ($job) {
+                return [
+                    'id'            => $job->id,
+                    'start_date'    => $job->start_date,
+                    'end_date'      => $job->end_date,
+                    'condition'     => $job->condition,
+                    'remarks'       => $job->remarks,
+                    'status'        => $job->status,
+                    'scheduled_at'  => $job->scheduled_at,
+                ];
+            }),
         ]);
-        }
+    }
 }
