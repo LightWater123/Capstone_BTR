@@ -45,7 +45,7 @@ export default function InventoryDashboard() {
   
   //Sort Handler
   const handleSort = (type) => {
-    console.log("Sorting by:", type);
+    //console.log("Sorting by:", type);
     setSortBy(type)
     setShowSortOptions(false); // close after picking
   };
@@ -423,7 +423,7 @@ export default function InventoryDashboard() {
             isOpen={showScheduleModal}
             onClose={() => setShowScheduleModal(false)}
             asset={selectedEquipment}  // whole object
-            onSuccess={() => {
+            onScheduled={() => {
               setShowScheduleModal(false);
               setSelectedEquipmentIds([]);
               fetchSchedules();

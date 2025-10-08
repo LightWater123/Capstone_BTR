@@ -42,6 +42,7 @@ Route::middleware(['auth:admin'])->group(function () {
 
 // SERVICE USER (service guard)
 Route::middleware(['auth:admin'])->group(function () {
+    Route::get('/service/user', fn(Request $r) => $r->user());
     Route::get('/my-messages', [MaintenanceController::class,'messages']);
     Route::patch('/maintenance-jobs/{job}/status', [MaintenanceController::class, 'updateStatus']);
     Route::post('/service/change-password', [PasswordController::class, 'change']);

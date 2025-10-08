@@ -1,12 +1,13 @@
 // ServiceInventory.jsx - Service inventory page showing maintenance items and archive
-import { useEffect, useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../index.css";
 import BTRheader from "../components/modals/btrHeader";
 import Navbar from "../components/modals/serviceNavbar.jsx";
+import { useServiceInventory } from "../hooks/useServiceInventory";
 
 export default function ServiceInventory() {
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   // Tab state: inventory (items under maintenance) or archive (completed maintenance)
   const [tab, setTab] = useState("inventory");
@@ -14,101 +15,25 @@ export default function ServiceInventory() {
   // Category filter for maintenance items
   const [category, setCategory] = useState("PPE");
   
-  // State for maintenance items
-  const [maintenanceItems, setMaintenanceItems] = useState([]);
-  const [loading, setLoading] = useState(true);
-  
   // State for selected item details
   const [selectedId, setSelectedId] = useState(null);
-  const [maintenanceDetails, setMaintenanceDetails] = useState(null);
   
-  // State for archived items (messages with related jobs)
-  const [archivedItems, setArchivedItems] = useState([]);
-  const [archiveLoading, setArchiveLoading] = useState(true);
+  // Use the TanStack Query hook
+  const {
+    maintenanceItems,
+    archivedItems,
+    maintenanceDetails,
+    refetchMaintenance,
+    refetchArchived,
+    updateStatus,
+    fetchMaintenanceDetails
+  } = useServiceInventory();
 
-  // Inside Inventory Fetch maintenance items based on category
-  useEffect(() => {
-    if (tab !== "inventory") return;
-    setLoading(true);
-    fetch(`http://localhost:8000/api/service/inventory`, {
-      credentials: "include",
-    })
-      .then((r) => r.json())
-      .then((json) => {
-        console.log("inv", json);
-        setMaintenanceItems(json);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error fetching inventory:", error);
-        setLoading(false);
-      });
-  }, [tab]);
-
-  // Fetch messages with related jobs (my-messages endpoint)
-  useEffect(() => {
-    if (tab !== "archive") return;
-    setArchiveLoading(true);
-    fetch("http://localhost:8000/api/my-messages?status=done", {
-      credentials: "include"
-    })
-      .then((r) => r.json())
-      .then((json) => {
-        console.log("Messages data:", json);
-        setArchivedItems(json);
-        setArchiveLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error fetching messages:", error);
-        setArchiveLoading(false);
-      });
-  }, [tab]);
-
-  // Update maintenance status
-  const updateStatus = async (jobId, newStatus) => {
-    try {
-      const response = await fetch(`http://localhost:8000/api/maintenance-jobs/${jobId}/status`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ status: newStatus }),
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to update status');
-      }
-      
-      // Update local state with new status
-      setMaintenanceItems((prev) =>
-        prev.map((item) =>
-          item.id === jobId ? { ...item, status: newStatus } : item
-        )
-      );
-      
-      // Also update archived items if the item is there
-      setArchivedItems((prev) =>
-        prev.map((item) =>
-          item.job?.id === jobId ? { ...item, job: { ...item.job, status: newStatus } } : item
-        )
-      );
-    } catch (error) {
-      console.error("Error updating status:", error);
-    }
-  };
-
-  // Load maintenance details for selected item 
+  // Load maintenance details for selected item
   const loadMaintenanceDetails = (id) => {
     console.log(id)
     setSelectedId(id);
-    fetch(`http://localhost:8000/api/service/inventory/${id}/maintenance`, {
-      credentials: "include",
-    })
-      .then((r) => r.json())
-      .then(setMaintenanceDetails)
-      .catch((error) => {
-        console.error("Error fetching maintenance details:", error);
-        setMaintenanceDetails(null);
-      });
+    fetchMaintenanceDetails(id);
   };
 
   // Status dropdown component
@@ -119,10 +44,10 @@ export default function ServiceInventory() {
     const dropdownRef = useRef(null);
     const buttonRef = useRef(null);
 
-    const handleStatusChange = (newStatus) => {
+    const handleStatusChange = async (newStatus) => {
       setStatus(newStatus);
       setIsOpen(false);
-      updateStatus(itemId, newStatus);
+      await updateStatus(itemId, newStatus);
     };
 
     const getStatusColor = (status) => {
@@ -288,31 +213,28 @@ export default function ServiceInventory() {
 
         {/* Maintenance items table */}
         {tab === "inventory" ? (
-          loading ? (
-            <p className="text-gray-500">Loading maintenance items...</p>
-          ) : (
-            <div className="bg-white rounded shadow overflow-hidden">
-              <table className="w-full text-left">
-                <thead className="bg-gray-100 text-sm uppercase text-gray-600">
-                  <tr>
-                    <th className="px-4 py-3">Equipment</th>
-                    <th className="px-4 py-3">Scheduled At</th>
-                    <th className="px-4 py-3">Status</th>
-                    <th className="px-4 py-3">Message</th>
-                    <th className="px-4 py-3 w-10"></th>
-                  </tr>
-                </thead>
-                <tbody>
-{maintenanceItems.map((item) => (
+          <div className="bg-white rounded shadow overflow-hidden">
+            <table className="w-full text-left">
+              <thead className="bg-gray-100 text-sm uppercase text-gray-600">
+                <tr>
+                  <th className="px-4 py-3">Equipment</th>
+                  <th className="px-4 py-3">Scheduled At</th>
+                  <th className="px-4 py-3">Status</th>
+                  <th className="px-4 py-3">Message</th>
+                  <th className="px-4 py-3 w-10"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {maintenanceItems.map((item) => (
                   <tr
-                    key={item.id} // Use _id for MongoDB
+                    key={item.id}
                     className="border-t hover:bg-gray-50"
-                    onClick={() => loadMaintenanceDetails(item.asset_id)} // Use id
+                    onClick={() => loadMaintenanceDetails(item.asset_id)}
                   >
                     <td
                       className="px-4 py-3 cursor-pointer hover:text-blue-600"
                     >
-                      {item.asset_name || "—"} {/* Use asset_name */}
+                      {item.asset_name || "—"}
                     </td>
                     <td className="px-4 py-3">
                       {item.scheduled_at ? new Date(item.scheduled_at).toLocaleDateString() : "—"}
@@ -329,39 +251,35 @@ export default function ServiceInventory() {
                       <StatusDropdown
                         itemId={item.id}
                         currentStatus={item.status}
-                      /> {/* Use id */}
+                      />
                     </td>
-                    <td className="px-4 py-3">{"—"}</td> {/* No message field on MaintenanceJob */}
+                    <td className="px-4 py-3">{"—"}</td>
                     <td
                       className="px-4 py-3 text-blue-600 cursor-pointer"
-                      onClick={() => loadMaintenanceDetails(item.id)} // Use id
+                      onClick={() => loadMaintenanceDetails(item.id)}
                     >
                       {">"}
                     </td>
                   </tr>
                 ))}
-                </tbody>
-              </table>
-            </div>
-          )
+              </tbody>
+            </table>
+          </div>
         ) : (
           // Archived items table with specific fields
-          archiveLoading ? (
-            <p className="text-gray-500">Loading archived items...</p>
-          ) : (
-            <div className="bg-white rounded shadow overflow-hidden">
-              <table className="w-full text-left">
-                <thead className="bg-gray-100 text-sm uppercase text-gray-600">
-                  <tr>
-                    <th className="px-4 py-3">Asset Name</th>
-                    <th className="px-4 py-3">Scheduled Date</th>
-                    <th className="px-4 py-3">Status</th>
-                    <th className="px-4 py-3">Message</th>
-                    <th className="px-4 py-3">Date Sent</th>
-                  </tr>
-                </thead>
-                <tbody>
-{archivedItems.map((item) => (
+          <div className="bg-white rounded shadow overflow-hidden">
+            <table className="w-full text-left">
+              <thead className="bg-gray-100 text-sm uppercase text-gray-600">
+                <tr>
+                  <th className="px-4 py-3">Asset Name</th>
+                  <th className="px-4 py-3">Scheduled Date</th>
+                  <th className="px-4 py-3">Status</th>
+                  <th className="px-4 py-3">Message</th>
+                  <th className="px-4 py-3">Date Sent</th>
+                </tr>
+              </thead>
+              <tbody>
+                {archivedItems.map((item) => (
                   <tr key={item.id} className="border-t hover:bg-gray-50">
                     <td className="px-4 py-3">{item.job?.asset_name || "—"}</td>
                     <td className="px-4 py-3">
@@ -390,10 +308,9 @@ export default function ServiceInventory() {
                     </td>
                   </tr>
                 ))}
-                </tbody>
-              </table>
-            </div>
-          )
+              </tbody>
+            </table>
+          </div>
         )}
 
         {/* Maintenance details panel */}
