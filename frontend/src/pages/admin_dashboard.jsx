@@ -33,7 +33,7 @@ export default function AdminDashboard() {
           </div>
 
           {/* Calendar – right side (1 col) */}
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-1 flex justify-center">
             <CalendarModal />
           </div>
         </div>

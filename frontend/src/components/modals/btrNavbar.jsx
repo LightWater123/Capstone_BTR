@@ -1,4 +1,4 @@
-import Bell from '../../assets/notification.png';
+
 import profileuser from '../../assets/profile-user.png';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -28,9 +28,6 @@ export default function BTRNavbar() {
 
         {/* RIGHT */}
         <div className="flex items-center gap-4">
-          <a href="#" className="text-gray-600 hover:text-blue-700">
-            <img src={Bell} alt="Notifications" className="h-5 w-5" />
-          </a>
 
           {/* User dropdown */}
           <div className="relative">
