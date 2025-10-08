@@ -108,6 +108,16 @@ export default function Login() {
           className="w-full px-4 py-2 border rounded focus:outline-none focus:ring focus:ring-yellow-400"
         />
 
+          {/* forgot password */}
+          <div className="text-sm text-right -mt-2 mb-2">
+            <Link
+              to="/forgot-password"
+              className="text-blue-600 hover:underline font-semibold"
+            >
+              Forgot password?
+            </Link>
+          </div>
+
         {error && <p className="text-red-600 text-sm">{error}</p>}
         </div>
         
@@ -130,15 +140,7 @@ export default function Login() {
             </Link>
         </p>
 
-        {/* forgot password */}
-        <div className="text-sm text-right -mt-2 mb-2">
-          <Link
-            to="/forgot-password"
-            className="text-blue-600 hover:underline"
-          >
-            Forgot password?
-          </Link>
-        </div>
+
       </form>
     </div>
   );
