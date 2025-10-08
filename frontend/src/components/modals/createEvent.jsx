@@ -50,13 +50,20 @@ export default function CreateEvent({ show, onClose, onSave, formData, setFormDa
           />
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Event Color</label>
-            <input
-              type="color"
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Event Color
+            </label>
+            <select
               value={formData.color}
               onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-              className="w-full h-10 rounded"
-            />
+              className="w-full h-10 rounded border border-gray-300 px-3 selection:bg-transparent"
+              
+              style={{ backgroundColor: formData.color, color: formData.color }}
+            >
+              <option value="#FFC107" style={{ backgroundColor: '#FFC107', color: '#FFC107' }}>Yellow</option>
+              <option value="#2196F3" style={{ backgroundColor: '#2196F3', color: '#2196F3' }}>Blue</option>
+              <option value="#800000" style={{ backgroundColor: '#800000', color: '#800000' }}>Maroon Red</option>
+            </select>
           </div>
         </div>
 
