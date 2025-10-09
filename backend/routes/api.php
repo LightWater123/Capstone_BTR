@@ -14,14 +14,20 @@ use Illuminate\Auth\Events\PasswordReset;
 
 // PUBLIC   
 Route::post('/login',    [AuthenticatedSessionController::class, 'store']);
-Route::post('/logout',   [AuthenticatedSessionController::class, 'destroy']);
+//Route::post('/logout',   [AuthenticatedSessionController::class, 'destroy']);
 Route::post('/register', [RegisteredUserController::class, 'store']);
 Route::post('/forgot-password',  fn(Request $r) => … );
 Route::post('/reset-password',   fn(Request $r) => … );
 
+// Authenticated Logout for all users
+// The auth.any middleware will allow logout requests even if not authenticated
+Route::middleware(['auth.any'])->group(function() {
+    Route::post('/logout',   [AuthenticatedSessionController::class, 'destroy']);
+});
+
 // AUTHENTICATED
 Route::middleware(['auth:admin'])->group(function () {
-
+    
     // user & password
     Route::get('/user', fn(Request $r) => $r->user());
     Route::post('/admin/change-password', [PasswordController::class, 'change']);
