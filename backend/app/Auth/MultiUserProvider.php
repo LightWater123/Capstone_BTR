@@ -50,11 +50,38 @@ class MultiUserProvider implements UserContract
         $field = filter_var($login, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
         $regex = ['$regex' => '^'.preg_quote($login, '/').'$', '$options' => 'i'];
 
+        \Log::info('MultiUserProvider search started', [
+            'login' => $login,
+            'field' => $field,
+            'regex' => $regex,
+            'credentials' => $credentials,
+        ]);
+
         foreach (self::MODELS as $model) {
+            \Log::info('Searching in collection', [
+                'model' => $model,
+                'collection' => (new $model)->getTable(),
+                'field' => $field,
+                'regex' => $regex,
+            ]);
+
             if ($user = $model::whereRaw([$field => $regex])->first()) {
+                \Log::info('User found', [
+                    'model' => $model,
+                    'collection' => (new $model)->getTable(),
+                    'user_id' => $user->getAuthIdentifier(),
+                    'user_role' => $user->role ?? 'not_set',
+                    'user_data' => $user->toArray(),
+                ]);
                 return $user;
             }
         }
+        
+        \Log::warning('No user found in any collection', [
+            'login' => $login,
+            'field' => $field,
+        ]);
+        
         return null;
     }
 

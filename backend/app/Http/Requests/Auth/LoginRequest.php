@@ -11,11 +11,22 @@ use Illuminate\Validation\ValidationException;
 
 class LoginRequest extends FormRequest
 {
+    /**
+     * The guard that was determined during authentication.
+     */
+    private ?string $usedGuard = null;
+
+    /**
+     * Determine if the user is authorized to make this request.
+     */
     public function authorize(): bool
     {
         return true;
     }
 
+    /**
+     * Get the validation rules that apply to the request.
+     */
     public function rules(): array
     {
         return [
@@ -25,18 +36,68 @@ class LoginRequest extends FormRequest
     }
 
     /**
-     * Attempt to authenticate the user.
+     * Attempt to authenticate the request's credentials.
      *
      * @throws \Illuminate\Validation\ValidationException
      */
     public function authenticate(): void
     {
-        // pick guard that owns the credentials
-        $guard = $this->has('login') && filter_var($this->input('login'), FILTER_VALIDATE_EMAIL)
-                ? 'web'
-                : 'admin';                 // username → admin collection
+        $this->ensureIsNotRateLimited();
 
-        if (! Auth::guard($guard)->attempt($this->only('login', 'password'), $this->boolean('remember'))) {
+        $login = $this->input('login');
+        
+        \Log::info('Authentication attempt', [
+            'login' => $login,
+            'is_email' => filter_var($login, FILTER_VALIDATE_EMAIL),
+            'session_id' => $this->session()->getId(),
+            'current_guard' => Auth::getDefaultDriver(),
+        ]);
+
+        // First, try to find the user to determine the correct guard
+        $user = null;
+        $field = filter_var($login, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+        $regex = ['$regex' => '^'.preg_quote($login, '/').'$', '$options' => 'i'];
+
+        // Check admin_users collection first
+        if ($user = \App\Models\AdminUser::whereRaw([$field => $regex])->first()) {
+            $this->usedGuard = 'admin';
+        }
+        // Then check service_users collection
+        elseif ($user = \App\Models\ServiceUser::whereRaw([$field => $regex])->first()) {
+            $this->usedGuard = 'service';
+        }
+        // Finally check users collection
+        elseif ($user = \App\Models\User::whereRaw([$field => $regex])->first()) {
+            $this->usedGuard = 'web';
+        } else {
+            // No user found in any collection
+            \Log::warning('No user found in any collection', [
+                'login' => $login,
+                'field' => $field,
+                'session_id' => $this->session()->getId(),
+            ]);
+            
+            RateLimiter::hit($this->throttleKey());
+            throw ValidationException::withMessages([
+                'login' => trans('auth.failed'),
+            ]);
+        }
+
+        \Log::info('Guard selection', [
+            'selected_guard' => $this->usedGuard,
+            'login' => $login,
+            'user_collection' => $user->getTable(),
+            'user_id' => $user->getAuthIdentifier(),
+            'user_role' => $user->role ?? 'not_set',
+        ]);
+
+        if (! Auth::guard($this->usedGuard)->attempt($this->only('login', 'password'), $this->boolean('remember'))) {
+            \Log::warning('Authentication failed', [
+                'login' => $login,
+                'guard' => $this->usedGuard,
+                'session_id' => $this->session()->getId(),
+            ]);
+            
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
@@ -44,7 +105,22 @@ class LoginRequest extends FormRequest
             ]);
         }
 
+        \Log::info('Authentication successful', [
+            'login' => $login,
+            'guard' => $this->usedGuard,
+            'user' => Auth::guard($this->usedGuard)->user()->toArray(),
+            'session_id' => $this->session()->getId(),
+        ]);
+
         RateLimiter::clear($this->throttleKey());
+    }
+
+    /**
+     * Get the guard that was used for authentication.
+     */
+    public function getUsedGuard(): ?string
+    {
+        return $this->usedGuard;
     }
 
     /**
@@ -78,20 +154,5 @@ class LoginRequest extends FormRequest
         return Str::transliterate(
             Str::lower($this->input('login')).'|'.$this->ip()
         );
-    }
-
-    public function retrieveByCredentials(array $credentials): ?Authenticatable
-    {
-        $type = filter_var($credentials['login'], FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
-
-        \Log::debug('Mongo lookup', [
-            'collection' => 'admins',   // or services / users
-            'field'      => $type,
-            'value'      => $credentials['login'],
-        ]);
-
-        return AdminUser::whereRaw([$type => ['$regex' => '^' . preg_quote($credentials['login']) . '$', '$options' => 'i']])->first()
-            ?? ServiceUser::whereRaw([$type => ['$regex' => '^' . preg_quote($credentials['login']) . '$', '$options' => 'i']])->first()
-            ?? User::whereRaw([$type => ['$regex' => '^' . preg_quote($credentials['login']) . '$', '$options' => 'i']])->first();
     }
 }

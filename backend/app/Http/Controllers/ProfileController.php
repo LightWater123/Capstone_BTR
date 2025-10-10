@@ -48,7 +48,18 @@ class ProfileController extends Controller
 
         $user = $request->user();
 
-        Auth::logout();
+        // Determine the current guard and use it for logout
+        $guard = null;
+        
+        if ($request->user('admin')) {
+            $guard = 'admin';
+        } elseif ($request->user('service')) {
+            $guard = 'service';
+        } else {
+            $guard = 'web'; // fallback
+        }
+        
+        Auth::guard($guard)->logout();
 
         $user->delete();
 

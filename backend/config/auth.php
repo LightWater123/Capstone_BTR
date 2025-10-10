@@ -13,14 +13,22 @@ return [
             'provider' => 'users',
         ],
 
-        'admin' => [          //only guard you need for username logins
+        'admin' => [
             'driver'   => 'session',
-            'provider' => 'admins',   // uses the "multi" driver
+            'provider' => 'admins',
+            // Add this to isolate the admin session
+            'session' => [
+                'cookie' => env('ADMIN_SESSION_COOKIE', 'btr_admin_session'),
+            ],
         ],
 
         'service' => [
             'driver'   => 'session',
-            'provider' => 'admins',   // uses the same provider as admin
+            'provider' => 'admins',
+            // Add this to isolate the service session
+            'session' => [
+                'cookie' => env('SERVICE_SESSION_COOKIE', 'btr_service_session'),
+            ],
         ],
     ],
 
@@ -31,11 +39,9 @@ return [
         ],
 
         'admins' => [
-            'driver' => 'multi',          //  searches admins + services + users
+            'driver' => 'multi',          // searches admins + services + users
             'model'  => App\Models\AdminUser::class,
         ],
-
-        
     ],
 
     'passwords' => [

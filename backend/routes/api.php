@@ -19,11 +19,19 @@ Route::post('/register', [RegisteredUserController::class, 'store']);
 Route::post('/forgot-password',  fn(Request $r) => … );
 Route::post('/reset-password',   fn(Request $r) => … );
 
+// AUTHENTICATED - Unified user endpoint for all guards
+Route::middleware(['auth:admin'])->group(function () {
+
+    // user & password
+    Route::get('/user', fn(Request $r) => $r->user());
+});
+
 // AUTHENTICATED
 Route::middleware(['auth:admin'])->group(function () {
 
     // user & password
     Route::get('/user', fn(Request $r) => $r->user());
+    
     Route::post('/admin/change-password', [PasswordController::class, 'change']);
 
     // inventory

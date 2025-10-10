@@ -23,32 +23,20 @@ export default function Login() {
       await api.get("/sanctum/csrf-cookie");
 
       // Attempt login
-      const loginRes = await api.post("/api/login", {
+      const response = await api.post("/api/login", {
         login: identifier,
         password,
       });
 
-      if (loginRes.status !== 200 && loginRes.status !== 204) {
-        throw new Error("Login failed");
-      }
+      console.log('Login response:', response.data);
 
-      // Fetch authenticated user
-      const { data: user } = await api.get("/api/user");
-      //console.log('I am', user);
-      //console.log('role from server:', user.role, typeof user.role);
-      // Role-based redirect
-      switch (user.role) {
-        case "admin":
-          navigate("/admin/dashboard");
-          break;
-        case "service_user":
-          navigate("/service/dashboard");
-          break;
-        case "oic":
-          navigate("/oic/dashboard");
-          break;
-        default:
-          navigate("/");
+      // Navigate to the redirect URL provided by the backend
+      if (response.data.redirect) {
+        console.log('Navigating to:', response.data.redirect);
+        navigate(response.data.redirect);
+      } else {
+        console.log('No redirect URL, navigating to home');
+        navigate("/");
       }
     } catch (err) {
       console.error("Login error:", err.response || err);
