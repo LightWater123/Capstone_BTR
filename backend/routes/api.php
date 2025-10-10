@@ -14,20 +14,14 @@ use Illuminate\Auth\Events\PasswordReset;
 
 // PUBLIC   
 Route::post('/login',    [AuthenticatedSessionController::class, 'store']);
-//Route::post('/logout',   [AuthenticatedSessionController::class, 'destroy']);
+Route::post('/logout',   [AuthenticatedSessionController::class, 'destroy']);
 Route::post('/register', [RegisteredUserController::class, 'store']);
 Route::post('/forgot-password',  fn(Request $r) => … );
 Route::post('/reset-password',   fn(Request $r) => … );
 
-// Authenticated Logout for all users
-// The auth.any middleware will allow logout requests even if not authenticated
-Route::middleware(['auth.any'])->group(function() {
-    Route::post('/logout',   [AuthenticatedSessionController::class, 'destroy']);
-});
-
 // AUTHENTICATED
 Route::middleware(['auth:admin'])->group(function () {
-    
+
     // user & password
     Route::get('/user', fn(Request $r) => $r->user());
     Route::post('/admin/change-password', [PasswordController::class, 'change']);
@@ -47,18 +41,18 @@ Route::middleware(['auth:admin'])->group(function () {
 });
 
 // SERVICE USER (service guard)
-Route::middleware(['auth:admin'])->group(function () {
+Route::middleware(['auth:service'])->group(function () {
     Route::get('/service/user', fn(Request $r) => $r->user());
     Route::get('/my-messages', [MaintenanceController::class,'messages']);
     Route::patch('/maintenance-jobs/{job}/status', [MaintenanceController::class, 'updateStatus']);
     Route::post('/service/change-password', [PasswordController::class, 'change']);
 });
 
-// SERVICE-ONLY INVENTORY VIEWS (no auth required, or add auth:service if you want)
+// SERVICE-ONLY INVENTORY VIEWS (protected by auth:service middleware)
 Route::prefix('service')->group(function () {
     Route::get('inventory',                    [MaintenanceController::class, 'serviceIndex']);
     Route::get('inventory/{id}/maintenance',   [EquipmentController::class, 'serviceMaintenance']);
-});
+})->middleware(['auth:service']);
 
 // EMAIL
 Route::post('/send-email', [EmailController::class, 'sendEmail']);

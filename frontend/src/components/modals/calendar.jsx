@@ -25,20 +25,17 @@ export default function CalendarModal() {
         </button>
       </div>
 
-      
-      <div className='w-full justify-center flex'>
-        <DatePicker
-          selected={selectedDate}
-          onChange={(date) => setSelectedDate(date)}
-          inline
-          calendarClassName="custom-calendar"
-          dayClassName={(date) =>
-            isSameDay(date, today)
-              ? 'bg-yellow-300 text-black rounded-full'
-              : undefined
-          }
-        />
-      </div>
+      <DatePicker
+        selected={selectedDate}
+        onChange={(date) => setSelectedDate(date)}
+        inline
+        calendarClassName="custom-calendar"
+        dayClassName={(date) =>
+          isSameDay(date, today)
+            ? 'bg-yellow-300 text-black rounded-full'
+            : undefined
+        }
+      />
     </div>
   );
 }

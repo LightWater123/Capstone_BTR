@@ -32,6 +32,9 @@ export default function Navbar() {
 
         {/* RIGHT */}
         <div className="flex items-center gap-4">
+          <a href="#" className="text-gray-600 hover:text-blue-700">
+            <img src={Bell} alt="Notifications" className="h-5 w-5" />
+          </a>
 
           {/* User dropdown */}
           <div className="relative">

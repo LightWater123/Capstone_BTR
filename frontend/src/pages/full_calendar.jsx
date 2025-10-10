@@ -18,7 +18,7 @@ export default function CalendarFullPage() {
     startTime: '',
     endTime: '',
     location: '',
-    color: '#FFC107'
+    color: '#EF4444'
   });
 
   const [eventDates, setEventDates] = useState([]);
@@ -70,13 +70,13 @@ export default function CalendarFullPage() {
           <div className="flex justify-end mb-4 gap-2">
             <button
               onClick={() => setShowModal(true)}
-              className="bg-yellow-400 text-white font-semibold px-4 py-2 rounded hover:bg-yellow-500"
+              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
             >
               Create Event
             </button>
             <button
               onClick={() => setShowEventList(true)}
-              className="bg-yellow-400 text-white font-semibold  px-4 py-2 rounded hover:bg-yellow-500"
+              className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
             >
               View All Events
             </button>

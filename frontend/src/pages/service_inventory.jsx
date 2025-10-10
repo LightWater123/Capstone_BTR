@@ -164,7 +164,10 @@ export default function ServiceInventory() {
       <main className="max-w-6xl mx-auto px-6 py-8">
         {/* Header with tab switcher */}
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-gray-800">Service Inventory</h1>
+          <div>
+            <h1 className="text-2xl font-bold text-gray-800">Service Inventory</h1>
+            <p className="text-sm text-gray-600">Showing maintenance items for your service</p>
+          </div>
 
           <div className="flex items-center gap-3">
             {/* Tab switcher */}

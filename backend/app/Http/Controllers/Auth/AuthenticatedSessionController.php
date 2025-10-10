@@ -40,15 +40,7 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request)
     {
-        // Determine which guard is currently authenticated
-        if (Auth::guard('admin')->check()) {
-            Auth::guard('admin')->logout();
-        } elseif (Auth::guard('service')->check()) {
-            Auth::guard('service')->logout();
-        } else {
-            Auth::guard('web')->logout();
-        }
-        
+        Auth::guard('web')->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 

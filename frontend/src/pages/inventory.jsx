@@ -265,7 +265,7 @@ export default function InventoryDashboard() {
                 disabled={selectedEquipmentIds.length === 0}
                 onClick={openScheduleModal}
                 className={`px-3 py-0.5 rounded-md font-semibold ${selectedEquipmentIds.length > 0
-                  ? "bg-yellow-500 text-white hover:bg-yellow-600"
+                  ? "bg-green-600 text-white hover:bg-green-700"
                   : "bg-gray-300 text-gray-500 cursor-not-allowed"
                   }`}
               >
