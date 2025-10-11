@@ -133,15 +133,12 @@ class AuthenticatedSessionController extends Controller
         }
 
         if ($activeGuard) {
-            // destroy current session
             Auth::guard($activeGuard)->logout();
-            Auth::guard($activeGuard)->user()->tokens()->delete();
             \Log::info('Logged out from active guard', ['guard' => $activeGuard, 'session_id' => $request->session()->getId()]);
         } else {
             // Fallback: if no specific guard was found, log out from all configured guards
             foreach ($guards as $guard) {
                 Auth::guard($guard)->logout();
-                Auth::guard($guard)->user()->tokens()->delete();
             }
             \Log::info('Logged out from all guards (no active guard found)', ['session_id' => $request->session()->getId()]);
         }
