@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "../api/api"; 
+import axios from "../api/api";
 import btrlogo from '../assets/btrlogo.png';
 import btrlegpics from '../assets/btrlegpics.jpg';
 import { Link } from "react-router-dom";
@@ -108,7 +108,7 @@ export default function AdminRegister() {
             onChange={handleChange}
             className="w-full px-4 py-2 border rounded focus:outline-none focus:ring focus:ring-yellow-400" required />
         </div>
-        
+
         <div className="flex flex-col items-start space-y-2">
           <input name="email"
             type="email"
@@ -128,20 +128,20 @@ export default function AdminRegister() {
 
         <div className="flex flex-col items-start space-y-2">
           <input name="password"
-          type="password"
-          placeholder="Password"
-          value={formData.password}
-          onChange={handleChange}
-          className="w-full px-4 py-2 border rounded focus:outline-none focus:ring focus:ring-yellow-400" required />
+            type="password"
+            placeholder="Password"
+            value={formData.password}
+            onChange={handleChange}
+            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring focus:ring-yellow-400" required />
         </div>
 
         <div className="flex flex-col items-start space-y-2">
           <input name="confirm_password"
-          type="password"
-          placeholder="Confirm Password"
-          value={formData.confirm_password}
-          onChange={handleChange}
-          className="w-full px-4 py-2 border rounded focus:outline-none focus:ring focus:ring-yellow-400" required />
+            type="password"
+            placeholder="Confirm Password"
+            value={formData.confirm_password}
+            onChange={handleChange}
+            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring focus:ring-yellow-400" required />
         </div>
 
         <button type="submit" disabled={loading}
@@ -149,12 +149,12 @@ export default function AdminRegister() {
           {loading ? "Registering..." : "Register"}
         </button>
 
-          {/* register Link */}
+        {/* register Link */}
         <p className="text-center text-sm">
           Back To{" "}
-            <Link to="/" className="text-blue-600 hover:underline font-medium">
+          <Link to="/" className="text-blue-600 hover:underline font-medium">
             Login
-            </Link>
+          </Link>
         </p>
 
       </form>

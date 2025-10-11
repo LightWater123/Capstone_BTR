@@ -42,10 +42,22 @@ export default function AdminDashboard() {
         <div className="w-full min-w-[300px] h-[350px] bg-gray-100 rounded-xl shadow-md p-4 flex flex-col">
           <h2 className="text-xl font-bold mb-4">Reminders</h2>
           <ul className="flex-1 overflow-y-auto space-y-2">
-            <li className="bg-white p-2 rounded shadow-sm">Maintenance</li>
-            <li className="bg-white p-2 rounded shadow-sm">Maintenance</li>
+            {eventDates.length === 0 ? (
+              <li className="text-gray-500">No reminders yet.</li>
+            ) : (
+              eventDates.map((event, index) => (
+                <li key={index} className="bg-white p-2 rounded shadow-sm">
+                  <div className="font-semibold">{event.title}</div>
+                  <div className="text-sm text-gray-600">
+                    {event.date} | {event.startTime} – {event.endTime}
+                  </div>
+                  <div className="text-sm text-gray-500">{event.location}</div>
+                </li>
+              ))
+            )}
           </ul>
         </div>
+
       </div>
     </div>
   );
