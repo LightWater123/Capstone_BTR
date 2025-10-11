@@ -16,6 +16,7 @@ export function useServiceInventory() {
         return [];
       }
     },
+    refetchOnMount: "always",
     refetchInterval: 10000, // 10 seconds refetch interval
     refetchIntervalInBackground: false,
   });
@@ -32,6 +33,7 @@ export function useServiceInventory() {
         return [];
       }
     },
+    refetchOnMount: "always",
     refetchInterval: 10000, // 10 seconds refetch interval
     refetchIntervalInBackground: false,
   });

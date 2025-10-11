@@ -66,6 +66,14 @@ class AuthenticatedSessionController extends Controller
             'redirect_url' => $redirectUrl,
         ]);
 
+        \Log::info('Login process completed', [
+            'status' => 'success',
+            'user_id' => $user?->getAuthIdentifier(),
+            'guard' => $guard,
+            'redirect_to' => $redirectUrl,
+            'session_id' => $request->session()->getId(),
+        ]);
+
         return response()->json([
             'redirect' => $redirectUrl
         ]);
@@ -108,13 +116,26 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request)
     {
-        // The destroy method should also be updated to log out from all possible guards
-        // to ensure a clean slate.
-        $guards = ['admin', 'service', 'web'];
+        \Log::info('test');
+        $activeGuard = null;
+        $guards = array_keys(config('auth.guards')); // Get all defined guards dynamically
+
         foreach ($guards as $guard) {
             if (Auth::guard($guard)->check()) {
+                $activeGuard = $guard;
+                break;
+            }
+        }
+
+        if ($activeGuard) {
+            Auth::guard($activeGuard)->logout();
+            \Log::info('Logged out from active guard', ['guard' => $activeGuard, 'session_id' => $request->session()->getId()]);
+        } else {
+            // Fallback: if no specific guard was found, log out from all configured guards
+            foreach ($guards as $guard) {
                 Auth::guard($guard)->logout();
             }
+            \Log::info('Logged out from all guards (no active guard found)', ['session_id' => $request->session()->getId()]);
         }
 
         $request->session()->invalidate();

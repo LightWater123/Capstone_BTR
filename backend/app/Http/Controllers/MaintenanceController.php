@@ -64,25 +64,43 @@ class MaintenanceController extends Controller
     {
         \Log::info('messages() called – raw query result');
 
-        $query = Message::with('job')
-                    ->where('recipient_email', Auth::user()->email)
+        
+        // filter through Message and gets the items with the same email as the currently logged in user
+        $message = Message::where('recipient_email', Auth::user()->email)
+                    ->orderBy('created_at', 'desc')->get();
+
+        \Log::info($message);
+        
+        $maint_item = [
+            
+        ];
+
+        for($i = 0, $n = count($message); $i < $n; $i++)
+        {
+            $item = (object) [
+                'sender_id' => $message[$i]->sender_id,
+                'recipient_email' => $message[$i]->recipient_email,
+                'subject' => $message[$i]->subject,
+                'body_html' => $message[$i]->body_html,
+                'read_at' => $message[$i]->read_at,
+                'job' => null
+            ];
+
+            $query = MaintenanceJob::where('id', $message[$i]->maint_job_id)
                     ->orderBy('created_at', 'desc');
 
-        // Filter by status if provided
-        if ($req->has('status') && in_array($req->status, ['pending', 'in-progress', 'done'])) {
-            $query->whereHas('job', function($q) use ($req) {
-                $q->where('status', $req->status);
-            });
+            // Filter by status if provided
+            if ($req->has('status') && in_array($req->status, ['pending', 'in-progress', 'done'])) {
+                $query->where('status', $req->status);
+            }
+
+            $data = $query->first();
+
+            $item->job = $data;
+            $maint_item[] = $item;
         }
 
-        $data = $query->get();
-
-        // dump the very first job._id we find
-        if ($data->isNotEmpty() && $data->first()->job) {
-            \Log::info('first job raw', $data->first()->job->toArray());
-        }
-
-        return $data;
+        return $maint_item;
 
     }
 
