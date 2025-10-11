@@ -8,6 +8,7 @@ use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Jenssegers\Mongodb\Auth\UserProvider;
 use App\Auth\MultiUserProvider;
 
 
@@ -27,8 +28,9 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {   
         // wires it up to the 'providers' in config/auth.php
-         Auth::provider('multiuser', function ($app, array $config) {
-            return new MultiUserProvider();
-        });
+        Auth::provider('multiuser', fn ($app, $config) =>
+            new MultiUserProvider($app['hash'])
+        );
+
     }
 }

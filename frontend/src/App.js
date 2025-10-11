@@ -8,12 +8,15 @@ import AdminDashboard from "./pages/admin_dashboard";
 import ServiceDashboard from "./pages/service_dashboard";
 import DirectorDashboard from "./pages/director_dashboard";
 import Inventory from "./pages/inventory";
-import ServiceMessages from "./pages/service_messages";
+import ServiceArchive from "./pages/service_archive";
 import AdminMessages from "./pages/admin_messages";
 import MaintenanceList from "./pages/maintenance_list";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import ServiceInventory from "./pages/service_inventory";
+import SettingsPage from './pages/settings_page';
 import CalendarFullPage from "./pages/full_calendar";
+import ForgotPassword from "./pages/forgot_password";
+import ResetPassword from "./pages/reset_password";
 
 export const queryClient = new QueryClient();
 
@@ -24,19 +27,21 @@ export default function App() {
       <Router>
         <Routes>
           <Route path="/" element={<Login />} />
+          
           <Route path="/register/admin" element={<AdminRegister />} />
           <Route path="/register/service" element={<ServiceRegister />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/service/dashboard" element={<ServiceDashboard />} />
           <Route path="/oic/dashboard" element={<DirectorDashboard />} />
           <Route path="/inventory" element={<Inventory />} />
-          <Route path="/service/messages" element={<ServiceMessages />} />
+          <Route path="/service/archive" element={<ServiceArchive />} />
           <Route path="/admin/messages" element={<AdminMessages />} />
           <Route path="/admin/maintenance-list" element={<MaintenanceList />} />
           <Route path="/service/inventory" element={<ServiceInventory />} />
+          <Route path="/settings" element={<SettingsPage />} />
           <Route path="/calendar-full" element={<CalendarFullPage />} />
-
-          
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
         </Routes>
     </Router>
     </QueryClientProvider>

@@ -2,35 +2,25 @@
 
 namespace App\Models;
 
-use MongoDB\Laravel\Auth\User as Authenticatable; // mongodb support for Eloquent
-use Laravel\Sanctum\HasApiTokens; //enables API token support for user authentication via Sanctum
-
+use MongoDB\Laravel\Auth\User as Authenticatable;
+use Laravel\Sanctum\HasApiTokens;
 
 class AdminUser extends Authenticatable
 {
-    // contains admin's username, email, and password
+    use HasApiTokens;
 
-    use HasApiTokens; // handles login credentials
-
-    // declare collection and connection
     protected $connection = 'mongodb';
     protected $collection = 'admin_users';
-    protected $appends = ['role'];
+    protected $primaryKey = '_id';
+    public $incrementing = false;
+    protected $keyType = 'string';
 
-    public function getRoleAttribute()
+    protected $fillable = ['username', 'email', 'password', 'mobile_number'];
+    protected $hidden   = ['password', 'remember_token'];
+    protected $appends  = ['role'];
+
+    public function getRoleAttribute(): string
     {
         return 'admin';
     }
-    
-    // columns for admins credentials and fillable field for mass assignment
-    protected $fillable = 
-    [
-        'username', 'email', 'password','mobile_number',
-    ];
-    
-    // hidden attribute
-    protected $hidden = 
-    [
-        'password'
-    ];
 }

@@ -3,11 +3,17 @@ import profileuser from '../../assets/profile-user.png';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import LogoutButton from './LogoutButton';
+import { useServiceAuth } from '../../hooks/useServiceAuth';
 
 export default function Navbar() {
   const [isDropOpen, setIsDropOpen] = useState(false);
   const navigate = useNavigate();
   const handleBack = () => navigate("/service/dashboard");
+  const { user, isLoading } = useServiceAuth();
+  
+  // Log the user data to see what we're getting
+  // console.log("Service user data:", user);
+  // console.log("Is loading:", isLoading);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 mt-4">
@@ -41,7 +47,9 @@ export default function Navbar() {
                 alt="User"
                 className="h-7 w-7 rounded-full object-cover"
               />
-              <span className="hidden sm:inline text-lg p-2">Username</span>
+              <span className="hidden sm:inline text-lg p-2">
+                {isLoading ? "Loading..." : user?.name || "Username"}
+              </span>
               <svg
                 className={`h-4 w-4 transition ${
                   isDropOpen ? 'rotate-180' : ''

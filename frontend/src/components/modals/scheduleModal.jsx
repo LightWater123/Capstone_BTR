@@ -35,7 +35,7 @@ export default function ScheduleModal({ asset, onClose, onScheduled }) {
       `on ${d.toLocaleDateString()} at ${d.toLocaleTimeString([], {
         hour: '2-digit',
         minute: '2-digit'
-      })}. Reply YES to confirm or call (xxx) xxx-xxxx.`
+      })}. Contact this number for inquiries (xxx) xxx-xxxx.`
     );
   }, [asset, form.scheduledAt]);
 

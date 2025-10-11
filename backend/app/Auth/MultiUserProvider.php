@@ -1,51 +1,131 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Auth;
 
-use Illuminate\Contracts\Auth\Authenticatable;
-use Illuminate\Contracts\Auth\UserProvider;
-use Illuminate\Support\Facades\Hash;
 use App\Models\AdminUser;
 use App\Models\ServiceUser;
 use App\Models\User;
+use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Contracts\Auth\UserProvider as UserContract;
+use Illuminate\Contracts\Hashing\Hasher;
+use Illuminate\Support\Str;
 
-class MultiUserProvider implements UserProvider
+class MultiUserProvider implements UserContract
 {
+    /* ---------- lookup order ---------- */
+    private const MODELS = [
+        AdminUser::class,
+        ServiceUser::class,
+        User::class,
+    ];
+
+    public function __construct(
+        private Hasher $hasher
+    ) {}
+
+    /* ------------------------------------------------------------------
+     * Find user by primary key (used for “remember me”, session restore)
+     * ------------------------------------------------------------------ */
     public function retrieveById($identifier): ?Authenticatable
     {
-        return AdminUser::find($identifier)
-            ?? ServiceUser::find($identifier)
-            ?? User::find($identifier);
+        foreach (self::MODELS as $model) {
+            if ($user = $model::find($identifier)) {
+                return $user;
+            }
+        }
+        return null;
     }
 
+    /* ------------------------------------------------------------------
+     * Find user by credentials (login field)
+     * ------------------------------------------------------------------ */
+    public function retrieveByCredentials(array $credentials): ?Authenticatable
+    {
+        $login = $credentials['login'] ?? $credentials['username'] ?? $credentials['email'] ?? null;
+        if (blank($login)) {
+            return null;
+        }
+
+        $field = filter_var($login, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+        $regex = ['$regex' => '^'.preg_quote($login, '/').'$', '$options' => 'i'];
+
+        \Log::info('MultiUserProvider search started', [
+            'login' => $login,
+            'field' => $field,
+            'regex' => $regex,
+            'credentials' => $credentials,
+        ]);
+
+        foreach (self::MODELS as $model) {
+            \Log::info('Searching in collection', [
+                'model' => $model,
+                'collection' => (new $model)->getTable(),
+                'field' => $field,
+                'regex' => $regex,
+            ]);
+
+            if ($user = $model::whereRaw([$field => $regex])->first()) {
+                \Log::info('User found', [
+                    'model' => $model,
+                    'collection' => (new $model)->getTable(),
+                    'user_id' => $user->getAuthIdentifier(),
+                    'user_role' => $user->role ?? 'not_set',
+                    'user_data' => $user->toArray(),
+                ]);
+                return $user;
+            }
+        }
+        
+        \Log::warning('No user found in any collection', [
+            'login' => $login,
+            'field' => $field,
+        ]);
+        
+        return null;
+    }
+
+    /* ------------------------------------------------------------------
+     * Password check + optional re-hash
+     * ------------------------------------------------------------------ */
+    public function validateCredentials(Authenticatable $user, array $credentials): bool
+    {
+        $plain = $credentials['password'];
+        $hash  = $user->getAuthPassword();
+
+        if (! $this->hasher->check($plain, $hash)) {
+            return false;
+        }
+
+        /* ---- auto-upgrade hash strength ---- */
+        if ($this->hasher->needsRehash($hash)) {
+            $user->setAttribute('password', $this->hasher->make($plain));
+            $user->save();
+        }
+
+        return true;
+    }
+
+    /* ------------------------------------------------------------------
+     * Laravel 9+ hook – we already handle re-hash inline, so no-op here
+     * ------------------------------------------------------------------ */
+    public function rehashPasswordIfRequired(Authenticatable $user, array $credentials, bool $force = false): void
+    {
+        // handled in validateCredentials
+    }
+
+    /* ------------------------------------------------------------------
+     * Remember-token boiler-plate (kept for compatibility)
+     * ------------------------------------------------------------------ */
     public function retrieveByToken($identifier, $token): ?Authenticatable
     {
         $user = $this->retrieveById($identifier);
-        return ($user && $user->getRememberToken() === $token) ? $user : null;
+        return $user && $user->getRememberToken() === $token ? $user : null;
     }
 
     public function updateRememberToken(Authenticatable $user, $token): void
     {
         $user->setRememberToken($token);
         $user->save();
-    }
-
-    public function retrieveByCredentials(array $credentials): ?Authenticatable
-    {
-        $loginType = filter_var($credentials['login'], FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
-
-        return AdminUser::where($loginType, $credentials['login'])->first()
-            ?? ServiceUser::where($loginType, $credentials['login'])->first()
-            ?? User::where($loginType, $credentials['login'])->first();
-    }
-
-    public function validateCredentials(Authenticatable $user, array $credentials): bool
-    {
-        return Hash::check($credentials['password'], $user->getAuthPassword());
-    }
-
-    public function rehashPasswordIfRequired(Authenticatable $user, array $credentials, bool $force = false): void
-    {
-        // Optional: implement password rehashing if needed
     }
 }

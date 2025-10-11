@@ -7,8 +7,9 @@ import LogoutButton from './LogoutButton';
 export default function BTRNavbar() {
   const [isDropOpen, setIsDropOpen] = useState(false);
   const navigate = useNavigate();
-  const handleCreateServiceAccount = () => navigate("/register/service");
-  const handleBack = () => navigate("/admin/dashboard");
+
+  const handleCreateServiceAccount = () => navigate('/register/service');
+  const handleBack = () => navigate('/admin/dashboard');
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 mt-4">
@@ -16,13 +17,13 @@ export default function BTRNavbar() {
         {/* LEFT */}
         <div className="flex items-center gap-3">
           <button
-        onClick={handleBack}
-        className="text-sm bg-white px-3 py-1 rounded"
-      >
-          <span className="grid h-10 w-10 place-items-center rounded-lg text-gray-500 font-bold text-lg">
-            Dashboard
-          </span>
-      </button>
+            onClick={handleBack}
+            className="text-sm bg-white px-3 py-1 rounded"
+          >
+            <span className="grid h-10 w-10 place-items-center rounded-lg text-gray-500 font-bold text-lg">
+              Dashboard
+            </span>
+          </button>
         </div>
 
         {/* RIGHT */}
@@ -34,7 +35,7 @@ export default function BTRNavbar() {
           {/* User dropdown */}
           <div className="relative">
             <button
-              onClick={() => setIsDropOpen(v => !v)}
+              onClick={() => setIsDropOpen((v) => !v)}
               className="flex items-center gap-2 text-gray-700 hover:text-blue-700"
             >
               <img
@@ -44,9 +45,7 @@ export default function BTRNavbar() {
               />
               <span className="hidden sm:inline text-lg p-2">Username</span>
               <svg
-                className={`h-4 w-4 transition ${
-                  isDropOpen ? 'rotate-180' : ''
-                }`}
+                className={`h-4 w-4 transition ${isDropOpen ? 'rotate-180' : ''}`}
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -61,7 +60,7 @@ export default function BTRNavbar() {
             </button>
 
             {isDropOpen && (
-              <div className="absolute right-0 top-full mt-2 w-40 rounded-lg border bg-white shadow-lg py-1 z-50">
+              <div className="absolute right-0 top-full mt-2 w-40 rounded-lg border bg-white shadow-lg py-1 z-40">
                 <a
                   onClick={handleCreateServiceAccount}
                   href="#"
@@ -69,11 +68,15 @@ export default function BTRNavbar() {
                 >
                   Create Service User Account
                 </a>
-                <a href="#" className="block px-4 py-2 hover:bg-gray-100">
+                <button
+                  onClick={() => {
+                    setIsDropOpen(false);
+                    navigate('/settings');  
+                  }}
+                  className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                >
                   Settings
-                </a>
-
-                
+                </button>
                 <LogoutButton className="block w-full text-left px-4 py-2 hover:bg-gray-100" />
               </div>
             )}

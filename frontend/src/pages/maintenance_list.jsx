@@ -10,7 +10,7 @@ export default function MaintenanceList() {
   const [schedules, setSchedules] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [openId, setOpenId] = useState(null); // which row is expanded
+  const [openId, setOpenId] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   
 
@@ -57,7 +57,7 @@ export default function MaintenanceList() {
           </button>
         </div>
 
-        {/* 🔍 Search Bar */}
+        {/* Search Bar */}
         <div className="mb-4">
           <input
             type="text"

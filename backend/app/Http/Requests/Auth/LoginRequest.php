@@ -11,11 +11,22 @@ use Illuminate\Validation\ValidationException;
 
 class LoginRequest extends FormRequest
 {
+    /**
+     * The guard that was determined during authentication.
+     */
+    private ?string $usedGuard = null;
+
+    /**
+     * Determine if the user is authorized to make this request.
+     */
     public function authorize(): bool
     {
         return true;
     }
 
+    /**
+     * Get the validation rules that apply to the request.
+     */
     public function rules(): array
     {
         return [
@@ -25,7 +36,7 @@ class LoginRequest extends FormRequest
     }
 
     /**
-     * Attempt to authenticate the user.
+     * Attempt to authenticate the request's credentials.
      *
      * @throws \Illuminate\Validation\ValidationException
      */
@@ -33,13 +44,60 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        // Hand the credentials to the guard; our MultiUserProvider will find the user.
-        $credentials = [
-            'login'    => $this->input('login'),
-            'password' => $this->input('password'),
-        ];
+        $login = $this->input('login');
+        
+        \Log::info('Authentication attempt', [
+            'login' => $login,
+            'is_email' => filter_var($login, FILTER_VALIDATE_EMAIL),
+            'session_id' => $this->session()->getId(),
+            'current_guard' => Auth::getDefaultDriver(),
+        ]);
 
-        if (! Auth::guard('web')->attempt($credentials, $this->boolean('remember'))) {
+        // First, try to find the user to determine the correct guard
+        $user = null;
+        $field = filter_var($login, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+        $regex = ['$regex' => '^'.preg_quote($login, '/').'$', '$options' => 'i'];
+
+        // Check admin_users collection first
+        if ($user = \App\Models\AdminUser::whereRaw([$field => $regex])->first()) {
+            $this->usedGuard = 'admin';
+        }
+        // Then check service_users collection
+        elseif ($user = \App\Models\ServiceUser::whereRaw([$field => $regex])->first()) {
+            $this->usedGuard = 'service';
+        }
+        // Finally check users collection
+        elseif ($user = \App\Models\User::whereRaw([$field => $regex])->first()) {
+            $this->usedGuard = 'web';
+        } else {
+            // No user found in any collection
+            \Log::warning('No user found in any collection', [
+                'login' => $login,
+                'field' => $field,
+                'session_id' => $this->session()->getId(),
+            ]);
+            
+            RateLimiter::hit($this->throttleKey());
+            throw ValidationException::withMessages([
+                'login' => trans('auth.failed'),
+            ]);
+        }
+
+        \Log::info('Guard selection', [
+            'selected_guard' => $this->usedGuard,
+            'login' => $login,
+            'user_collection' => $user->getTable(),
+            'user_id' => $user->getAuthIdentifier(),
+            'user_role' => $user->role ?? 'not_set',
+        ]);
+
+        if (! Auth::guard($this->usedGuard)->attempt($this->only('login', 'password'), $this->boolean('remember'))) {
+            \Log::warning('Authentication failed', [
+                'login' => $login,
+                'guard' => $this->usedGuard,
+                'session_id' => $this->session()->getId(),
+            ]);
+            
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
@@ -47,7 +105,22 @@ class LoginRequest extends FormRequest
             ]);
         }
 
+        \Log::info('Authentication successful', [
+            'login' => $login,
+            'guard' => $this->usedGuard,
+            'user' => Auth::guard($this->usedGuard)->user()->toArray(),
+            'session_id' => $this->session()->getId(),
+        ]);
+
         RateLimiter::clear($this->throttleKey());
+    }
+
+    /**
+     * Get the guard that was used for authentication.
+     */
+    public function getUsedGuard(): ?string
+    {
+        return $this->usedGuard;
     }
 
     /**

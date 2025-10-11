@@ -15,6 +15,7 @@ class Equipment extends Model
 
     // Fields that can be mass-assigned through controller
     protected $fillable = [
+        '_id',
         'category',  // PPE or RPCSP
         'article',
         'description',
@@ -27,7 +28,8 @@ class Equipment extends Model
         'actual_count', // actual count of items
         'remarks',
         'location',
-        'condition', // optional, can be null
+        'condition', // optional, can be null   
+        'date_added', // optional, can be null
         'start_date', // optional, can be null
         'end_date' // optional, can be null
     ];

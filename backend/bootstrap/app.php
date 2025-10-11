@@ -15,7 +15,8 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         // Ensure full session + cookie stack for web routes
         $middleware->web(prepend: [
-             \Illuminate\Cookie\Middleware\EncryptCookies::class,
+            \Illuminate\Http\Middleware\HandleCors::class,
+            \Illuminate\Cookie\Middleware\EncryptCookies::class,
             \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
             \Illuminate\Session\Middleware\StartSession::class,
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
@@ -37,6 +38,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => \App\Http\Middleware\RoleMiddleware::class,
         ]);
     })
+    ->withProviders([
+        \App\Providers\MongoDBAuthServiceProvider::class,
+    ])
     ->withExceptions(function (Exceptions $exceptions): void {
         
     })

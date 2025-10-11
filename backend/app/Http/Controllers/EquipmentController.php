@@ -7,6 +7,8 @@ use App\Models\Equipment;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
+use App\Models\MaintenanceJob;
+use MongoDB\BSON\ObjectId;
 
 class EquipmentController extends Controller
 {
@@ -179,5 +181,73 @@ class EquipmentController extends Controller
                 'error'   => $e->getMessage() // debug, shows error message
             ], 500);
         }
+    }
+
+    /**
+ * GET /api/service/inventory?category=PPE|RPCSP
+ * Service-user list: only the 4 allowed columns
+ */
+    public function serviceIndex(Request $request)
+    {
+        $category = $request->query('category');
+
+        $query = Equipment::query()
+            ->select(
+                'id',                                      // needed for the “click” link
+                'category',
+                'article',
+                'description',
+                'property_ro',
+                'property_co',
+                'semi_expendable_property_no'
+            );
+
+        if ($category) {
+            $query->where('category', $category);
+        }
+
+        // tidy up the JSON so the frontend always sees the same keys
+        return $query->cursor()->map(fn ($i) => [
+            'id'            => $i->id,
+            'article'       => $i->article,
+            'description'   => $i->description,
+            'property_ro'   => $i->property_ro,
+            'property_co'   => $i->property_co,
+            'semi_expendable_property_no' => $i->semi_expendable_property_no,
+        ]);
+    }
+
+    /**
+     * GET /api/service/inventory/{id}/maintenance
+     * Maintenance progress timeline for the clicked item
+    */
+    public function serviceMaintenance($id)
+    {
+        // Find the equipment by id (MongoDB _id)
+        // $equipment = Equipment::find($id);
+        $equipment = Equipment::where("id", $id)->first();
+        
+        // // Find maintenance jobs related to this equipment using the equipment's id
+        $maintenanceJobs = MaintenanceJob::where('equipment_id', $id)->get();
+        // return response()->json($equipment);
+
+        // // Return equipment details and maintenance history
+        return response()->json([
+            'id'            => $equipment->id,
+            'article'       => $equipment->article,
+            'description'   => $equipment->description,
+            'asset_id'      => $equipment->asset_id ?? $equipment->id, // Use asset_id if available, otherwise use id
+            'maintenance'   => $maintenanceJobs->map(function ($job) {
+                return [
+                    'id'            => $job->id,
+                    'start_date'    => $job->start_date,
+                    'end_date'      => $job->end_date,
+                    'condition'     => $job->condition,
+                    'remarks'       => $job->remarks,
+                    'status'        => $job->status,
+                    'scheduled_at'  => $job->scheduled_at,
+                ];
+            }),
+        ]);
     }
 }

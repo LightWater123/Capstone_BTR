@@ -2,6 +2,7 @@
 import { useNavigate } from 'react-router-dom';
 import useMaintenanceMessages from '../hooks/useMaintenanceMessages';
 import { statusColor, statusLabel } from '../utils/maintenanceHelpers';
+import BTRheader from "../components/modals/btrHeader";
 
 export default function ServiceMessages() {
   const navigate = useNavigate();
@@ -10,17 +11,18 @@ export default function ServiceMessages() {
   if (loading) return <p>Loading messages…</p>;
   
   return (
-    <div className="p-6">
+    <div className="min-h-screen bg-gray-50 relative">
+      <BTRheader />
       <h2 className="text-xl font-bold mb-4">Maintenance Schedule</h2>
 
       <button
-        onClick={() => navigate('/service/dashboard')}
+        onClick={() => navigate('/service/inventory')}
         className="mb-4 px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-800"
       >
-        Back to Dashboard
+        Back to Inventory
       </button>
 
-      {messages.length === 0 ? (
+      {messages.length === 0 ? ( 
         <p>No maintenance scheduled for you.</p>
       ) : (
         <table className="w-full border text-sm">
@@ -29,7 +31,7 @@ export default function ServiceMessages() {
               <th className="px-4 py-2 text-left">Equipment</th>
               <th className="px-4 py-2 text-left">Scheduled At</th>
               <th className="px-4 py-2 text-left">Status</th>
-              <th className="px-4 py-2 text-left">Notes</th>
+              <th className="px-4 py-2 text-left">Message from Admin</th>
             </tr>
           </thead>
           <tbody>
