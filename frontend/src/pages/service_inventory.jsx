@@ -290,8 +290,8 @@ export default function ServiceInventory() {
                 </tr>
               </thead>
               <tbody>
-                {archivedItems.map((item) => (
-                  <tr key={item.job.asset_id} className="border-t hover:bg-gray-50">
+                {archivedItems.map((item, k) => (
+                  <tr key={item.job?.asset_id ?? k} className="border-t hover:bg-gray-50">
                     <td className="px-4 py-3">{item.job?.asset_name || "—"}</td>
                     <td className="px-4 py-3">
                       {item.job?.scheduled_at ?
