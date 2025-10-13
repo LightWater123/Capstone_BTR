@@ -94,7 +94,7 @@ export default function MaintenanceList() {
                 {openId === s.asset_id && (
                   <div className="px-4 pb-4 text-sm text-gray-700 grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <span className="text-gray-500">Asset:</span>
+                      <span className="text-gray-500">jAsset:</span>
                       <p className="font-medium">{s.asset_name}</p>
                     </div>
                     <div>

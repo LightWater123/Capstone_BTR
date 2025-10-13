@@ -112,6 +112,14 @@ class LoginRequest extends FormRequest
             'user' => Auth::guard($this->usedGuard)->user()->toArray(),
             'session_id' => $this->session()->getId(),
         ]);
+        
+        // logout other devices if a user logins into a new device
+        Auth::guard($this->usedGuard)->logoutOtherDevices($this->input('password'));
+        \Log::info('Logged out other sessions', [
+            'user_id' => Auth::guard($this->usedGuard)->id(),
+            'guard' => $this->usedGuard,
+            'current_session_id' => $this->session()->getId(),
+        ]);
 
         RateLimiter::clear($this->throttleKey());
     }

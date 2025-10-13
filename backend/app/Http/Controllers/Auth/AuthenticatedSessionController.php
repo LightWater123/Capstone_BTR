@@ -75,9 +75,9 @@ class AuthenticatedSessionController extends Controller
         ]);
 
         // destroys other sessions for different devices
-        $tokenId = $request->user()->currentAccessToken()->id;
+        // $tokenId = $request->user()->currentAccessToken()->id;
 
-        $user->tokens()->where('id', '!=',$tokenId)->delete(); 
+        // $user->tokens()->where('id', '!=',$tokenId)->delete(); 
 
         return response()->json([
             'redirect' => $redirectUrl

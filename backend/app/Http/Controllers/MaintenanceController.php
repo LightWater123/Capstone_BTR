@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Equipment;
 use App\Models\MaintenanceJob;
 use App\Models\Message;
 use App\Jobs\SendMaintenanceEmail;
@@ -147,5 +148,31 @@ class MaintenanceController extends Controller
         $job->update(['status' => $request->status]);
 
         return response()->json($job);
+    }
+
+    // get items due for maintenance
+    public function getDueForMaintenance(Request $request)
+    {
+        // Get the number of days from the request, defaulting to 2.
+    // This makes your API more flexible.
+    $days = $request->get('days', 2);
+
+    // Validate the 'days' parameter
+    if (!is_numeric($days) || (int)$days < 0) {
+        return response()->json(['error' => 'The "days" parameter must be a non-negative integer.'], 400);
+    }
+    $days = (int)$days;
+
+    $now = Carbon::now();
+    $futureDate = $now->copy()->addDays($days);
+
+    // Query the Equipment model
+    $dueItems = Equipment::whereNotNull('end_date')                  // Ensure the item has an end date
+                        ->where('end_date', '>=', $now)              // Due date is today or in the future
+                        ->where('end_date', '<=', $futureDate)       // But not beyond our future date (e.g., 2 days from now)
+                        ->orderBy('end_date', 'asc')                 // Order by the soonest due date first
+                        ->get();
+
+    return response()->json($dueItems);
     }
 }

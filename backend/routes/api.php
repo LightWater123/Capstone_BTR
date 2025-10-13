@@ -45,6 +45,7 @@ Route::middleware(['auth:admin'])->group(function () {
         Route::get('/schedule',      [MaintenanceController::class, 'index']);
         Route::post('/schedule',     [MaintenanceController::class, 'store']);
         Route::get('/admin/messages',[MaintenanceController::class, 'sent']);
+        Route::get('/due-for-maintenance', [MaintenanceController::class, 'getDueForMaintenance']);
     });
 });
 
