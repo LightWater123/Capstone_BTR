@@ -29,6 +29,7 @@ class LoginRequest extends FormRequest
      */
     public function rules(): array
     {
+        \Log::info('LoginRequest credentials received', $this->only('login', 'password'));
         return [
             'login'    => ['required', 'string'], // email or username
             'password' => ['required', 'string'],

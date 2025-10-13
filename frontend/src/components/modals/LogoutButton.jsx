@@ -8,7 +8,7 @@ export default function LogoutButton({ className = "" }) {
 
   const handleLogout = async () => {
     try {
-      await api.post("/logout"); // Laravel kills the session
+      await api.post("api/logout"); // Laravel kills the session
     } catch (err) {
       console.error("Logout error:", err);
     } finally {

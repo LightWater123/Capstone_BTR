@@ -15,7 +15,7 @@ export default function AdminMessages() {
     useEffect(() => {
         const fetchMessages = async () => {
         try {
-            const { data } = await api.get("/maintenance-messages");
+            const { data } = await api.get("api/maintenance-messages");
             setMessages(data);
             console.log(data);
         } catch (err) {

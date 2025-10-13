@@ -6,38 +6,7 @@ import BTRheader from "../components/modals/btrHeader";
 import Navbar from "../components/modals/serviceNavbar.jsx";
 import { useServiceInventory } from "../hooks/useServiceInventory";
 
-export default function ServiceInventory() {
-  const navigate = useNavigate();
-
-  // Tab state: inventory (items under maintenance) or archive (completed maintenance)
-  const [tab, setTab] = useState("inventory");
-  
-  // Category filter for maintenance items
-  const [category, setCategory] = useState("PPE");
-  
-  // State for selected item details
-  const [selectedId, setSelectedId] = useState(null);
-  
-  // Use the TanStack Query hook
-  const {
-    maintenanceItems,
-    archivedItems,
-    maintenanceDetails,
-    refetchMaintenance,
-    refetchArchived,
-    updateStatus,
-    fetchMaintenanceDetails
-  } = useServiceInventory();
-
-  // Load maintenance details for selected item
-  const loadMaintenanceDetails = (id) => {
-    console.log(id)
-    setSelectedId(id);
-    fetchMaintenanceDetails(id);
-  };
-
-  // Status dropdown component
-  const StatusDropdown = ({ itemId, currentStatus }) => {
+const StatusDropdown = ({ itemId, currentStatus, updateStatus, refetchMaintenance, refetchArchived }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [status, setStatus] = useState(currentStatus || 'pending');
     const [dropdownPosition, setDropdownPosition] = useState({ left: 0, top: 0 });
@@ -47,7 +16,10 @@ export default function ServiceInventory() {
     const handleStatusChange = async (newStatus) => {
       setStatus(newStatus);
       setIsOpen(false);
-      await updateStatus(itemId, newStatus);
+      await updateStatus(itemId, newStatus).then(() => {
+        refetchArchived()
+        refetchMaintenance()
+      });
     };
 
     const getStatusColor = (status) => {
@@ -156,6 +128,39 @@ export default function ServiceInventory() {
     );
   };
 
+export default function ServiceInventory() {
+  const navigate = useNavigate();
+
+  // Tab state: inventory (items under maintenance) or archive (completed maintenance)
+  const [tab, setTab] = useState("inventory");
+  
+  // Category filter for maintenance items
+  const [category, setCategory] = useState("PPE");
+  
+  // State for selected item details
+  const [selectedId, setSelectedId] = useState(null);
+  
+  // Use the TanStack Query hook
+  const {
+    maintenanceItems,
+    archivedItems,
+    maintenanceDetails,
+    refetchMaintenance,
+    refetchArchived,
+    updateStatus,
+    fetchMaintenanceDetails
+  } = useServiceInventory();
+
+  // Load maintenance details for selected item
+  const loadMaintenanceDetails = (id) => {
+    console.log(id)
+    setSelectedId(id);
+    fetchMaintenanceDetails(id);
+  };
+
+  // Status dropdown component
+  
+
   return (
     <div className="min-h-screen bg-gray-50 relative">
       <BTRheader />
@@ -254,6 +259,9 @@ export default function ServiceInventory() {
                       <StatusDropdown
                         itemId={item.id}
                         currentStatus={item.status}
+                        updateStatus={updateStatus}
+                        refetchArchived={refetchArchived}
+                        refetchMaintenance={refetchMaintenance}
                       />
                     </td>
                     <td className="px-4 py-3">{"—"}</td>
@@ -282,12 +290,12 @@ export default function ServiceInventory() {
                 </tr>
               </thead>
               <tbody>
-                {archivedItems.map((item) => (
-                  <tr key={item.id} className="border-t hover:bg-gray-50">
+                {archivedItems.map((item, k) => (
+                  <tr key={item.job?.asset_id ?? k} className="border-t hover:bg-gray-50">
                     <td className="px-4 py-3">{item.job?.asset_name || "—"}</td>
                     <td className="px-4 py-3">
                       {item.job?.scheduled_at ?
-                        new Date(item.job.scheduled_at).toLocaleDateString() : "—"
+                        new Date(item.job?.scheduled_at).toLocaleDateString() : "—"
                       }
                     </td>
                     <td className="px-4 py-3">
