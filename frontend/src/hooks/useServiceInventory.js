@@ -1,8 +1,10 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "../api/api";
+import { useState } from "react";
 
 export function useServiceInventory() {
   const queryClient = useQueryClient();
+  const [maintId, setMaintId] = useState(undefined);
 
   // Fetch inventory maintenance items using TanStack Query with 10-second refetch interval
   const { data: maintenanceItems = [], refetch: refetchMaintenance } = useQuery({
@@ -39,13 +41,13 @@ export function useServiceInventory() {
   });
 
   // Fetch maintenance details for a specific item
-  const { data: maintenanceDetails = null } = useQuery({
-    queryKey: ['service-inventory', 'details'],
+  const { data: maintenanceDetails = [] } = useQuery({
+    queryKey: ["service-inventory", "details", maintId ?? "default"],
     queryFn: async ({ queryKey }) => {
       try {
         const id = queryKey[2]; // Extract ID from queryKey
         if (!id) return null;
-        
+
         const res = await axios.get(`/api/service/inventory/${id}/maintenance`);
         return res.data;
       } catch (err) {
@@ -53,7 +55,8 @@ export function useServiceInventory() {
         return null;
       }
     },
-    enabled: false, // Only fetch when manually enabled
+    staleTime: Infinity,
+    enabled: !!maintId, // Only fetch when manually enabled
   });
 
   // Update maintenance status
@@ -85,11 +88,14 @@ export function useServiceInventory() {
   };
 
   // Enable maintenance details query for specific ID
-  const fetchMaintenanceDetails = (id) => {
-    queryClient.invalidateQueries({
-      queryKey: ['service-inventory', 'details']
+  const fetchMaintenanceDetails = async (id) => {
+    setMaintId(id);
+    await queryClient.invalidateQueries({
+      queryKey: ["service-inventory", "details", id ?? "default"],
     });
-    queryClient.setQueryData(['service-inventory', 'details', id], null);
+    // console.log("test");
+
+    // await queryClient.setQueryData(["service-inventory", "details", id], null);
   };
 
   return {

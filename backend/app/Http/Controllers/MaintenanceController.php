@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Equipment;
 use App\Models\MaintenanceJob;
 use App\Models\Message;
 use App\Jobs\SendMaintenanceEmail;
@@ -9,7 +10,9 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use MongoDB\BSON\UTCDateTime;
 use MongoDB\BSON\ObjectId;
+use Illuminate\Support\Facades\Log;
 
 class MaintenanceController extends Controller
 {
@@ -96,6 +99,11 @@ class MaintenanceController extends Controller
 
             $data = $query->first();
 
+            if($data === null)
+            {
+                continue;
+            }
+
             $item->job = $data;
             $maint_item[] = $item;
         }
@@ -146,6 +154,63 @@ class MaintenanceController extends Controller
 
         $job->update(['status' => $request->status]);
 
+        $now = Carbon::now();
+        $equipt = Equipment::find($job->asset_id);
+        \Log::info("test", ['request' => $request ]);
+
+        if($equipt && $request->status === 'in-progress') {
+            $equipt->start_date = $now;
+        } elseif ($equipt && $request->status === 'done') {
+            $equipt->end_date = $now;
+        }
+        \Log::info("test", ['equipt' => $equipt]);
+        
+        $equipt->save();
+
         return response()->json($job);
+    }
+
+    // get items due for maintenance
+    public function getDueForMaintenance(Request $request)
+    {
+        // Get the number of days from the request, defaulting to 2.
+        $days = $request->get('days', 2);
+
+        // Validate the 'days' parameter
+        if (!is_numeric($days) || (int)$days < 0) {
+            return response()->json(['error' => 'The "days" parameter must be a non-negative integer.'], 400);
+        }
+        $days = (int)$days;
+
+        // Use UTC to match MongoDB's date storage
+        $now = Carbon::now('UTC');
+        $futureDate = $now->copy()->addDays($days)->endOfDay();
+        
+        // Log for debugging
+        Log::info("Checking maintenance from {$now} to {$futureDate}");
+
+        // MongoDB-specific query with proper date handling
+        // The UTCDateTime class is now correctly referenced
+        $dueItems = MaintenanceJob::whereNotNull('scheduled_at')
+                            ->where('scheduled_at', '>=', new UTCDateTime($now->timestamp * 1000))
+                            ->where('scheduled_at', '<=', new UTCDateTime($futureDate->timestamp * 1000))
+                            ->orderBy('scheduled_at', 'asc')
+                            ->get();
+        
+        // Log results for debugging
+        Log::info("Found {$dueItems->count()} items due for maintenance");
+        
+        // The Laravel MongoDB driver automatically converts BSON dates to Carbon instances
+        // when you retrieve them, so you usually don't need to format them here.
+        // The frontend will handle the conversion.
+        
+        return response()->json([
+            'data' => $dueItems,
+            'count' => $dueItems->count(),
+            'date_range' => [
+                'from' => $now->toDateString(),
+                'to' => $futureDate->toDateString()
+            ]
+        ]);
     }
 }

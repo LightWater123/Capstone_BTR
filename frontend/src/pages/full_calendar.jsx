@@ -5,6 +5,8 @@ import BTRheader from '../components/modals/btrHeader';
 import BTRNavbar from '../components/modals/btrNavbar';
 import CreateEvent from '../components/modals/createEvent';
 import '../components/modals/calendar-full.css';
+import { CalendarPlus } from 'lucide-react';
+import { Binoculars } from 'lucide-react';
 
 export default function CalendarFullPage() {
   const [selectedDate, setSelectedDate] = useState(null);
@@ -18,7 +20,7 @@ export default function CalendarFullPage() {
     startTime: '',
     endTime: '',
     location: '',
-    color: '#EF4444'
+    color: '#FFC107'
   });
 
   const [eventDates, setEventDates] = useState([]);
@@ -54,7 +56,7 @@ export default function CalendarFullPage() {
       startTime: '',
       endTime: '',
       location: '',
-      color: '#EF4444'
+      color: '#FFC107'
     });
   };
 
@@ -70,14 +72,16 @@ export default function CalendarFullPage() {
           <div className="flex justify-end mb-4 gap-2">
             <button
               onClick={() => setShowModal(true)}
-              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+              className="bg-yellow-400 text-white px-4 py-2 rounded hover:bg-yellow-500"
             >
+              <CalendarPlus className='h-5 w-5 inline-block mr-2'/>
               Create Event
             </button>
             <button
               onClick={() => setShowEventList(true)}
-              className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+              className="bg-yellow-400 text-white px-4 py-2 rounded hover:bg-yellow-500"
             >
+              <Binoculars className='h-5 w-5 inline-block mr-2'/>
               View All Events
             </button>
           </div>

@@ -63,6 +63,10 @@ export default function ScheduleModal({ asset, onClose, onScheduled }) {
         scheduledAt: form.scheduledAt.toISOString(),
         message: dynamicMessage
       });
+      
+      // Add success alert after email is sent
+      alert('Email sent successfully!');
+      
       onScheduled();
       onClose();
     } catch (err) {
