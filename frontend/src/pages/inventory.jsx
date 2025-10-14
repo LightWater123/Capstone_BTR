@@ -8,6 +8,11 @@ import api from "../api/api";
 import { toast } from 'react-toastify';
 import BTRheader from "../components/modals/btrHeader";
 import BTRNavbar from "../components/modals/btrNavbar.jsx";
+import { Icon, Plus } from 'lucide-react';
+import { Monitor } from 'lucide-react';
+import { Calendar } from 'lucide-react';
+import { Car } from 'lucide-react';
+import { Keyboard } from 'lucide-react';
 
 // Modals
 import ScheduleMaintenanceModal from "../components/modals/scheduleModal.jsx";
@@ -192,14 +197,15 @@ export default function InventoryDashboard() {
         <div className="flex gap-4 px-4 pt-4 justify-center ">
 
 
-          {["PPE", "RPCSP"].map((type) => (
+          {[{ name:"PPE",Icon:Car}, {name:"RPCSP",Icon:Keyboard}].map((type) => (
             <button
-              key={type}
-              className={`px-4 py-2 rounded-md ${category === type ? "bg-gray-200 text-black hover:bg-yellow-500" : "bg-gray-200 text-black hover:bg-yellow-500"
+              key={type.name}
+              className={`px-4 py-2 rounded-md ${category === type.name ? "bg-gray-200 text-black hover:bg-yellow-500" : "bg-gray-200 text-black hover:bg-yellow-500"
                 }`}
-              onClick={() => setCategory(type)}
+              onClick={() => setCategory(type.name)}
             >
-              {type}
+              <type.Icon className="h-5 w-5 inline-block mr-2"/>
+              {type.name}
             </button>
           ))}
         </div>
@@ -258,6 +264,7 @@ export default function InventoryDashboard() {
                 className="bg-yellow-500 text-white px-3 py-0.5 rounded-md font-semibold hover:bg-yellow-600"
                 onClick={() => setShowTypeSelector(true)}
               >
+                <Plus  className="h-5 w-5 inline-block mr-2"/>
                 Add Equipment
               </button>
 
@@ -265,10 +272,11 @@ export default function InventoryDashboard() {
                 disabled={selectedEquipmentIds.length === 0}
                 onClick={openScheduleModal}
                 className={`px-3 py-0.5 rounded-md font-semibold ${selectedEquipmentIds.length > 0
-                  ? "bg-green-600 text-white hover:bg-green-700"
+                  ? "bg-yellow-500 text-white hover:bg-yellow-600"
                   : "bg-gray-300 text-gray-500 cursor-not-allowed"
                   }`}
               >
+                <Calendar className="h-5 w-5 inline-block mr-2"/>
                 Schedule Maintenance
               </button>
 
@@ -276,6 +284,7 @@ export default function InventoryDashboard() {
                 onClick={() => navigate("/admin/maintenance-list")}
                 className="px-3 py-0.5 bg-yellow-500 text-white rounded-md font-semibold hover:bg-yellow-600"
               >
+                <Monitor className="h-5 w-5 inline-block mr-2"/>
                 Monitor Maintenance
               </button>
 
