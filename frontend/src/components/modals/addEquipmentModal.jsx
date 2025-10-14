@@ -141,10 +141,18 @@ export default function AddEquipmentModal({
             <input
               type="number"
               placeholder="Unit Value"
+              min="0"
               value={newItem.unit_value === 0 ? '' : newItem.unit_value}
+              onKeyDown={(e) => {
+              // Prevent the minus key, plus key, and 'e'/'E' from being pressed.
+              if (e.key === '-' || e.key === '+' || e.key === 'e' || e.key === 'E') {
+                e.preventDefault();
+              }
+            }}
               onChange={(e) => {
-                const value = e.target.value === '' ? 0 : Number(e.target.value);
-                setNewItem({ ...newItem, unit_value: value });
+                 const numericValue = Number(e.target.value);
+                 const value = isNaN(numericValue) ? 0 : Math.max(0, numericValue);
+                 setNewItem({ ...newItem, unit_value: value });
               }}
               className="w-full px-3 py-2 border border-black rounded bg-yellow-100 placeholder-black"
               required

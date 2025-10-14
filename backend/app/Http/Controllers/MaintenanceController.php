@@ -155,12 +155,14 @@ class MaintenanceController extends Controller
         $now = Carbon::now();
         $equipt = Equipment::find($job->asset_id);
         \Log::info("test", ['request' => $request ]);
+
         if($equipt && $request->status === 'in-progress') {
             $equipt->start_date = $now;
         } elseif ($equipt && $request->status === 'done') {
             $equipt->end_date = $now;
         }
         \Log::info("test", ['equipt' => $equipt]);
+        
         $equipt->save();
 
         return response()->json($job);
