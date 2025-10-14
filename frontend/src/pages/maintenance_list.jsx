@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import BTRheader from "../components/modals/btrHeader";
 import Navbar from "../components/modals/serviceNavbar.jsx";
 import BTRNavbar from '../components/modals/btrNavbar.jsx';
@@ -19,9 +19,17 @@ export default function MaintenanceList() {
     setSortBy
   } = useMonitorMaintenance();
 
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const assetId = searchParams.get("id");
+
   const formatDate = (d) => new Date(d).toLocaleString();
 
   const toggle = (id) => setOpenId((prev) => (prev === id ? null : id));
+
+  useEffect(()=> {
+    if(!assetId) return 
+    setSearchQuery(`id:${assetId}`)},[setSearchQuery, assetId]);
 
   return (
     <div className="min-h-screen bg-gray-50 relative">

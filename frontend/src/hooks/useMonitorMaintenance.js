@@ -26,6 +26,12 @@ export function useMonitorMaintenance() {
   // Filter function
   const filteredData = schedulesData.filter(schedule => {
     const query = searchQuery.toLowerCase();
+    if(query.startsWith("id:"))
+      {
+        const idQuery = query.slice(3);
+        console.log(idQuery);
+        return schedule.asset_id?.toLowerCase().includes(idQuery);
+      }
     return schedule.asset_name?.toLowerCase().includes(query) || 
            (schedule.user_email && schedule.user_email.toLowerCase().includes(query));
   });
