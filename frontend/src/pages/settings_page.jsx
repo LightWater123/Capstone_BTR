@@ -1,15 +1,19 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import ChangePasswordModal from '../components/modals/changePasswordModal';
+import BTRheader from "../components/modals/btrHeader";
+import BTRNavbar from "../components/modals/btrNavbar.jsx";
 
 export default function SettingsPage() {
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 mt-6">
+    <div className="min-h-screen bg-gray-50 relative">
+      <BTRheader />
+      <BTRNavbar />
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 mt-4">
         <h1 className="text-2xl font-bold">Account Settings</h1>
         <button
           onClick={() => navigate('/admin/dashboard')}
@@ -20,7 +24,7 @@ export default function SettingsPage() {
       </div>
 
       {/* Security card */}
-      <div className="bg-white rounded-xl shadow p-6 space-y-4">
+      <div className="bg-white max-w-7xl mx-auto px-4 sm:px-6 mt-4">
         <h2 className="text-lg font-semibold">Security</h2>
 
         {/* Change Password button opens modal */}

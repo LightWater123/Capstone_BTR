@@ -71,7 +71,7 @@ export default function AdminDashboard() {
             </button>
           </div>
 
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-1 justify-center flex">
             <CalendarModal />
           </div>
         </div>
