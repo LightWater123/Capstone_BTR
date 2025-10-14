@@ -5,6 +5,8 @@ import BTRheader from '../components/modals/btrHeader';
 import BTRNavbar from '../components/modals/btrNavbar';
 import CreateEvent from '../components/modals/createEvent';
 import '../components/modals/calendar-full.css';
+import { CalendarPlus } from 'lucide-react';
+import { Binoculars } from 'lucide-react';
 
 export default function CalendarFullPage() {
   const [selectedDate, setSelectedDate] = useState(null);
@@ -72,12 +74,14 @@ export default function CalendarFullPage() {
               onClick={() => setShowModal(true)}
               className="bg-yellow-400 text-white px-4 py-2 rounded hover:bg-yellow-500"
             >
+              <CalendarPlus className='h-5 w-5 inline-block mr-2'/>
               Create Event
             </button>
             <button
               onClick={() => setShowEventList(true)}
               className="bg-yellow-400 text-white px-4 py-2 rounded hover:bg-yellow-500"
             >
+              <Binoculars className='h-5 w-5 inline-block mr-2'/>
               View All Events
             </button>
           </div>
