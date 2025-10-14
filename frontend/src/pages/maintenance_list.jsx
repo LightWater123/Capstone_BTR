@@ -1,41 +1,23 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api from '../api/api';
 import BTRheader from "../components/modals/btrHeader";
 import Navbar from "../components/modals/serviceNavbar.jsx";
 import BTRNavbar from '../components/modals/btrNavbar.jsx';
+import { useMonitorMaintenance } from '../hooks/useMonitorMaintenance.js';
 
 export default function MaintenanceList() {
   const navigate = useNavigate();
-  const [schedules, setSchedules] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [openId, setOpenId] = useState(null);
-  const [searchQuery, setSearchQuery] = useState("");
   
-
-  useEffect(() => {
-    fetchSchedules();
-  }, []);
-
-  const fetchSchedules = async () => {
-    try {
-      const { data } = await api.get('/api/maintenance/schedule');
-      setSchedules(data);
-      console.log(data);
-    } catch (err) {
-      console.error(err);
-      setError('Failed to fetch maintenance schedules. Please try again later.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const filteredSchedules = schedules.filter(
-    (s) =>
-      s.asset_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (s.user_email && s.user_email.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
+  // Use the custom hook
+  const {
+    filteredSchedules,
+    searchQuery,
+    setSearchQuery,
+    loading,
+    error,
+    setSortBy
+  } = useMonitorMaintenance();
 
   const formatDate = (d) => new Date(d).toLocaleString();
 
@@ -58,26 +40,34 @@ export default function MaintenanceList() {
         </div>
 
         {/* Search Bar */}
-        <div className="mb-4">
+        <div className="mb-4 flex gap-4">
           <input
             type="text"
             placeholder="Search by asset or email..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-yellow-400"
+            className="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-yellow-400"
           />
+          <select
+            onChange={(e) => setSortBy(e.target.value)}
+            className="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-yellow-400"
+          >
+            <option value="asset_name">Sort by Name</option>
+            <option value="scheduled_at">Sort by Date</option>
+            <option value="status">Sort by Status</option>
+          </select>
         </div>
 
         {loading && <p className="text-gray-600">Loading schedules…</p>}
         {error && <p className="text-red-600">{error}</p>}
-        {!loading && schedules.length === 0 && (
+        {!loading && filteredSchedules.length === 0 && (
           <p className="text-gray-600">No maintenance schedules yet.</p>
         )}
 
         {/* Accordion list */}
-        {!loading && schedules.length > 0 && (
+        {!loading && filteredSchedules.length > 0 && (
           <div className="bg-white rounded shadow divide-y divide-gray-200">
-            {schedules.map((s) => (
+            {filteredSchedules.map((s) => (
               <div key={s.asset_id} className="cursor-pointer">
                 {/* Visible bar – click to expand */}
                 <div
