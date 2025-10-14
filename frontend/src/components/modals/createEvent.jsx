@@ -61,7 +61,7 @@ export default function CreateEvent({ show, onClose, onSave, formData, setFormDa
             >
               <option value="#FFC107" style={{ backgroundColor: '#FFC107', color: '#FFC107' }}>Yellow</option>
               <option value="#2196F3" style={{ backgroundColor: '#2196F3', color: '#2196F3' }}>Blue</option>
-              <option value="#800000" style={{ backgroundColor: '#F40B0B', color: '#F40B0B' }}>Red</option>
+              <option value="#F40B0B" style={{ backgroundColor: '#F40B0B', color: '#F40B0B' }}>Red</option>
             </select>
           </div>
         </div>

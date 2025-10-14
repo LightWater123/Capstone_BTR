@@ -3,7 +3,7 @@ import "../index.css";
 import BTRheader from "../components/modals/btrHeader";
 import Navbar from "../components/modals/serviceNavbar.jsx";
 import Calendar from "../components/modals/serviceCalendar.jsx";
-import wrenchicon from '../assets/wrench.png';
+import { Wrench } from 'lucide-react';
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
@@ -26,7 +26,7 @@ export default function AdminDashboard() {
                     onClick={handleInventoryList}
                     className="w-full h-[350px] bg-white rounded-xl text-gray-800 hover:bg-[#FCFC62] font-medium shadow-md text-3xl flex items-center justify-center transition-colors"
                   >
-                    <img src={wrenchicon} alt="Wrench Icon" className="w-14 h-14 opacity-50 p-3" />
+                    <Wrench className="h-10 w-10 inline-block mr-2"/>
                      Assets to be maintained
                   </button>
                 </div>

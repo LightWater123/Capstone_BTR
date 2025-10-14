@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "../api/api";
 import BTRheader from "../components/modals/btrHeader";
+import { ChevronLeftCircle } from "lucide-react"
 
 
 export default function ServiceRegister() {
@@ -87,6 +88,7 @@ export default function ServiceRegister() {
               className="w-full px-4 py-2 bg-yellow-400 hover:bg-yellow-500 text-white font-bold rounded mb-6"
                style={{ boxShadow: "0 4px 50px rgba(255, 255, 255, 0.3)" }}
             >
+              <ChevronLeftCircle className="h-5 w-5 inline-block mr-2" />
               Back to Dashboard
             </button>
 
