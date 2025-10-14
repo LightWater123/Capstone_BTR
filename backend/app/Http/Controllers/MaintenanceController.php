@@ -191,10 +191,10 @@ class MaintenanceController extends Controller
 
         // MongoDB-specific query with proper date handling
         // The UTCDateTime class is now correctly referenced
-        $dueItems = Equipment::whereNotNull('end_date')
-                            ->where('end_date', '>=', new UTCDateTime($now->timestamp * 1000))
-                            ->where('end_date', '<=', new UTCDateTime($futureDate->timestamp * 1000))
-                            ->orderBy('end_date', 'asc')
+        $dueItems = MaintenanceJob::whereNotNull('scheduled_at')
+                            ->where('scheduled_at', '>=', new UTCDateTime($now->timestamp * 1000))
+                            ->where('scheduled_at', '<=', new UTCDateTime($futureDate->timestamp * 1000))
+                            ->orderBy('scheduled_at', 'asc')
                             ->get();
         
         // Log results for debugging

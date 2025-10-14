@@ -88,11 +88,10 @@ export default function AdminDashboard() {
               <li className="text-gray-500">No items are due for maintenance in the next 2 days.</li>
             ) : (
               dueItems.map((item) => (
-                <li key={item._id} className="bg-white p-3 rounded shadow-sm border-l-4 border-yellow-500">
-                  <div className="font-semibold text-gray-800">{item.article}</div>
-                  <div className="text-sm text-gray-700">{item.description}</div>
+                <li key={item.id} className="bg-white p-3 rounded shadow-sm border-l-4 border-yellow-500">
+                  <div className="font-semibold text-gray-800">{item.asset_name}</div>
                   <div className="text-sm text-gray-600 mt-1">
-                    Due: {new Date(item.end_date).toLocaleDateString()} | Location: {item.location}
+                    Due: {new Date(item.scheduled_at).toLocaleDateString()} | Assigned to: {item.user_email} | Status: {item.status}
                   </div>
                 </li>
               ))
