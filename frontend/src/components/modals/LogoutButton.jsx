@@ -2,6 +2,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../api/api";
+import { LogOut } from 'lucide-react';
 
 export default function LogoutButton({ className = "" }) {
   const navigate = useNavigate();
@@ -17,7 +18,9 @@ export default function LogoutButton({ className = "" }) {
   };
 
   return (
+    
     <button onClick={handleLogout} className={className || "btn btn-danger"}>
+      <LogOut className="h-4 w-4 inline-block mr-2"/>
       Logout
     </button>
   );
