@@ -10,6 +10,7 @@ export default function AdminDashboard() {
   const navigate = useNavigate();
   const handleInventoryList = () => navigate("/inventory");
   const [open, setOpen] = useState(false);
+  const eventDates = [];
 
   return (
     <div className="min-h-screen bg-gray-50 relative">
