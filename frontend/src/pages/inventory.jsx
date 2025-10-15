@@ -8,6 +8,12 @@ import api from "../api/api";
 import { toast } from 'react-toastify';
 import BTRheader from "../components/modals/btrHeader";
 import BTRNavbar from "../components/modals/btrNavbar.jsx";
+import { Icon, Plus } from 'lucide-react';
+import { Monitor } from 'lucide-react';
+import { Calendar } from 'lucide-react';
+import { Car } from 'lucide-react';
+import { Keyboard } from 'lucide-react';
+import { Search } from 'lucide-react';
 
 // Modals
 import ScheduleMaintenanceModal from "../components/modals/scheduleModal.jsx";
@@ -183,195 +189,234 @@ export default function InventoryDashboard() {
   return (
     <>
       <div className="min-h-screen bg-gray-50 relative">
-
-        {/* 1.  Government banner */}
         <BTRheader />
         <BTRNavbar />
 
         {/* Category Tabs */}
         <div className="flex gap-4 px-4 pt-4 justify-center ">
-
-
-          {["PPE", "RPCSP"].map((type) => (
-            <button
-              key={type}
-              className={`px-4 py-2 rounded-md ${category === type ? "bg-gray-200 text-black hover:bg-yellow-500" : "bg-gray-200 text-black hover:bg-yellow-500"
+          {[
+            { name: "PPE", Icon: Car },
+            { name: "RPCSP", Icon: Keyboard },
+          ].map((type) => {
+            const isActive = category === type.name;
+            return (
+              <button
+                key={type.name}
+                onClick={() => setCategory(type.name)}
+                className={`px-4 py-2 rounded-md transition ${
+                  isActive
+                    ? "bg-yellow-400 text-white"
+                    : "bg-gray-200 text-black hover:bg-yellow-400"
                 }`}
-              onClick={() => setCategory(type)}
-            >
-              {type}
-            </button>
-          ))}
+              >
+                <type.Icon className="h-5 w-5 inline-block mr-2" />
+                {type.name}
+              </button>
+            );
+          })}
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 mt-4">
           <nav className="w-full bg-white shadow-md rounded-xl mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-6 py-4 px-4 sm:px-6 relative">
-
             {/* Search */}
-            <div className="w-full sm:w-1/2">
+            <div className="w-full sm:w-1/2 relative">
               <input
                 type="text"
                 placeholder={`Search ${category} items...`}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                style={{ paddingLeft: "2.5rem" }}
               />
+              <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
             </div>
 
-
             {/* Sort Dropdown */}
-              <div className="relative">
-                <button
-                  onClick={() => setShowSortOptions(!showSortOptions)}
-                  className="px-2 py-0.5 bg-gray-200 text-gray-800 rounded-md font-semibold hover:bg-gray-300"
-                >
-                  Sort by:
-                </button>
+            <div className="relative">
+              <button
+                onClick={() => setShowSortOptions(!showSortOptions)}
+                className="px-2 py-0.5 bg-gray-200 text-gray-800 rounded-md font-semibold hover:bg-gray-300"
+              >
+                Sort by:
+              </button>
 
-                {showSortOptions && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-20">
-                    <button
-                      onClick={() => handleSort("name")}
-                      className="block w-full text-left px-4 py-2 hover:bg-gray-100"
-                    >
-                      Name
-                    </button>
-                    <button
-                      onClick={() => handleSort("price")}
-                      className="block w-full text-left px-4 py-2 hover:bg-gray-100"
-                    >
-                      Price (Highest to lowest)
-                    </button>
-                    <button
-                      onClick={() => handleSort("category")}
-                      className="block w-full text-left px-4 py-2 hover:bg-gray-100"
-                    >
-                      Category
-                    </button>
-                  </div>
-                )}
-              </div>
+              {showSortOptions && (
+                <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-20">
+                  <button
+                    onClick={() => handleSort("name")}
+                    className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                  >
+                    Name
+                  </button>
+                  <button
+                    onClick={() => handleSort("price")}
+                    className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                  >
+                    Price (Highest to lowest)
+                  </button>
+                  <button
+                    onClick={() => handleSort("category")}
+                    className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                  >
+                    Category
+                  </button>
+                </div>
+              )}
+            </div>
 
             {/* Buttons */}
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto">
               <button
-                className="bg-yellow-500 text-white px-3 py-0.5 rounded-md font-semibold hover:bg-yellow-600"
+                className="bg-yellow-400 text-white px-3 py-0.5 rounded-md font-semibold hover:bg-yellow-500"
                 onClick={() => setShowTypeSelector(true)}
               >
+                <Plus className="h-5 w-5 inline-block mr-2" />
                 Add Equipment
               </button>
 
               <button
                 disabled={selectedEquipmentIds.length === 0}
                 onClick={openScheduleModal}
-                className={`px-3 py-0.5 rounded-md font-semibold ${selectedEquipmentIds.length > 0
-                  ? "bg-green-600 text-white hover:bg-green-700"
-                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                  }`}
+                className={`px-3 py-0.5 rounded-md font-semibold ${
+                  selectedEquipmentIds.length > 0
+                    ? "bg-yellow-400 text-white hover:bg-yellow-500"
+                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                }`}
               >
+                <Calendar className="h-5 w-5 inline-block mr-2" />
                 Schedule Maintenance
               </button>
 
               <button
                 onClick={() => navigate("/admin/maintenance-list")}
-                className="px-3 py-0.5 bg-yellow-500 text-white rounded-md font-semibold hover:bg-yellow-600"
+                className="px-3 py-0.5 bg-yellow-400 text-white rounded-md font-semibold hover:bg-yellow-500"
               >
+                <Monitor className="h-5 w-5 inline-block mr-2" />
                 Monitor Maintenance
               </button>
-
-              
             </div>
           </nav>
         </div>
 
-        <div className="px-4 pt-6">
-          {filteredData.length === 0 ? (
-            <p className="text-gray-500">No equipment found in {category}.</p>
-          ) : (
-            <table className="w-full table-auto border border-gray-300">
-              <thead className="bg-black-100">
-                <tr>
-                  <th className="border px-2 py-1">Article</th>
-                  <th className="border px-2 py-1">Description</th>
-                  {category === "PPE" ? (
-                    <>
-                      <th className="border px-2 py-1">Property Number (RO)</th>
-                      <th className="border px-2 py-1">Property Number (CO)</th>
-                    </>
-                  ) : (
-                    <th className="border px-2 py-1">Semi-Expendable Property No.</th>
-                  )}
-                  <th className="border px-2 py-1">Unit</th>
-                  <th className="border px-2 py-1">Unit Value</th>
-                  <th className="border px-2 py-1">Actions</th>
-                  <th className="border px-2 py-1 text-center">
-                    <input
-                      type="checkbox"
-                      checked={
-                        filteredData.length > 0 &&
-                        selectedEquipmentIds.length === filteredData.length
-                      }
-                      onChange={(e) => {
-                        setSelectedEquipmentIds(
-                          e.target.checked ? filteredData.map((item) => item.id) : []
-                        );
-                      }}
-                      className="accent-green-500 w-4 h-4"
-                      title="Select All"
-                    />
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredData.map((item, index) => (
-                  <tr key={index} className="hover:bg-gray-100 transition">
-                    <td className="border px-2 py-1 text-center">{item.article}</td>
-                    <td className="border px-2 py-1 text-center">{item.description}</td>
-                    {item.category === "PPE" ? (
+        {/* Equipment Table */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="px-4 pt-6">
+            {filteredData.length === 0 ? (
+              <p className="text-gray-500">No equipment found in {category}.</p>
+            ) : (
+              <div className="overflow-x-auto w-full">
+              <table className="w-full table-auto border border-gray-300">
+                <thead className="bg-black-100">
+                  <tr>
+                    <th className="border px-2 py-1">Article</th>
+                    <th className="border px-2 py-1">Description</th>
+                    {category === "PPE" ? (
                       <>
-                        <td className="border px-2 py-1 text-center">{item.property_ro}</td>
-                        <td className="border px-2 py-1 text-center">
-                          {item.property_co || <span className="text-gray-400 italic">—</span>}
-                        </td>
+                        <th className="border px-2 py-1">
+                          Property Number (RO)
+                        </th>
+                        <th className="border px-2 py-1">
+                          Property Number (CO)
+                        </th>
                       </>
                     ) : (
-                      <td className="border px-2 py-1 text-center">{item.semi_expendable_property_no}</td>
+                      <th className="border px-2 py-1">
+                        Semi-Expendable Property No.
+                      </th>
                     )}
-                    <td className="border px-2 py-1 text-center">{item.unit}</td>
-                    <td className="border px-2 py-1 text-center">₱{Number(item.unit_value).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                    <td className="border px-2 py-1 text-center space-x-2">
-                      <button
-                        className="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600"
-                        onClick={() => {
-                          setSelectedDetailItem(item);
-                          setShowDetailModal(true);
-                        }}
-                      >
-                        View Full Detail
-                      </button>
-                    </td>
-                    <td className="border px-2 py-1 text-center">
+                    <th className="border px-2 py-1">Unit</th>
+                    <th className="border px-2 py-1">Unit Value</th>
+                    <th className="border px-2 py-1">Actions</th>
+                    <th className="border px-2 py-1 text-center">
                       <input
                         type="checkbox"
-                        checked={selectedEquipmentIds.includes(item.id)}
+                        checked={
+                          filteredData.length > 0 &&
+                          selectedEquipmentIds.length === filteredData.length
+                        }
                         onChange={(e) => {
-                          setSelectedEquipmentIds((prev) =>
+                          setSelectedEquipmentIds(
                             e.target.checked
-                              ? [...prev, item.id]
-                              : prev.filter((id) => id !== item.id)
+                              ? filteredData.map((item) => item.id)
+                              : []
                           );
                         }}
                         className="accent-green-500 w-4 h-4"
-                        title="Select for Maintenance"
+                        title="Select All"
                       />
-                    </td>
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
+                </thead>
+                <tbody>
+                  {filteredData.map((item, index) => (
+                    <tr key={index} className="hover:bg-gray-100 transition">
+                      <td className="border px-2 py-1 text-center">
+                        {item.article}
+                      </td>
+                      <td className="border px-2 py-1 text-center">
+                        {item.description}
+                      </td>
+                      {item.category === "PPE" ? (
+                        <>
+                          <td className="border px-2 py-1 text-center">
+                            {item.property_ro}
+                          </td>
+                          <td className="border px-2 py-1 text-center">
+                            {item.property_co || (
+                              <span className="text-gray-400 italic">—</span>
+                            )}
+                          </td>
+                        </>
+                      ) : (
+                        <td className="border px-2 py-1 text-center">
+                          {item.semi_expendable_property_no}
+                        </td>
+                      )}
+                      <td className="border px-2 py-1 text-center">
+                        {item.unit}
+                      </td>
+                      <td className="border px-2 py-1 text-center">
+                        ₱
+                        {Number(item.unit_value).toLocaleString("en-PH", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
+                      </td>
+                      <td className="border px-2 py-1 text-center space-x-2">
+                        <button
+                          className="bg-yellow-400 text-white px-2 py-1 rounded hover:bg-yellow-500"
+                          onClick={() => {
+                            setSelectedDetailItem(item);
+                            setShowDetailModal(true);
+                          }}
+                        >
+                          View Full Detail
+                        </button>
+                      </td>
+                      <td className="border px-2 py-1 text-center">
+                        <input
+                          type="checkbox"
+                          checked={selectedEquipmentIds.includes(item.id)}
+                          onChange={(e) => {
+                            setSelectedEquipmentIds((prev) =>
+                              e.target.checked
+                                ? [...prev, item.id]
+                                : prev.filter((id) => id !== item.id)
+                            );
+                          }}
+                          className="accent-green-500 w-4 h-4"
+                          title="Select for Maintenance"
+                        />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              </div>
+            )}
+          </div>
         </div>
-
+    
         {/* Modals */}
         <TypeSelectorModal
           isOpen={showTypeSelector}
@@ -382,7 +427,6 @@ export default function InventoryDashboard() {
             setShowModal(true);
           }}
         />
-
 
         <AddEquipmentModal
           // add equipment
@@ -404,7 +448,7 @@ export default function InventoryDashboard() {
               unit: "pc",
               unit_value: 0,
               location: "",
-              remarks: ""
+              remarks: "",
             });
           }}
           onSubmit={handleSubmit}
@@ -422,7 +466,7 @@ export default function InventoryDashboard() {
           <ScheduleMaintenanceModal
             isOpen={showScheduleModal}
             onClose={() => setShowScheduleModal(false)}
-            asset={selectedEquipment}  // whole object
+            asset={selectedEquipment} // whole object
             onScheduled={() => {
               setShowScheduleModal(false);
               setSelectedEquipmentIds([]);
@@ -441,7 +485,8 @@ export default function InventoryDashboard() {
           }}
           // delete item
           onDelete={async (id) => {
-            if (!window.confirm("Are you sure you want to delete this item?")) return;
+            if (!window.confirm("Are you sure you want to delete this item?"))
+              return;
             try {
               await api.delete(`/api/inventory/${id}`);
               alert("Item deleted successfully!");
@@ -455,7 +500,6 @@ export default function InventoryDashboard() {
         />
 
         <EditItemModal
-
           // edit item
           isOpen={showEditModal}
           item={selectedItem}
@@ -466,7 +510,6 @@ export default function InventoryDashboard() {
             setSelectedDetailItem(updatedItem);
           }}
         />
-
       </div>
     </>
   );

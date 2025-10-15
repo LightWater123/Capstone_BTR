@@ -7,33 +7,36 @@ import { ChevronLeftCircle } from "lucide-react"
 import { Mail } from 'lucide-react';
 import { Lock } from 'lucide-react';
 
-export default function SettingsPage() { 
+export default function SettingsPage() {
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
-  
+
   return (
     <div className="min-h-screen bg-gray-50 relative">
       <BTRheader />
       <BTRNavbar />
       {/* Header */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 mt-4">
-        
-
-        <div className="flex items-center gap-4 justify-end">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 mt-4 flex justify-between items-center">
+      
+        <div className="flex items-center gap-4 justify-start">
         <button
-          onClick={() => navigate('/admin/dashboard')}
-          className="px-4 py-2 bg-yellow-400 text-white rounded hover:bg-yellow-500"
+          onClick={() => navigate("/admin/dashboard")}
+          className="px-4 py-2 bg-yellow-400 text-white rounded hover:bg-yellow-500 justify-end"
         >
           <ChevronLeftCircle className="h-5 w-5 inline-block mr-2" />
           Back to Dashboard
         </button>
       </div>
-      <h2 className="text-lg font-bold m-2 gap-3">Account Settings</h2>
       </div>
 
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 mt-4">
+        <h1 className="text-2xl font-semibold mb-6">Settings</h1>
+      </div>
       {/* Security card */}
-      <div className=" max-w-7xl mx-auto px-4 sm:px-6 mt-4">
-        <h2 className="text-lg rounded font-semibold m-2">Security</h2>
+      
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 mt-4">
+        <div className="bg-white shadow-sm rounded-xl p-6">
+          <h2 className="text-xl font-semibold mb-4">Security</h2>
 
         {/* Change Password button opens modal */}
         <button
@@ -45,7 +48,7 @@ export default function SettingsPage() {
         </button>
 
         <button
-          to="/forgot-password"
+          onClick={() => navigate("/forgot-password")}
           className="px-4 py-2 bg-yellow-400 text-white rounded hover:bg-yellow-500 ml-4"
         >
           <Mail className="h-5 w-5 inline-block mr-2" />
@@ -55,6 +58,7 @@ export default function SettingsPage() {
 
       {/* Render modal */}
       {showModal && <ChangePasswordModal onClose={() => setShowModal(false)} />}
+    </div>
     </div>
   );
 }

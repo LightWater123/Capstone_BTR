@@ -3,6 +3,9 @@ import profileuser from '../../assets/profile-user.png';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import LogoutButton from './LogoutButton';
+import { Settings } from 'lucide-react';
+import { UserPlus } from 'lucide-react';
+
 
 export default function BTRNavbar() {
   const [isDropOpen, setIsDropOpen] = useState(false);
@@ -61,8 +64,9 @@ export default function BTRNavbar() {
                 <a
                   onClick={handleCreateServiceAccount}
                   href="#"
-                  className="block px-4 py-2 hover:bg-gray-100"
+                  className="block w-full text-left px-4 py-2 hover:bg-gray-100"
                 >
+                  <UserPlus className='h-4 w-4 inline-block mr-2'/>
                   Create Service User Account
                 </a>
                 <button
@@ -72,9 +76,11 @@ export default function BTRNavbar() {
                   }}
                   className="block w-full text-left px-4 py-2 hover:bg-gray-100"
                 >
+                  <Settings className='h-4 w-4 inline-block mr-2'/>
                   Settings
                 </button>
-                <LogoutButton className="block w-full text-left px-4 py-2 hover:bg-gray-100" />
+
+                <LogoutButton className=" w-full text-left px-4 py-2 hover:bg-gray-100" />
               </div>
             )}
           </div>

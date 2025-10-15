@@ -3,6 +3,7 @@ import profileuser from '../../assets/profile-user.png';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import LogoutButton from './LogoutButton';
+import { Settings } from 'lucide-react';
 import { useServiceAuth } from '../../hooks/useServiceAuth';
 
 export default function Navbar() {
@@ -67,6 +68,7 @@ export default function Navbar() {
               <div className="absolute right-0 top-full mt-2 w-40 rounded-lg border bg-white shadow-lg py-1 z-50">
                 
                 <a href="#" className="block px-4 py-2 hover:bg-gray-100">
+                  <Settings className='h-4 w-4 inline-block mr-2'/>
                   Settings
                 </a>
 

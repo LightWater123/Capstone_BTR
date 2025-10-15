@@ -19,7 +19,7 @@ export default function CalendarModal() {
         <h2 className="text-xl font-bold text-gray-700">Calendar</h2>
         <button
           onClick={() => navigate('/calendar-full')}
-          className="text-sm text-blue-600 hover:underline"
+          className="text-sm text-yellow-400 hover:underline"
         >
           View Full Calendar
         </button>
