@@ -23,7 +23,7 @@ export default function useMaintenanceMessages() {
 
   const updateStatus = async (jobId, status) => {
 
-    console.log('updateStatus called with jobId:', jobId);
+    //console.log('updateStatus called with jobId:', jobId);
     if (!jobId || !/^[0-9a-fA-F]{24}$/.test(jobId)) {
      console.warn('Invalid job id - not calling API', jobId);
      return;

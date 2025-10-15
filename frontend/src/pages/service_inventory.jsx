@@ -153,7 +153,7 @@ export default function ServiceInventory() {
 
   // Load maintenance details for selected item
   const loadMaintenanceDetails = (id) => {
-    console.log(id)
+    //console.log(id)
     setSelectedId(id);
     fetchMaintenanceDetails(id);
   };

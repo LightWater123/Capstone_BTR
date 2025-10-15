@@ -27,26 +27,26 @@ export default function AdminDashboard() {
 
             // Get current date for debugging
             const today = new Date();
-            console.log("Today's date:", today.toISOString());
+            //console.log("Today's date:", today.toISOString());
             
             // Use the api instance
             const response = await api.get('/api/maintenance/due-for-maintenance?days=2');
             
             // Log the response for debugging
-            console.log("API Response:", response.data);
+            //console.log("API Response:", response.data);
             
             // The data is in the `data.data` property of the response
             setDueItems(response.data.data || []);
             
             // Additional debugging info
             if (response.data.date_range) {
-                console.log("Checking dates from", response.data.date_range.from, "to", response.data.date_range.to);
+                //console.log("Checking dates from", response.data.date_range.from, "to", response.data.date_range.to);
             }
         } catch (err) {
             // Axios provides a more detailed error object
             const errorMessage = err.response?.data?.error || err.response?.data?.message || err.message || 'An unknown error occurred';
             setError(errorMessage);
-            console.error("Failed to fetch maintenance items:", err);
+            //console.error("Failed to fetch maintenance items:", err);
         } finally {
             setIsLoading(false);
         }

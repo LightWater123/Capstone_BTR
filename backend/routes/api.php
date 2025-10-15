@@ -39,6 +39,8 @@ Route::middleware(['auth:admin'])->group(function () {
          ->only(['index','store','update','destroy']);
     // pdf parse
     Route::post('parse-pdf', [PdfParserController::class, 'parse']);
+    // bulk delete
+    Route::delete('inventory/bulk-destroy', [EquipmentController::class, 'bulkDestroy']);
 
     // admin maintenance
     Route::prefix('maintenance')->group(function () {
