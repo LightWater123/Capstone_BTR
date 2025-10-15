@@ -27,6 +27,7 @@ export default function App() {
       <Router>
         <Routes>
           <Route path="/" element={<Login />} />
+          <Route path="*" element={<Login />} />
           
           <Route path="/register/admin" element={<AdminRegister />} />
           <Route path="/register/service" element={<ServiceRegister />} />
@@ -42,6 +43,7 @@ export default function App() {
           <Route path="/calendar-full" element={<CalendarFullPage />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/service/settings" element={<SettingsPage />} />
         </Routes>
     </Router>
     </QueryClientProvider>

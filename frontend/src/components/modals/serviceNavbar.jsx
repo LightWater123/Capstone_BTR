@@ -22,13 +22,13 @@ export default function Navbar() {
         {/* LEFT */}
         <div className="flex items-center gap-3">
           <button
-        onClick={handleBack}
-        className="text-sm bg-white  px-3 py-1 rounded"
-      >
-          <span className="grid h-10 w-10 place-items-center rounded-lg text-gray-500 font-bold text-lg">
-            Dashboard
-          </span>
-      </button>
+            onClick={handleBack}
+            className="text-sm bg-white  px-3 py-1 rounded"
+          >
+            <span className="grid h-10 w-10 place-items-center rounded-lg text-gray-500 font-bold text-lg">
+              Dashboard
+            </span>
+          </button>
         </div>
 
         {/* RIGHT */}
@@ -36,7 +36,7 @@ export default function Navbar() {
           {/* User dropdown */}
           <div className="relative">
             <button
-              onClick={() => setIsDropOpen(v => !v)}
+              onClick={() => setIsDropOpen((v) => !v)}
               className="flex items-center gap-2 text-gray-700 hover:text-blue-700"
             >
               <img
@@ -49,7 +49,7 @@ export default function Navbar() {
               </span>
               <svg
                 className={`h-4 w-4 transition ${
-                  isDropOpen ? 'rotate-180' : ''
+                  isDropOpen ? "rotate-180" : ""
                 }`}
                 fill="none"
                 stroke="currentColor"
@@ -65,14 +65,19 @@ export default function Navbar() {
             </button>
 
             {isDropOpen && (
-              <div className="absolute right-0 top-full mt-2 w-40 rounded-lg border bg-white shadow-lg py-1 z-50">
-                
-                <a href="#" className="block px-4 py-2 hover:bg-gray-100">
-                  <Settings className='h-4 w-4 inline-block mr-2'/>
-                  Settings
-                </a>
+              <div className="absolute right-0 top-full mt-2 w-40 rounded-lg border bg-white shadow-lg py-1 z-40">
+                  <button
+                    onClick=
+                    {() => {
+                      setIsDropOpen(false);
+                      navigate("/service/settings");
+                    }}
+                    className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                    >
+                    <Settings className="h-4 w-4 inline-block mr-2" />
+                    Settings
+                  </button>
 
-                
                 <LogoutButton className="block w-full text-left px-4 py-2 hover:bg-gray-100" />
               </div>
             )}
