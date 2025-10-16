@@ -48,7 +48,7 @@ export default function MaintenanceList() {
         </div>
 
         {/* Search Bar */}
-        <div className="mb-4 flex gap-4">
+        <div className="mb-4 flex gap-2 sm:justify-end mt-4">
           <input
             type="text"
             placeholder="Search by asset or email..."
@@ -58,7 +58,7 @@ export default function MaintenanceList() {
           />
           <select
             onChange={(e) => setSortBy(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-yellow-400"
+            className="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-yellow-400 "
           >
             <option value="asset_name">Sort by Name</option>
             <option value="scheduled_at">Sort by Date</option>

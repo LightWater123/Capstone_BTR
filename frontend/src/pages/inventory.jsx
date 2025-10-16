@@ -252,7 +252,7 @@ export default function InventoryDashboard() {
                     onClick={() => handleSort("price")}
                     className="block w-full text-left px-4 py-2 hover:bg-gray-100"
                   >
-                    Price (Highest to lowest)
+                    Price (Highest to Lowest)
                   </button>
                   <button
                     onClick={() => handleSort("category")}
@@ -300,7 +300,7 @@ export default function InventoryDashboard() {
 
         {/* Equipment Table */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="px-4 pt-6">
+          <div className="px-1 pt-3 pb-3 bg-transparent rounded-xl shadow-md">
             {filteredData.length === 0 ? (
               <p className="text-gray-500">No equipment found in {category}.</p>
             ) : (
