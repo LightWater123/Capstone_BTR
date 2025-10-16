@@ -80,33 +80,46 @@ export default function ScheduleModal({ asset, onClose, onScheduled }) {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center">
       <div className="bg-white rounded p-6 w-full max-w-md space-y-4">
-        <h2 className="text-lg font-semibold">Schedule maintenance for {asset.description}</h2>
+        <h2 className="text-lg font-semibold">
+          Schedule maintenance for {asset.description}
+        </h2>
 
-        <label>Service-User E-mail</label>
-        <input
-          type="email"
-          className="w-full border rounded p-2"
-          placeholder="user@example.com"
-          value={form.recipientEmail}
-          onChange={(e) => setForm({ ...form, recipientEmail: e.target.value })}
-        />
+        <div className="flex flex-col items-start space-y-2">
+          <label className="text-base font-medium text-gray-700">
+            Service-User E-mail
+          </label>
+          <input
+            type="email"
+            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring focus:ring-yellow-400"
+            placeholder="user@example.com"
+            value={form.recipientEmail}
+            onChange={(e) =>
+              setForm({ ...form, recipientEmail: e.target.value })
+            }
+          />
+        </div>
 
-        <label>Service-User Name (optional)</label>
-        <input
-          type="text"
-          className="w-full border rounded p-2"
-          placeholder="Juan Dela Cruz"
-          value={form.recipientName}
-          onChange={(e) => setForm({ ...form, recipientName: e.target.value })}
-        />
+        <div className='flex flex-col items-start space-y-2'>
+          <label className='text-base font-medium text-gray-700'>Service-User Name (optional)</label>
+          <input
+            type="text"
+            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring focus:ring-yellow-400"
+            placeholder="Juan Dela Cruz"
+            value={form.recipientName}
+            onChange={(e) => setForm({ ...form, recipientName: e.target.value })}
+          />
+        </div>
 
-        <label>Date & Time</label>
+        <div className='flex flex-col items-start space-y-2'>
+        <label className='text-base font-medium text-gray-700'>Date & Time</label>
         <Flatpickr
           value={form.scheduledAt}
           onChange={([d]) => setForm({ ...form, scheduledAt: d })}
-          options={{ enableTime: true, dateFormat: 'Y-m-d H:i' }}
+          options={{ enableTime: true, dateFormat: "Y-m-d H:i" }}
         />
+        </div>
 
+        <div className='flex flex-col items-start space-y-2'>
         <label>Message (preview)</label>
         <textarea
           className="w-full border rounded p-2"
@@ -114,11 +127,18 @@ export default function ScheduleModal({ asset, onClose, onScheduled }) {
           value={dynamicMessage}
           readOnly /* let the user see it update live */
         />
+        </div>
 
         <div className="flex justify-end gap-2">
-          <button onClick={onClose} className="btn btn-secondary">Cancel</button>
-          <button onClick={handleSchedule} disabled={loading} className="btn btn-primary">
-            {loading ? 'Scheduling...' : 'Schedule & Notify'}
+          <button onClick={onClose} className="btn btn-secondary bg-red-500 hover:bg-red-600 px-4 py-2 rounded font-semibold text-white">
+            Cancel
+          </button>
+          <button
+            onClick={handleSchedule}
+            disabled={loading}
+            className="btn btn-primary bg-yellow-500 hover:bg-yellow-600 px-4 py-2 rounded font-semibold text-white"
+          >
+            {loading ? "Scheduling..." : "Schedule & Notify"}
           </button>
         </div>
       </div>

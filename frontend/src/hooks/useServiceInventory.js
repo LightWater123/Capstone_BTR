@@ -6,6 +6,10 @@ export function useServiceInventory() {
   const queryClient = useQueryClient();
   const [maintId, setMaintId] = useState(undefined);
 
+    // ➊  search / sort state
+  const [searchQuery, setSearchQuery] = useState("");
+  
+
   // Fetch inventory maintenance items using TanStack Query with 10-second refetch interval
   const { data: maintenanceItems = [], refetch: refetchMaintenance } = useQuery({
     queryKey: ['service-inventory', 'maintenance'],
@@ -105,6 +109,7 @@ export function useServiceInventory() {
     refetchMaintenance,
     refetchArchived,
     updateStatus,
-    fetchMaintenanceDetails
+    fetchMaintenanceDetails,
+    setSearchQuery
   };
 }

@@ -67,7 +67,7 @@ export default function AdminDashboard() {
               onClick={handleInventoryList}
               className="w-full h-[350px] bg-white rounded-xl text-gray-800 hover:bg-[#FCFC62] font-medium shadow-md text-3xl flex items-center justify-center transition-colors"
             >
-              <Wrench className="h-10 w-10 inline-block mr-2"/>
+              <Wrench className="h-10 w-10 inline-block mr-2 relative m-4"/>
               Preventive Maintenance
             </button>
           </div>
