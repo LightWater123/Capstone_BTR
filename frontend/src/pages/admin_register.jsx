@@ -67,7 +67,6 @@ export default function AdminRegister() {
 
   return (
     <div className="min-h-screen flex items-center justify-center relative">
-
       {/* background image */}
       <div
         className="absolute inset-0"
@@ -82,71 +81,103 @@ export default function AdminRegister() {
       {/* yellow overlay */}
       <div className="absolute inset-0 bg-[#FCFC62] opacity-90"></div>
 
-      <form onSubmit={handleRegister}
+      <form
+        onSubmit={handleRegister}
         className="relative p-6 space-y-4 w-full max-w-sm rounded-lg bg-white"
         style={{ boxShadow: "0 4px 50px rgba(0, 0, 0, 0.3)" }}
       >
         <img src={btrlogo} alt="Logo" className="mx-auto w-24 h-24" />
-        <h1 className="text-2xl font-bold text-center text-gray-800">Admin Registration</h1>
+        <h1 className="text-2xl font-bold text-center text-gray-800">
+          Admin Registration
+        </h1>
 
         {Object.values(errors).map((err, i) => (
-          <p key={i} className="text-red-500 mb-2">{err}</p>
+          <p key={i} className="text-red-500 mb-2">
+            {err}
+          </p>
         ))}
 
         <div className="flex flex-col items-start space-y-2">
-          <input name="name"
+          <input
+            name="name"
             placeholder="Name"
             value={formData.name}
             onChange={handleChange}
-            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring focus:ring-yellow-400" required
+            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring focus:ring-yellow-400"
+            required
           />
         </div>
 
         <div className="flex flex-col items-start space-y-2">
-          <input name="username"
+          <input
+            name="username"
             placeholder="Username"
             value={formData.username}
             onChange={handleChange}
-            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring focus:ring-yellow-400" required />
+            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring focus:ring-yellow-400"
+            required
+          />
         </div>
 
         <div className="flex flex-col items-start space-y-2">
-          <input name="email"
+          <input
+            name="email"
             type="email"
             placeholder="Email"
             value={formData.email}
             onChange={handleChange}
-            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring focus:ring-yellow-400" required />
+            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring focus:ring-yellow-400"
+            required
+          />
         </div>
 
         <div className="flex flex-col items-start space-y-2">
-          <input name="mobile_number"
+          <input
+            name="mobile_number"
+            type="tel"
             placeholder="Mobile Number"
             value={formData.mobile_number}
-            onChange={handleChange}
-            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring focus:ring-yellow-400" required />
+            onChange={(e) => {
+              const digits = e.target.value.replace(/\D/g, "").slice(0, 11);
+              handleChange({
+                target: { name: "mobile_number", value: digits },
+              });
+            }}
+            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring focus:ring-yellow-400"
+            required
+            pattern="\d{11}"
+          />
         </div>
 
         <div className="flex flex-col items-start space-y-2">
-          <input name="password"
+          <input
+            name="password"
             type="password"
             placeholder="Password"
             value={formData.password}
             onChange={handleChange}
-            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring focus:ring-yellow-400" required />
+            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring focus:ring-yellow-400"
+            required
+          />
         </div>
 
         <div className="flex flex-col items-start space-y-2">
-          <input name="confirm_password"
+          <input
+            name="confirm_password"
             type="password"
             placeholder="Confirm Password"
             value={formData.confirm_password}
             onChange={handleChange}
-            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring focus:ring-yellow-400" required />
+            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring focus:ring-yellow-400"
+            required
+          />
         </div>
 
-        <button type="submit" disabled={loading}
-          className="w-full py-2 text-white font-bold rounded bg-yellow-400 hover:bg-yellow-500">
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full py-2 text-white font-bold rounded bg-yellow-400 hover:bg-yellow-500"
+        >
           {loading ? "Registering..." : "Register"}
         </button>
 
@@ -157,7 +188,6 @@ export default function AdminRegister() {
             Login
           </Link>
         </p>
-
       </form>
     </div>
   );
