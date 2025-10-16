@@ -57,7 +57,7 @@ class EquipmentController extends Controller
                 'category'        => ['required', 'string', Rule::in(['PPE', 'RPCSP'])],
                 'article'         => ['required', 'string'],
                 'description'     => ['required', 'string'],
-                'property_ro'     => ['required_if:category,PPE', 'string'], // or semi-expendable property no.
+                'property_ro'     => ['required_if:category,PPE', 'nullable','string'], // or semi-expendable property no.
                 'property_co'     => ['nullable', 'string'], // only for PPE
                 'semi_expendable_property_no' => ['required_if:category,RPCSP', 'nullable', 'string'], // only for RPCSP
                 'unit'            => ['required', 'string'],

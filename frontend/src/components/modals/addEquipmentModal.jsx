@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 export default function AddEquipmentModal({
   isOpen,
@@ -21,6 +21,14 @@ export default function AddEquipmentModal({
       reader.readAsDataURL(file);
     }
   };
+
+  // resets the img selected in the upload img
+  useEffect(()=>{
+    if(!isOpen){
+      setUploadedImage(null);
+      
+    }
+  },[isOpen]); 
 
   if (!isOpen) return null;
 
