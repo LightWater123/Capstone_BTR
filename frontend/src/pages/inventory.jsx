@@ -5,15 +5,15 @@ import { useMaintenance } from "../hooks/useMaintenance";
 import { parsePdf } from "../hooks/usePdfParser";
 import { useCsrf } from "../hooks/useCsrf";
 import api from "../api/api";
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
 import BTRheader from "../components/modals/btrHeader";
 import BTRNavbar from "../components/modals/btrNavbar.jsx";
-import { Icon, Plus } from 'lucide-react';
-import { Monitor } from 'lucide-react';
-import { Calendar } from 'lucide-react';
-import { Car } from 'lucide-react';
-import { Keyboard } from 'lucide-react';
-import { Search } from 'lucide-react';
+import { Icon, Plus } from "lucide-react";
+import { Monitor } from "lucide-react";
+import { Calendar } from "lucide-react";
+import { Car } from "lucide-react";
+import { Keyboard } from "lucide-react";
+import { Search } from "lucide-react";
 
 // Modals
 import ScheduleMaintenanceModal from "../components/modals/scheduleModal.jsx";
@@ -22,6 +22,7 @@ import AddEquipmentModal from "../components/modals/addEquipmentModal.jsx";
 import UploadPDFModal from "../components/modals/uploadPDFModal.jsx";
 import ViewFullDetailModal from "../components/modals/fullDetailModal.jsx";
 import EditItemModal from "../components/modals/editItemModal.jsx";
+import ViewHistory from "../components/modals/viewHistoryModal.jsx";
 
 export default function InventoryDashboard() {
   useCsrf();
@@ -29,11 +30,9 @@ export default function InventoryDashboard() {
   // Category state
   const [category, setCategory] = useState("PPE");
 
-
   //Sort
   const [showSortOptions, setShowSortOptions] = useState(false);
 
-  
   // Inventory hook
   const {
     inventoryData,
@@ -43,16 +42,16 @@ export default function InventoryDashboard() {
     fetchInventory,
     handleDelete,
     setSortBy,
-    setInventoryData
+    setInventoryData,
   } = useInventory(category);
-  
+
   // Maintenance hook
   const { maintenanceSchedules, fetchSchedules } = useMaintenance();
-  
+
   //Sort Handler
   const handleSort = (type) => {
     //console.log("Sorting by:", type);
-    setSortBy(type)
+    setSortBy(type);
     setShowSortOptions(false); // close after picking
   };
   // Modals
@@ -64,6 +63,7 @@ export default function InventoryDashboard() {
   const [showScheduleModal, setShowScheduleModal] = useState(false);
   const [showSentModal, setShowSentModal] = useState(false);
   const [lastSent, setLastSent] = useState(null);
+  const [showViewHistory, setShowViewHistory] = useState(false);
 
   // Selected items
   const [selectedItem, setSelectedItem] = useState(null);
@@ -77,11 +77,9 @@ export default function InventoryDashboard() {
   // this toast displays after scheduling
   const handleScheduled = (job) => {
     toast.success("Maintenance scheduled & mail sent!");
-    setLastSent(job);          // the record we just created
-    setShowSentModal(true);    // pop the mini receipt
+    setLastSent(job); // the record we just created
+    setShowSentModal(true); // pop the mini receipt
   };
-
-
 
   // PDF file
   const [pdfFile, setPdfFile] = useState(null);
@@ -99,15 +97,15 @@ export default function InventoryDashboard() {
     unit: "pc",
     unit_value: 0,
     location: "",
-    remarks: ""
+    remarks: "",
   });
 
-  // state 
+  // state
   const [newItem, setNewItem] = useState(initialShape(category));
 
   // keep category in sync
   useEffect(() => {
-    setNewItem(prev => ({ ...prev, category }));
+    setNewItem((prev) => ({ ...prev, category }));
   }, [category]);
 
   // submit
@@ -118,7 +116,7 @@ export default function InventoryDashboard() {
     const payload = Object.fromEntries(
       Object.entries(newItem).map(([k, v]) => [
         k,
-        typeof v === "string" && v.trim() === "" ? null : v
+        typeof v === "string" && v.trim() === "" ? null : v,
       ])
     );
 
@@ -126,7 +124,7 @@ export default function InventoryDashboard() {
     try {
       await api.post("/api/inventory", payload);
       setShowModal(false);
-      setNewItem(initialShape(category));   // reset
+      setNewItem(initialShape(category)); // reset
       await fetchInventory();
     } catch (err) {
       console.error("Add item failed:", err.response?.data || err);
@@ -163,10 +161,10 @@ export default function InventoryDashboard() {
         recorded_count: Number(row.quantity_per_property_card) || 0,
         actual_count: Number(row.quantity_per_physical_count) || 0,
         location: row.whereabouts || "",
-        remarks: row.remarks || ""
+        remarks: row.remarks || "",
       }));
 
-      setInventoryData(prev => [...prev, ...formattedItems]);
+      setInventoryData((prev) => [...prev, ...formattedItems]);
       setShowPdfModal(false);
       setShowModal(false);
       alert("PDF uploaded and inventory updated!");
@@ -177,7 +175,9 @@ export default function InventoryDashboard() {
   };
 
   // derive the actual equipment object
-  const selectedEquipment = inventoryData.find(eq => eq.id === selectedEquipmentIds[0]);
+  const selectedEquipment = inventoryData.find(
+    (eq) => eq.id === selectedEquipmentIds[0]
+  );
 
   // opens the schedule modal for only 1 row
   const openScheduleModal = () => {
@@ -305,118 +305,118 @@ export default function InventoryDashboard() {
               <p className="text-gray-500">No equipment found in {category}.</p>
             ) : (
               <div className="overflow-x-auto w-full">
-              <table className="w-full table-auto border border-gray-300">
-                <thead className="bg-black-100">
-                  <tr>
-                    <th className="border px-2 py-1">Article</th>
-                    <th className="border px-2 py-1">Description</th>
-                    {category === "PPE" ? (
-                      <>
-                        <th className="border px-2 py-1">
-                          Property Number (RO)
-                        </th>
-                        <th className="border px-2 py-1">
-                          Property Number (CO)
-                        </th>
-                      </>
-                    ) : (
-                      <th className="border px-2 py-1">
-                        Semi-Expendable Property No.
-                      </th>
-                    )}
-                    <th className="border px-2 py-1">Unit</th>
-                    <th className="border px-2 py-1">Unit Value</th>
-                    <th className="border px-2 py-1">Actions</th>
-                    <th className="border px-2 py-1 text-center">
-                      <input
-                        type="checkbox"
-                        checked={
-                          filteredData.length > 0 &&
-                          selectedEquipmentIds.length === filteredData.length
-                        }
-                        onChange={(e) => {
-                          setSelectedEquipmentIds(
-                            e.target.checked
-                              ? filteredData.map((item) => item.id)
-                              : []
-                          );
-                        }}
-                        className="accent-green-500 w-4 h-4"
-                        title="Select All"
-                      />
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredData.map((item, index) => (
-                    <tr key={index} className="hover:bg-gray-100 transition">
-                      <td className="border px-2 py-1 text-center">
-                        {item.article}
-                      </td>
-                      <td className="border px-2 py-1 text-center">
-                        {item.description}
-                      </td>
-                      {item.category === "PPE" ? (
+                <table className="w-full table-auto border border-gray-300">
+                  <thead className="bg-black-100">
+                    <tr>
+                      <th className="border px-2 py-1">Article</th>
+                      <th className="border px-2 py-1">Description</th>
+                      {category === "PPE" ? (
                         <>
-                          <td className="border px-2 py-1 text-center">
-                            {item.property_ro}
-                          </td>
-                          <td className="border px-2 py-1 text-center">
-                            {item.property_co || (
-                              <span className="text-gray-400 italic">—</span>
-                            )}
-                          </td>
+                          <th className="border px-2 py-1">
+                            Property Number (RO)
+                          </th>
+                          <th className="border px-2 py-1">
+                            Property Number (CO)
+                          </th>
                         </>
                       ) : (
-                        <td className="border px-2 py-1 text-center">
-                          {item.semi_expendable_property_no}
-                        </td>
+                        <th className="border px-2 py-1">
+                          Semi-Expendable Property No.
+                        </th>
                       )}
-                      <td className="border px-2 py-1 text-center">
-                        {item.unit}
-                      </td>
-                      <td className="border px-2 py-1 text-center">
-                        ₱
-                        {Number(item.unit_value).toLocaleString("en-PH", {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        })}
-                      </td>
-                      <td className="border px-2 py-1 text-center space-x-2">
-                        <button
-                          className="bg-yellow-400 text-white px-2 py-1 rounded hover:bg-yellow-500"
-                          onClick={() => {
-                            setSelectedDetailItem(item);
-                            setShowDetailModal(true);
-                          }}
-                        >
-                          View Full Detail
-                        </button>
-                      </td>
-                      <td className="border px-2 py-1 text-center">
+                      <th className="border px-2 py-1">Unit</th>
+                      <th className="border px-2 py-1">Unit Value</th>
+                      <th className="border px-2 py-1">Actions</th>
+                      <th className="border px-2 py-1 text-center">
                         <input
                           type="checkbox"
-                          checked={selectedEquipmentIds.includes(item.id)}
+                          checked={
+                            filteredData.length > 0 &&
+                            selectedEquipmentIds.length === filteredData.length
+                          }
                           onChange={(e) => {
-                            setSelectedEquipmentIds((prev) =>
+                            setSelectedEquipmentIds(
                               e.target.checked
-                                ? [...prev, item.id]
-                                : prev.filter((id) => id !== item.id)
+                                ? filteredData.map((item) => item.id)
+                                : []
                             );
                           }}
                           className="accent-green-500 w-4 h-4"
-                          title="Select for Maintenance"
+                          title="Select All"
                         />
-                      </td>
+                      </th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {filteredData.map((item, index) => (
+                      <tr key={index} className="hover:bg-gray-100 transition">
+                        <td className="border px-2 py-1 text-center">
+                          {item.article}
+                        </td>
+                        <td className="border px-2 py-1 text-center">
+                          {item.description}
+                        </td>
+                        {item.category === "PPE" ? (
+                          <>
+                            <td className="border px-2 py-1 text-center">
+                              {item.property_ro}
+                            </td>
+                            <td className="border px-2 py-1 text-center">
+                              {item.property_co || (
+                                <span className="text-gray-400 italic">—</span>
+                              )}
+                            </td>
+                          </>
+                        ) : (
+                          <td className="border px-2 py-1 text-center">
+                            {item.semi_expendable_property_no}
+                          </td>
+                        )}
+                        <td className="border px-2 py-1 text-center">
+                          {item.unit}
+                        </td>
+                        <td className="border px-2 py-1 text-center">
+                          ₱
+                          {Number(item.unit_value).toLocaleString("en-PH", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}
+                        </td>
+                        <td className="border px-2 py-1 text-center space-x-2">
+                          <button
+                            className="bg-yellow-400 text-white px-2 py-1 rounded hover:bg-yellow-500"
+                            onClick={() => {
+                              setSelectedDetailItem(item);
+                              setShowDetailModal(true);
+                            }}
+                          >
+                            View Full Detail
+                          </button>
+                        </td>
+                        <td className="border px-2 py-1 text-center">
+                          <input
+                            type="checkbox"
+                            checked={selectedEquipmentIds.includes(item.id)}
+                            onChange={(e) => {
+                              setSelectedEquipmentIds((prev) =>
+                                e.target.checked
+                                  ? [...prev, item.id]
+                                  : prev.filter((id) => id !== item.id)
+                              );
+                            }}
+                            className="accent-green-500 w-4 h-4"
+                            title="Select for Maintenance"
+                          />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             )}
           </div>
         </div>
-    
+
         {/* Modals */}
         <TypeSelectorModal
           isOpen={showTypeSelector}
@@ -479,6 +479,7 @@ export default function InventoryDashboard() {
           isOpen={showDetailModal}
           item={selectedDetailItem}
           onClose={() => setShowDetailModal(false)}
+          onViewHistory={() => setShowViewHistory(true)}
           onEdit={() => {
             setSelectedItem(selectedDetailItem);
             setShowEditModal(true);
@@ -497,6 +498,12 @@ export default function InventoryDashboard() {
               console.error("Error deleting item:", err);
             }
           }}
+        />
+
+        <ViewHistory
+          isOpen={showViewHistory}
+          setOpen={setShowViewHistory}
+          detailItem={selectedDetailItem}
         />
 
         <EditItemModal
