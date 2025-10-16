@@ -29,7 +29,7 @@ export function useMonitorMaintenance() {
     if(query.startsWith("id:"))
       {
         const idQuery = query.slice(3);
-        console.log(idQuery);
+        //console.log(idQuery);
         return schedule.asset_id?.toLowerCase().includes(idQuery);
       }
     return schedule.asset_name?.toLowerCase().includes(query) || 

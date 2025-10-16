@@ -50,7 +50,7 @@ export default function AdminRegister() {
         role: 'admin',
       });
 
-      console.log("Registered user:", response.data.user);
+      //console.log("Registered user:", response.data.user);
       navigate('/');
     } catch (err) {
       console.error("Registration error:", err.response?.data);

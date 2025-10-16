@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 use App\Models\MaintenanceJob;
 use MongoDB\BSON\ObjectId;
+use Illuminate\Database\Eloquent\Builder; // Added for type-hinting
+use Carbon\Carbon; // Added for date manipulation
 
 class EquipmentController extends Controller
 {
@@ -27,22 +29,77 @@ class EquipmentController extends Controller
 
     /**
      * GET /api/inventory
-     * Retrieve equipment filtered by category (PPE or RPCSP)
+     * Retrieve equipment filtered by category (PPE or RPCSP),
+     * enriched with predictive maintenance data.
      */
     public function index(Request $request)
     {
         $category = $request->query('category');
 
-        // initialize query
-        $query = Equipment::query();
+        // 1. Define maintenance intervals in MONTHS for each equipment type.
+        $maintenanceIntervals = [
+            'airconditioner' => 6,
+            'generator' => 3,
+            'transformer' => 12,
+            'computer' => 12,
+            'pc set' => 12,
+            'notebook' => 12,
+            'refrigerator' => 6,
+        ];
+        $keywords = array_keys($maintenanceIntervals);
 
-        // apply category filter if present
+        // 2. Initialize the base query with the category filter
+        $query = Equipment::query();
         if ($category) {
             $query->where('category', $category);
         }
 
-        // return matching equipment
-        return response()->json($query->get(), 200);
+        // 3. Get the equipment and then map over the collection to add the predictive date
+        $equipmentWithSchedule = $query->get()->map(function ($equipment) use ($maintenanceIntervals, $keywords) {
+            $interval = 0;
+            $description = $equipment->description ?? ''; // Use null coalescing to prevent errors
+
+            // Find the matching keyword and its interval for the current equipment's description.
+            foreach ($maintenanceIntervals as $keyword => $months) {
+                if (stripos($description, $keyword) !== false) {
+                    $interval = $months;
+                    break; // Stop after finding the first match
+                }
+            }
+
+            // Add the new attribute to the equipment object, defaulting to null.
+            // This will be the value for items that don't need maintenance or have no date.
+            $equipment->next_maintenance_checkup = null;
+
+            // If a matching type was found and it requires maintenance, proceed.
+            if ($interval > 0) {
+                // Use the most recent date: 'end_date' (completion) is best, otherwise 'start_date'.
+                $lastMaintenanceDate = $equipment->end_date ?: $equipment->start_date;
+
+                // *** KEY FIX: Check if a date actually exists before trying to parse it. ***
+                if ($lastMaintenanceDate) {
+                    try {
+                        // Ensure the date is a Carbon instance for calculations.
+                        $lastMaintenanceDate = Carbon::parse($lastMaintenanceDate);
+                        // Calculate the next due date based on the interval.
+                        $nextMaintenanceDate = (clone $lastMaintenanceDate)->addMonths($interval);
+                        
+                        // Format the date to the MM/dd/yyyy format requested by the frontend
+                        $equipment->next_maintenance_checkup = $nextMaintenanceDate->format('m/d/Y');
+                    } catch (\Exception $e) {
+                        // Log error if date parsing fails for some reason (e.g., invalid format)
+                        Log::warning("Could not parse maintenance date for equipment ID: " . $equipment->_id, ['error' => $e->getMessage()]);
+                        $equipment->next_maintenance_checkup = 'Invalid Date';
+                    }
+                }
+            }
+
+            // Return the modified equipment object
+            return $equipment;
+        });
+
+        // 4. Return the enriched collection as JSON
+        return response()->json($equipmentWithSchedule, 200);
     }
 
     /**
@@ -69,7 +126,6 @@ class EquipmentController extends Controller
                 'condition' => 'nullable|string',
                 'start_date' => 'nullable|date',
                 'end_date' => 'nullable|date',
-
             ]);
 
             

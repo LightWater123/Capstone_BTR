@@ -277,6 +277,7 @@ class MaintenanceController extends Controller
 
                 // Prepare the data for our view, formatting the date exactly as requested.
                 $maintenanceSchedule[] = [
+                    'id' => $equipment->id,
                     'description' => $equipment->description,
                     'next_maintenance_checkup' => $nextMaintenanceDate ? $nextMaintenanceDate->format('m/d/Y') : 'N/A',
                 ];
@@ -285,6 +286,6 @@ class MaintenanceController extends Controller
 
         // 5. Return the schedule to a view for rendering.
         // We will create this view file next.
-        return view('maintenance.predictive-schedule', ['schedule' => $maintenanceSchedule]);
+        return $maintenanceSchedule;
     }
 }

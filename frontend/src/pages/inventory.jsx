@@ -98,6 +98,7 @@ export default function InventoryDashboard() {
     unit_value: 0,
     location: "",
     remarks: "",
+    //image: ""
   });
 
   // state
@@ -119,6 +120,8 @@ export default function InventoryDashboard() {
         typeof v === "string" && v.trim() === "" ? null : v,
       ])
     );
+
+    //console.log(payload)
 
     // add item
     try {
