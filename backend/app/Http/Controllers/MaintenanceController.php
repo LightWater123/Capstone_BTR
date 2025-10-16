@@ -237,6 +237,7 @@ class MaintenanceController extends Controller
             foreach ($keywords as $keyword) {
                 // Using 'regex' for case-insensitive search in MongoDB
                 $query->orWhere('description', 'regex', new \MongoDB\BSON\Regex($keyword, 'i'));
+                $query->orWhere('article', 'regex', new \MongoDB\BSON\Regex($keyword, 'i'));
             }
         })->get();
 
@@ -251,7 +252,9 @@ class MaintenanceController extends Controller
                 if (stripos($equipment->description, $keyword) !== false) {
                     $interval = $months;
                     break; // Stop after finding the first match
-                }
+                } else if (stripos($equipment->article, $keyword) !== false) {
+                    $interval = $months;
+                    break; }
             }
 
             // If a matching type was found and it requires maintenance (interval > 0), proceed.
@@ -278,6 +281,7 @@ class MaintenanceController extends Controller
                 // Prepare the data for our view, formatting the date exactly as requested.
                 $maintenanceSchedule[] = [
                     'id' => $equipment->id,
+                    'article' => $equipment->article,
                     'description' => $equipment->description,
                     'next_maintenance_checkup' => $nextMaintenanceDate ? $nextMaintenanceDate->format('m/d/Y') : 'N/A',
                 ];
