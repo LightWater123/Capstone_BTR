@@ -12,6 +12,7 @@ export default function AdminDashboard() {
   const handleInventoryList = () => navigate("/inventory");
   const handleMaintenanceList = (e) => navigate(`/admin/maintenance-list?id=${e}`);
   const [open, setOpen] = useState(false);
+  const eventDates = [];
 
   // State for data, loading, and errors
   const [dueItems, setDueItems] = useState([]);
