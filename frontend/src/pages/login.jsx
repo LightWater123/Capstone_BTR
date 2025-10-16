@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import btrlogo from '../assets/btrlogo.png';
 import btrlegpics from '../assets/btrlegpics.jpg';
 import { Link } from "react-router-dom";
+import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
+
 
 
 export default function Login() {
@@ -12,6 +14,8 @@ export default function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -48,7 +52,7 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex items-center justify-center relative">
-      
+
       {/* background image */}
       <div
         className="absolute inset-0"
@@ -62,7 +66,7 @@ export default function Login() {
 
       {/* yellow overlay */}
       <div className="absolute inset-0 bg-[#FCFC62] opacity-90"></div>
-      
+
       {/* login form */}
       <form
         onSubmit={handleLogin}
@@ -75,37 +79,51 @@ export default function Login() {
 
         {/* username */}
         <div className="flex flex-col items-start space-y-2">
-        <input
-          type="text"
-          value={identifier}
-          onChange={(e) => setIdentifier(e.target.value)}
-          placeholder="Username or Email"
-          required
-          className="w-full px-4 py-2 border rounded focus:outline-none focus:ring focus:ring-yellow-400"
-        />
+          <input
+            type="text"
+            value={identifier}
+            onChange={(e) => setIdentifier(e.target.value)}
+            placeholder="Username or Email"
+            required
+            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring focus:ring-yellow-400"
+          />
         </div>
 
         {/* password */}
-        <div className="flex flex-col items-start space-y-2">
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Password"
-          required
-          className="w-full px-4 py-2 border rounded focus:outline-none focus:ring focus:ring-yellow-400"
-        />
 
-        {error && <p className="text-red-600 text-sm">{error}</p>}
+        <div className="flex flex-col items-start space-y-2 relative">
+          <input
+            type={showPassword ? "text" : "password"}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Password"
+            required
+            className="w-full px-4 py-2 pr-10 border rounded focus:outline-none focus:ring focus:ring-yellow-400"
+          />
+
+          <button
+            type="button"
+            onClick={() => setShowPassword((prev) => !prev)}
+            className="absolute right-3 top-2 focus:outline-none"
+          >
+            {showPassword ? (
+              <EyeSlashIcon className="h-5 w-5 text-gray-600 hover:text-gray-800" />
+            ) : (
+              <EyeIcon className="h-5 w-5 text-gray-600 hover:text-gray-800" />
+            )}
+          </button>
+
+
+          {error && <p className="text-red-600 text-sm">{error}</p>}
         </div>
-        
+
+
         {/* login button */}
         <button
           type="submit"
           disabled={loading}
-          className={`w-full py-2 text-white font-bold rounded ${
-            loading ? "bg-gray-400" : "bg-yellow-400 hover:bg-yellow-500"
-          }`}
+          className={`w-full py-2 text-white font-bold rounded ${loading ? "bg-gray-400" : "bg-yellow-400 hover:bg-yellow-500"
+            }`}
         >
           {loading ? "Logging in..." : "Login"}
         </button>
@@ -113,9 +131,9 @@ export default function Login() {
         {/* register Link */}
         <p className="text-center text-sm">
           Don’t have an account?{" "}
-            <Link to="/register/admin" className="text-blue-600 hover:underline font-medium">
+          <Link to="/register/admin" className="text-blue-600 hover:underline font-medium">
             Register
-            </Link>
+          </Link>
         </p>
 
         {/* forgot password */}
