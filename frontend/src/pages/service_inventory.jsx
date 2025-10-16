@@ -6,144 +6,161 @@ import BTRheader from "../components/modals/btrHeader";
 import Navbar from "../components/modals/serviceNavbar.jsx";
 import { useServiceInventory } from "../hooks/useServiceInventory";
 
-const StatusDropdown = ({ itemId, currentStatus, updateStatus, refetchMaintenance, refetchArchived }) => {
-    const [isOpen, setIsOpen] = useState(false);
-    const [status, setStatus] = useState(currentStatus || 'pending');
-    const [dropdownPosition, setDropdownPosition] = useState({ left: 0, top: 0 });
-    const dropdownRef = useRef(null);
-    const buttonRef = useRef(null);
+const StatusDropdown = ({
+  itemId,
+  currentStatus,
+  updateStatus,
+  refetchMaintenance,
+  refetchArchived,
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [status, setStatus] = useState(currentStatus || "pending");
+  const [dropdownPosition, setDropdownPosition] = useState({ left: 0, top: 0 });
+  const dropdownRef = useRef(null);
+  const buttonRef = useRef(null);
 
-    const handleStatusChange = async (newStatus) => {
-      setStatus(newStatus);
-      setIsOpen(false);
-      await updateStatus(itemId, newStatus).then(() => {
-        refetchArchived()
-        refetchMaintenance()
-      });
-    };
-
-    const getStatusColor = (status) => {
-      switch(status) {
-        case 'done': return 'bg-green-100 text-green-800';
-        case 'in-progress': return 'bg-blue-100 text-blue-800';
-        default: return 'bg-yellow-100 text-yellow-800';
-      }
-    };
-
-    // Calculate dropdown position when opening
-    const calculateDropdownPosition = () => {
-      if (buttonRef.current) {
-        const buttonRect = buttonRef.current.getBoundingClientRect();
-        // Position dropdown below the button
-        setDropdownPosition({
-          left: buttonRect.left,
-          top: buttonRect.bottom + 5 // Add 5px spacing
-        });
-      }
-    };
-
-    // Handle button click
-    const handleButtonClick = () => {
-      if (!isOpen) {
-        calculateDropdownPosition();
-      }
-      setIsOpen(!isOpen);
-    };
-
-    // Close dropdown when clicking outside
-    useEffect(() => {
-      const handleClickOutside = (event) => {
-        if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-          setIsOpen(false);
-        }
-      };
-
-      document.addEventListener('mousedown', handleClickOutside);
-      return () => {
-        document.removeEventListener('mousedown', handleClickOutside);
-      };
-    }, []);
-
-    // Close dropdown when scrolling
-    useEffect(() => {
-      const handleScroll = () => {
-        if (isOpen) {
-          setIsOpen(false);
-        }
-      };
-
-      window.addEventListener('scroll', handleScroll);
-      return () => {
-        window.removeEventListener('scroll', handleScroll);
-      };
-    }, [isOpen]);
-
-    // UI
-    return (
-      // Maintenance status dropdown
-      <div className="relative" onClick={(e) => e.stopPropagation()}>
-        <button
-          ref={buttonRef}
-          onClick={handleButtonClick}
-          className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(status)} flex items-center gap-1 w-full text-left`}
-        >
-          {status}
-          <svg className="w-3 h-3 ml-1" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-          </svg>
-        </button>
-        
-        {isOpen && (
-          <div
-            ref={dropdownRef}
-            style={{
-              position: 'fixed',
-              zIndex: 9999,
-              left: dropdownPosition.left,
-              top: dropdownPosition.top,
-            }}
-            className="w-48 bg-white rounded-md shadow-lg py-1"
-          >
-            <button
-              onClick={() => handleStatusChange('pending')}
-              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-            >
-              Pending
-            </button>
-            <button
-              onClick={() => handleStatusChange('in-progress')}
-              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-            >
-              In Progress
-            </button>
-            <button
-              onClick={() => handleStatusChange('done')}
-              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-            >
-              Done
-            </button>
-          </div>
-        )}
-      </div>
-    );
+  const handleStatusChange = async (newStatus) => {
+    setStatus(newStatus);
+    setIsOpen(false);
+    await updateStatus(itemId, newStatus).then(() => {
+      refetchArchived();
+      refetchMaintenance();
+    });
   };
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "done":
+        return "bg-green-100 text-green-800";
+      case "in-progress":
+        return "bg-blue-100 text-blue-800";
+      default:
+        return "bg-yellow-100 text-yellow-800";
+    }
+  };
+
+  // Calculate dropdown position when opening
+  const calculateDropdownPosition = () => {
+    if (buttonRef.current) {
+      const buttonRect = buttonRef.current.getBoundingClientRect();
+      // Position dropdown below the button
+      setDropdownPosition({
+        left: buttonRect.left,
+        top: buttonRect.bottom + 5, // Add 5px spacing
+      });
+    }
+  };
+
+  // Handle button click
+  const handleButtonClick = () => {
+    if (!isOpen) {
+      calculateDropdownPosition();
+    }
+    setIsOpen(!isOpen);
+  };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  // Close dropdown when scrolling
+  useEffect(() => {
+    const handleScroll = () => {
+      if (isOpen) {
+        setIsOpen(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [isOpen]);
+
+  // UI
+  return (
+    // Maintenance status dropdown
+    <div className="relative" onClick={(e) => e.stopPropagation()}>
+      <button
+        ref={buttonRef}
+        onClick={handleButtonClick}
+        className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(
+          status
+        )} flex items-center gap-1 w-full text-left`}
+      >
+        {status}
+        <svg className="w-3 h-3 ml-1" fill="currentColor" viewBox="0 0 20 20">
+          <path
+            fillRule="evenodd"
+            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+            clipRule="evenodd"
+          />
+        </svg>
+      </button>
+
+      {isOpen && (
+        <div
+          ref={dropdownRef}
+          style={{
+            position: "fixed",
+            zIndex: 9999,
+            left: dropdownPosition.left,
+            top: dropdownPosition.top,
+          }}
+          className="w-48 bg-white rounded-md shadow-lg py-1"
+        >
+          <button
+            onClick={() => handleStatusChange("pending")}
+            className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+          >
+            Pending
+          </button>
+          <button
+            onClick={() => handleStatusChange("in-progress")}
+            className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+          >
+            In Progress
+          </button>
+          <button
+            onClick={() => handleStatusChange("done")}
+            className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+          >
+            Done
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
 
 export default function ServiceInventory() {
   const navigate = useNavigate();
 
   // Tab state: inventory (items under maintenance) or archive (completed maintenance)
   const [tab, setTab] = useState("inventory");
-  
+
   // Category filter for maintenance items
   const [category, setCategory] = useState("PPE");
-  
+
   // State for selected item details
   const [selectedId, setSelectedId] = useState(null);
-  
+
   // Use the TanStack Query hook
   const {
     maintenanceItems,
+    filteredMaintenanceItems,
     archivedItems,
+    filteredArchiveItems,
     maintenanceDetails,
     refetchMaintenance,
     refetchArchived,
@@ -155,13 +172,12 @@ export default function ServiceInventory() {
 
   // Load maintenance details for selected item
   const loadMaintenanceDetails = (id) => {
-    console.log(id)
+    console.log(id);
     setSelectedId(id);
     fetchMaintenanceDetails(id);
   };
 
   // Status dropdown component
-  
 
   return (
     <div className="min-h-screen bg-gray-50 relative">
@@ -244,60 +260,60 @@ export default function ServiceInventory() {
         {tab === "inventory" ? (
           <div className="bg-white rounded shadow overflow-hidden">
             <div className="overflow-x-auto w-full">
-            <table className="w-full text-left">
-              <thead className="bg-gray-100 text-sm uppercase text-gray-600">
-                <tr>
-                  <th className="px-4 py-3">Equipment</th>
-                  <th className="px-4 py-3">Scheduled At</th>
-                  <th className="px-4 py-3">Status</th>
-                  <th className="px-4 py-3">Message</th>
-                  <th className="px-4 py-3 w-10"></th>
-                </tr>
-              </thead>
-              <tbody>
-                {maintenanceItems.map((item) => (
-                  <tr
-                    key={item.id}
-                    className="border-t hover:bg-gray-50"
-                    onClick={() => loadMaintenanceDetails(item.asset_id)}
-                  >
-                    <td className="px-4 py-3 cursor-pointer hover:text-blue-600">
-                      {item.asset_name || "—"}
-                    </td>
-                    <td className="px-4 py-3">
-                      {item.scheduled_at
-                        ? new Date(item.scheduled_at).toLocaleDateString()
-                        : "—"}
-                    </td>
-                    <td
-                      className="px-4 py-3"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        // Store button position for dropdown
-                        const buttonRect =
-                          e.currentTarget.getBoundingClientRect();
-                        // We'll handle the position in a different way
-                      }}
-                    >
-                      <StatusDropdown
-                        itemId={item.id}
-                        currentStatus={item.status}
-                        updateStatus={updateStatus}
-                        refetchArchived={refetchArchived}
-                        refetchMaintenance={refetchMaintenance}
-                      />
-                    </td>
-                    <td className="px-4 py-3">{"—"}</td>
-                    <td
-                      className="px-4 py-3 text-blue-600 cursor-pointer"
-                      onClick={() => loadMaintenanceDetails(item.id)}
-                    >
-                      {">"}
-                    </td>
+              <table className="w-full text-left">
+                <thead className="bg-gray-100 text-sm uppercase text-gray-600">
+                  <tr>
+                    <th className="px-4 py-3">Equipment</th>
+                    <th className="px-4 py-3">Scheduled At</th>
+                    <th className="px-4 py-3">Status</th>
+                    <th className="px-4 py-3">Message</th>
+                    <th className="px-4 py-3 w-10"></th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {maintenanceItems.map((item) => (
+                    <tr
+                      key={item.id}
+                      className="border-t hover:bg-gray-50"
+                      onClick={() => loadMaintenanceDetails(item.asset_id)}
+                    >
+                      <td className="px-4 py-3 cursor-pointer hover:text-blue-600">
+                        {item.asset_name || "—"}
+                      </td>
+                      <td className="px-4 py-3">
+                        {item.scheduled_at
+                          ? new Date(item.scheduled_at).toLocaleDateString()
+                          : "—"}
+                      </td>
+                      <td
+                        className="px-4 py-3"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          // Store button position for dropdown
+                          const buttonRect =
+                            e.currentTarget.getBoundingClientRect();
+                          // We'll handle the position in a different way
+                        }}
+                      >
+                        <StatusDropdown
+                          itemId={item.id}
+                          currentStatus={item.status}
+                          updateStatus={updateStatus}
+                          refetchArchived={refetchArchived}
+                          refetchMaintenance={refetchMaintenance}
+                        />
+                      </td>
+                      <td className="px-4 py-3">{"—"}</td>
+                      <td
+                        className="px-4 py-3 text-blue-600 cursor-pointer"
+                        onClick={() => loadMaintenanceDetails(item.id)}
+                      >
+                        {">"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         ) : (
@@ -314,7 +330,7 @@ export default function ServiceInventory() {
                 </tr>
               </thead>
               <tbody>
-                {archivedItems.map((item, k) => (
+                {filteredArchiveItems.map((item, k) => (
                   <tr
                     key={item.job?.asset_id ?? k}
                     className="border-t hover:bg-gray-50"
