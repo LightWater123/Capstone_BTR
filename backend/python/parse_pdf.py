@@ -32,14 +32,37 @@ def is_small_int(value: str) -> bool:
     value = str(value).replace(",", "").strip()
     return value.isdigit() and int(value) <= 1000
 
-
 # ---------------------------------------------------------------------------
 # Row filtering
 # ---------------------------------------------------------------------------
 
 def looks_like_header(row: List[str]) -> bool:
-    first = clean(row[0]).lower()
-    return first in {"quantity", "value", "total", "grand total"}
+    """Check if row looks like a header row."""
+    if not row:
+        return False
+    
+    # Check if any cell contains common header keywords
+    header_keywords = {
+        "quantity", "value", "total", "grand total", "article", "description", 
+        "property", "unit", "measure", "remarks", "whereabouts", "shortage", 
+        "overage", "semi-expendable", "property number", "physical count"
+    }
+    
+    # Clean all cells and check if any contain header keywords
+    cleaned_cells = [clean(cell).lower() for cell in row if cell]
+    
+    # If most cells are empty or very short, it might be a header
+    non_empty_cells = [cell for cell in cleaned_cells if cell]
+    if len(non_empty_cells) < 3 and len(row) >= 5:
+        return True
+    
+    # Check if any cell contains header keywords
+    for cell in cleaned_cells:
+        for keyword in header_keywords:
+            if keyword in cell:
+                return True
+    
+    return False
 
 
 def looks_like_subtotal(row: List[str]) -> bool:
@@ -170,14 +193,15 @@ def build_ppe_row(raw_row: List) -> Optional[Dict]:
 # Main parsing loop
 # ---------------------------------------------------------------------------
 
-def parse_pdf(path: Path, mode: str) -> List[Dict]:
+def parse_pdf(path: Path, mode: str, header_rows: int = 1) -> List[Dict]:
     rows: List[Dict] = []
 
     with pdfplumber.open(path) as pdf:
         for page in pdf.pages:
             tables = extract_tables_from_page(page)
             for table in tables:
-                for raw_row in table[1:]:  # skip header row
+                # Skip the specified number of header rows
+                for raw_row in table[header_rows:]:
                     if not is_data_row(raw_row):
                         continue
 
@@ -200,16 +224,19 @@ def parse_pdf(path: Path, mode: str) -> List[Dict]:
 
 def main(argv: Optional[List[str]] = None) -> None:
     argv = argv or sys.argv[1:]
-    if len(argv) != 2:
-        print("Usage: python parser.py <file.pdf> <RPCSP|PPE>", file=sys.stderr)
+    if len(argv) < 2:
+        print("Usage: python parser.py <file.pdf> <RPCSP|PPE> [header_rows]", file=sys.stderr)
         sys.exit(1)
 
-    file_path, mode = Path(argv[0]), argv[1].strip().upper()
+    file_path = Path(argv[0])
+    mode = argv[1].strip().upper()
+    header_rows = int(argv[2]) if len(argv) > 2 else 1
+    
     if not file_path.exists():
         print(f"File not found: {file_path}", file=sys.stderr)
         sys.exit(1)
 
-    data = parse_pdf(file_path, mode)
+    data = parse_pdf(file_path, mode, header_rows)
     print(json.dumps(data, ensure_ascii=False))
 
 

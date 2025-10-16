@@ -5,6 +5,7 @@ import btrlogo from "../assets/btrlogo.png";
 import btrlegpics from "../assets/btrlegpics.jpg";
 import { Link } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
+import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 
 export default function Login() {
   const [identifier, setIdentifier] = useState(""); // username or email
@@ -13,6 +14,7 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -94,15 +96,28 @@ export default function Login() {
         </div>
 
         {/* password */}
-        <div className="flex flex-col items-start space-y-2">
+
+        <div className="flex flex-col items-start space-y-2 relative">
           <input
-            type="password"
+            type={showPassword ? "text" : "password"}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Password"
             required
-            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring focus:ring-yellow-400"
+            className="w-full px-4 py-2 pr-10 border rounded focus:outline-none focus:ring focus:ring-yellow-400"
           />
+
+          <button
+            type="button"
+            onClick={() => setShowPassword((prev) => !prev)}
+            className="absolute right-3 top-2 focus:outline-none"
+          >
+            {showPassword ? (
+              <EyeSlashIcon className="h-5 w-5 text-gray-600 hover:text-gray-800" />
+            ) : (
+              <EyeIcon className="h-5 w-5 text-gray-600 hover:text-gray-800" />
+            )}
+          </button>
 
           {error && <p className="text-red-600 text-sm">{error}</p>}
         </div>

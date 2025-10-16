@@ -43,7 +43,7 @@ export function useInventory(category) {
   // Create a sorted copy to avoid mutating the original array
   const sortedData = [...filteredData];
   
-  if(sortBy === "name") {
+  if(sortBy === "name:asc") {
     sortedData.sort((a,b) => {
       const aItem = a.article?.toLowerCase().trim() || "";
       const bItem = b.article?.toLowerCase().trim() || "";
@@ -51,8 +51,19 @@ export function useInventory(category) {
       if(aItem > bItem) return 1
       return 0
     })
-  } else if(sortBy === "price") {
+  } else if (sortBy === "name:desc") {
+    sortedData.sort((a,b) => {
+      const aItem = a.article?.toLowerCase().trim() || "";
+      const bItem = b.article?.toLowerCase().trim() || "";
+      if(aItem < bItem) return 1
+      if(aItem > bItem) return -1
+      return 0
+    })
+  } else if(sortBy === "price:asc") {
     sortedData.sort((a,b) => (b.unit_value || 0) - (a.unit_value || 0))
+  } else if (sortBy === "price:desc") {
+    sortedData.sort((a,b) => (a.unit_value || 0) - (b.unit_value || 0))
+
   }
 
   return {
@@ -66,6 +77,7 @@ export function useInventory(category) {
       // Update the query cache directly
       queryClient.setQueryData(['inventory', category], data);
     },
-    setSortBy
+    setSortBy,
+    sortBy
   };
 }

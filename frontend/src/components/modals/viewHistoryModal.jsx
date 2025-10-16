@@ -12,7 +12,7 @@ export default function ViewHistory({
     setShowModal(isOpen);
   }, [isOpen]);
 
-  console.log(JSON.stringify(detailItem));
+  //console.log(JSON.stringify(detailItem));
 
   return (
     <div>

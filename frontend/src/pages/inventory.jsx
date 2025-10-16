@@ -8,12 +8,14 @@ import api from "../api/api";
 import { toast } from "react-toastify";
 import BTRheader from "../components/modals/btrHeader";
 import BTRNavbar from "../components/modals/btrNavbar.jsx";
-import { Icon, Plus } from "lucide-react";
+import { ArrowUpAZ, Icon, Plus } from "lucide-react";
 import { Monitor } from "lucide-react";
 import { Calendar } from "lucide-react";
 import { Car } from "lucide-react";
 import { Keyboard } from "lucide-react";
 import { Search } from "lucide-react";
+import { ArrowUpDown } from 'lucide-react';
+import { ArrowDownAZ } from 'lucide-react';
 
 // Modals
 import ScheduleMaintenanceModal from "../components/modals/scheduleModal.jsx";
@@ -42,6 +44,7 @@ export default function InventoryDashboard() {
     fetchInventory,
     handleDelete,
     setSortBy,
+    sortBy,
     setInventoryData,
   } = useInventory(category);
 
@@ -51,7 +54,19 @@ export default function InventoryDashboard() {
   //Sort Handler
   const handleSort = (type) => {
     //console.log("Sorting by:", type);
-    setSortBy(type);
+    const sortFilter = sortBy.split(":")
+    if(sortFilter[0] === type) {
+      if(sortFilter[1] === "asc") {
+
+        setSortBy(`${type}:desc`);
+      } else {
+        setSortBy(`${type}:asc`);
+
+      }
+    } else {
+      setSortBy(`${type}:asc`);
+    }
+
     setShowSortOptions(false); // close after picking
   };
   // Modals
@@ -98,6 +113,7 @@ export default function InventoryDashboard() {
     unit_value: 0,
     location: "",
     remarks: "",
+    //image: ""
   });
 
   // state
@@ -119,6 +135,8 @@ export default function InventoryDashboard() {
         typeof v === "string" && v.trim() === "" ? null : v,
       ])
     );
+
+    //console.log(payload)
 
     // add item
     try {
@@ -247,18 +265,14 @@ export default function InventoryDashboard() {
                     className="block w-full text-left px-4 py-2 hover:bg-gray-100"
                   >
                     Name
+                    {sortBy.split(":")[0] === "name" && sortBy.split(":")[1] === "desc" ? <ArrowUpAZ className="h-5 w-5 inline-block ml-2"/> : <ArrowDownAZ className="h-5 w-5 inline-block ml-2"/>}
                   </button>
                   <button
                     onClick={() => handleSort("price")}
                     className="block w-full text-left px-4 py-2 hover:bg-gray-100"
                   >
-                    Price (Highest to Lowest)
-                  </button>
-                  <button
-                    onClick={() => handleSort("category")}
-                    className="block w-full text-left px-4 py-2 hover:bg-gray-100"
-                  >
-                    Category
+                    Price
+                    <ArrowUpDown className="h-5 w-5 inline-block ml-2"/>
                   </button>
                 </div>
               )}

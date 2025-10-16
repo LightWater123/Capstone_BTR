@@ -3,15 +3,19 @@ import api from '../../api/api';
 
 export default function EditItemModal({ isOpen, item, onClose, onSave }) {
   const [form, setForm] = useState({});
+  const [uploadedImage, setUploadedImage] = useState(null);
 
   useEffect(() => {
     if (item) {
       setForm({
         ...item,
-        // make sure dates are yyyy-mm-dd
         start_date: item.start_date ? item.start_date.substr(0, 10) : '',
-        end_date:   item.end_date   ? item.end_date.substr(0, 10)   : '',
+        end_date: item.end_date ? item.end_date.substr(0, 10) : '',
       });
+
+      if (item.imageUrl) {
+        setUploadedImage(item.imageUrl);
+      }
     }
   }, [item]);
 
@@ -20,14 +24,20 @@ export default function EditItemModal({ isOpen, item, onClose, onSave }) {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  /* -------------------------------------------------
-   * auto-compute shortage / overage while typing
-   * ------------------------------------------------*/
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const imageUrl = URL.createObjectURL(file);
+      setUploadedImage(imageUrl);
+      setForm((prev) => ({ ...prev, image: file }));
+    }
+  };
+
   useEffect(() => {
     const recorded = Number(form.recorded_count) || 0;
-    const actual   = Number(form.actual_count)   || 0;
-    const diffQty  = actual - recorded;
-    const unitVal  = Number(form.unit_value)     || 0;
+    const actual = Number(form.actual_count) || 0;
+    const diffQty = actual - recorded;
+    const unitVal = Number(form.unit_value) || 0;
     setForm((prev) => ({
       ...prev,
       shortage_or_overage_qty: diffQty,
@@ -40,10 +50,21 @@ export default function EditItemModal({ isOpen, item, onClose, onSave }) {
     if (!item) return;
 
     try {
-      
-      await api.put(`/api/inventory/${item._id || item.id}`, form);
+      const formData = new FormData();
+      Object.entries(form).forEach(([key, value]) => {
+        formData.append(key, value);
+      });
+
+      if (form.image) {
+        formData.append('image', form.image);
+      }
+
+      await api.put(`/api/inventory/${item._id || item.id}`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+
       alert('Item updated successfully!');
-      onSave?.(form);          
+      onSave?.(form);
       onClose();
     } catch (err) {
       console.error(err);
@@ -55,7 +76,7 @@ export default function EditItemModal({ isOpen, item, onClose, onSave }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-3xl mx-4 p-6">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-3xl mx-4 p-6 overflow-y-auto max-h-screen">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold text-gray-800">Edit Equipment</h2>
           <button onClick={onClose} className="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
@@ -64,6 +85,35 @@ export default function EditItemModal({ isOpen, item, onClose, onSave }) {
         <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-6 text-sm text-gray-700">
           {/* Left Column */}
           <div className="space-y-3">
+            <label
+              htmlFor="imageUpload"
+              className="w-full h-72 border-2 border-dashed border-gray-400 rounded-md flex items-center justify-center cursor-pointer bg-gray-50 hover:bg-gray-100"
+            >
+              {uploadedImage ? (
+                <img src={uploadedImage} alt="Uploaded" className="w-full h-full object-contain rounded-md" />
+              ) : (
+                <div className="text-center text-gray-500">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-12 w-12 mx-auto mb-2"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                  <p className="text-sm">Drop or select files</p>
+                </div>
+              )}
+            </label>
+            <input
+              id="imageUpload"
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+              className="hidden"
+            />
+
             <input type="text" name="article" value={form.article || ''} onChange={handleChange} placeholder="Article" required className="w-full border border-black rounded px-3 py-2" />
             <input type="text" name="description" value={form.description || ''} onChange={handleChange} placeholder="Description" className="w-full border border-black rounded px-3 py-2" />
             {form.category === "PPE" ? (
@@ -116,5 +166,6 @@ export default function EditItemModal({ isOpen, item, onClose, onSave }) {
         </div>
       </div>
     </div>
+    
   );
 }

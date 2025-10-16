@@ -40,6 +40,8 @@ Route::middleware(['auth:admin'])->group(function () {
          ->only(['index','store','update','destroy']);
     // pdf parse
     Route::post('parse-pdf', [PdfParserController::class, 'parse']);
+    // bulk delete
+    Route::delete('inventory/bulk-destroy', [EquipmentController::class, 'bulkDestroy']);
 
     // admin maintenance
     Route::prefix('maintenance')->group(function () {
@@ -47,7 +49,7 @@ Route::middleware(['auth:admin'])->group(function () {
         Route::post('/schedule',     [MaintenanceController::class, 'store']);
         Route::get('/admin/messages',[MaintenanceController::class, 'sent']);
         Route::get('/due-for-maintenance', [MaintenanceController::class, 'getDueForMaintenance']);
-        Route::get('/maintenance/predictive', [MaintenanceController::class, 'predictiveMaintenance']);
+        Route::get('/predictive', [MaintenanceController::class, 'predictiveMaintenance']);
     });
 });
 

@@ -17,7 +17,7 @@ export default function AdminMessages() {
         try {
             const { data } = await api.get("api/maintenance-messages");
             setMessages(data);
-            console.log(data);
+            //console.log(data);
         } catch (err) {
             console.error("Failed to fetch messages:", err);
         } finally {

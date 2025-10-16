@@ -10,7 +10,9 @@ import api from '../api/api';
 export default function AdminDashboard() {
   const navigate = useNavigate();
   const handleInventoryList = () => navigate("/inventory");
+  const handleMaintenanceList = (e) => navigate(`/admin/maintenance-list?id=${e}`);
   const [open, setOpen] = useState(false);
+  const eventDates = [];
 
   // State for data, loading, and errors
   const [dueItems, setDueItems] = useState([]);
@@ -26,26 +28,26 @@ export default function AdminDashboard() {
 
             // Get current date for debugging
             const today = new Date();
-            console.log("Today's date:", today.toISOString());
+            //console.log("Today's date:", today.toISOString());
             
             // Use the api instance
             const response = await api.get('/api/maintenance/due-for-maintenance?days=2');
             
             // Log the response for debugging
-            console.log("API Response:", response.data);
+            //console.log("API Response:", response.data);
             
             // The data is in the `data.data` property of the response
             setDueItems(response.data.data || []);
             
             // Additional debugging info
             if (response.data.date_range) {
-                console.log("Checking dates from", response.data.date_range.from, "to", response.data.date_range.to);
+                //console.log("Checking dates from", response.data.date_range.from, "to", response.data.date_range.to);
             }
         } catch (err) {
             // Axios provides a more detailed error object
             const errorMessage = err.response?.data?.error || err.response?.data?.message || err.message || 'An unknown error occurred';
             setError(errorMessage);
-            console.error("Failed to fetch maintenance items:", err);
+            //console.error("Failed to fetch maintenance items:", err);
         } finally {
             setIsLoading(false);
         }
@@ -76,7 +78,7 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Update the reminders section with conditional rendering */}
+        {/* Reminders */}
         <div className="w-full min-w-[300px] h-[350px] bg-gray-100 rounded-xl shadow-md p-4 flex flex-col">
           <h2 className="text-xl font-bold mb-4">Reminders</h2>
           <ul className="flex-1 overflow-y-auto space-y-2">
@@ -88,7 +90,11 @@ export default function AdminDashboard() {
               <li className="text-gray-500">No items are due for maintenance in the next 2 days.</li>
             ) : (
               dueItems.map((item) => (
-                <li key={item.id} className="bg-white p-3 rounded shadow-sm border-l-4 border-yellow-500">
+                <li 
+                  key={item.id} 
+                  className="bg-white p-3 rounded shadow-sm border-l-4 border-yellow-500 cursor-pointer hover:bg-gray-50 transition-colors"
+                  onClick={()=>handleMaintenanceList(item.asset_id)}
+                >
                   <div className="font-semibold text-gray-800">{item.asset_name}</div>
                   <div className="text-sm text-gray-600 mt-1">
                     Due: {new Date(item.scheduled_at).toLocaleDateString()} | Assigned to: {item.user_email} | Status: {item.status}

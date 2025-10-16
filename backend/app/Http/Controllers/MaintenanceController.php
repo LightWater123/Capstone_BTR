@@ -217,16 +217,16 @@ class MaintenanceController extends Controller
 
     public function predictiveMaintenance(Request $request)
     {
-        // 1. Define maintenance intervals in months for each equipment type.
+        // 1. Define maintenance intervals in MONTHS for each equipment type.
         // The keys should match the words you want to find in the 'description' field.
         $maintenanceIntervals = [
-            'airconditioner' => 12,
-            'generator' => 6,
-            'transformer' => 24,
-            'motor vehicle' => 6,
+            'airconditioner' => 6, // Checked every 6 months
+            'generator' => 3,      // Checked quarterly
+            'transformer' => 12,   // Checked annually
             'computer' => 12,
             'pc set' => 12,
-            'mobile phone' => 0, // 0 means no scheduled maintenance
+            'notebook' => 12,
+            'refrigerator' => 6,
         ];
 
         // 2. Get the keywords to search for.
@@ -235,108 +235,61 @@ class MaintenanceController extends Controller
         // 3. Query the MongoDB collection for equipment whose 'description' contains any of our keywords.
         $trackedEquipment = Equipment::where(function (Builder $query) use ($keywords) {
             foreach ($keywords as $keyword) {
-                $query->orWhere('description', 'LIKE', '%' . $keyword . '%');
+                // Using 'regex' for case-insensitive search in MongoDB
+                $query->orWhere('description', 'regex', new \MongoDB\BSON\Regex($keyword, 'i'));
+                $query->orWhere('article', 'regex', new \MongoDB\BSON\Regex($keyword, 'i'));
             }
         })->get();
 
         $maintenanceSchedule = [];
 
-        // 4. Loop through each piece of equipment to calculate its next maintenance date.
+        // 4. Loop through each piece of equipment to calculate and update its next maintenance date.
         foreach ($trackedEquipment as $equipment) {
-            $equipmentType = null;
             $interval = 0;
 
-            // Find the matching keyword for the current equipment's description.
+            // Find the matching keyword and its interval for the current equipment's description.
             foreach ($maintenanceIntervals as $keyword => $months) {
                 if (stripos($equipment->description, $keyword) !== false) {
-                    $equipmentType = $keyword;
                     $interval = $months;
                     break; // Stop after finding the first match
-                }
+                } else if (stripos($equipment->article, $keyword) !== false) {
+                    $interval = $months;
+                    break; }
             }
 
-            // If a matching type was found and it requires maintenance, calculate its schedule.
-            if ($equipmentType && $interval > 0) {
-                $lastMaintenanceDate = $equipment->start_date; // Using 'start_date' as the baseline
+            // If a matching type was found and it requires maintenance (interval > 0), proceed.
+            if ($interval > 0) {
+                // Use the most recent date: 'end_date' (completion) is best, otherwise 'start_date'.
+                $lastMaintenanceDate = $equipment->end_date ?: $equipment->start_date;
                 $nextMaintenanceDate = null;
 
-                // We can only calculate if we have a starting date.
+                // We can only calculate if we have a valid starting date.
                 if ($lastMaintenanceDate) {
                     // Ensure the date is a Carbon instance for calculations.
                     $lastMaintenanceDate = Carbon::parse($lastMaintenanceDate);
-                    // Calculate the next due date based on the interval.
+                    // Calculate the next due date by adding the interval in months.
                     $nextMaintenanceDate = (clone $lastMaintenanceDate)->addMonths($interval);
+
+                    // **IMPORTANT: Save the calculated date back to the database for future use.**
+                    $equipment->next_due_date = $nextMaintenanceDate;
+                    $equipment->save();
+                }else
+                {
+                    Log::info('No end and start dates found.');
                 }
 
-                // Add only the required date fields to our schedule list.
+                // Prepare the data for our view, formatting the date exactly as requested.
                 $maintenanceSchedule[] = [
-                    'last_maintenance_date' => $lastMaintenanceDate ? $lastMaintenanceDate->toFormattedDateString() : 'N/A',
-                    'next_maintenance_date' => $nextMaintenanceDate ? $nextMaintenanceDate->toFormattedDateString() : 'N/A',
+                    'id' => $equipment->id,
+                    'article' => $equipment->article,
+                    'description' => $equipment->description,
+                    'next_maintenance_checkup' => $nextMaintenanceDate ? $nextMaintenanceDate->format('m/d/Y') : 'N/A',
                 ];
             }
         }
 
-        // 5. Return the schedule as a direct JSON array.
-        return response()->json($maintenanceSchedule);// 1. Define maintenance intervals in months for each equipment type.
-        // The keys should match the words you want to find in the 'description' field.
-        $maintenanceIntervals = [
-            'airconditioner' => 12,
-            'generator' => 6,
-            'transformer' => 24,
-            'motor vehicle' => 6,
-            'computer' => 12,
-            'pc set' => 12,
-            'mobile phone' => 0, // 0 means no scheduled maintenance
-        ];
-
-        // 2. Get the keywords to search for.
-        $keywords = array_keys($maintenanceIntervals);
-
-        // 3. Query the MongoDB collection for equipment whose 'description' contains any of our keywords.
-        $trackedEquipment = Equipment::where(function (Builder $query) use ($keywords) {
-            foreach ($keywords as $keyword) {
-                $query->orWhere('description', 'LIKE', '%' . $keyword . '%');
-            }
-        })->get();
-
-        $maintenanceSchedule = [];
-
-        // 4. Loop through each piece of equipment to calculate its next maintenance date.
-        foreach ($trackedEquipment as $equipment) {
-            $equipmentType = null;
-            $interval = 0;
-
-            // Find the matching keyword for the current equipment's description.
-            foreach ($maintenanceIntervals as $keyword => $months) {
-                if (stripos($equipment->description, $keyword) !== false) {
-                    $equipmentType = $keyword;
-                    $interval = $months;
-                    break; // Stop after finding the first match
-                }
-            }
-
-            // If a matching type was found and it requires maintenance, calculate its schedule.
-            if ($equipmentType && $interval > 0) {
-                $lastMaintenanceDate = $equipment->start_date; // Using 'start_date' as the baseline
-                $nextMaintenanceDate = null;
-
-                // We can only calculate if we have a starting date.
-                if ($lastMaintenanceDate) {
-                    // Ensure the date is a Carbon instance for calculations.
-                    $lastMaintenanceDate = Carbon::parse($lastMaintenanceDate);
-                    // Calculate the next due date based on the interval.
-                    $nextMaintenanceDate = (clone $lastMaintenanceDate)->addMonths($interval);
-                }
-
-                // Add only the required date fields to our schedule list.
-                $maintenanceSchedule[] = [
-                    'last_maintenance_date' => $lastMaintenanceDate ? $lastMaintenanceDate->toFormattedDateString() : 'N/A',
-                    'next_maintenance_date' => $nextMaintenanceDate ? $nextMaintenanceDate->toFormattedDateString() : 'N/A',
-                ];
-            }
-        }
-
-        // 5. Return the schedule as a direct JSON array.
-        return response()->json($maintenanceSchedule);
+        // 5. Return the schedule to a view for rendering.
+        // We will create this view file next.
+        return $maintenanceSchedule;
     }
 }

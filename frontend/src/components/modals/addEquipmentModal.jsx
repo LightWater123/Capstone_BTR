@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 export default function AddEquipmentModal({
   isOpen,
@@ -9,18 +9,29 @@ export default function AddEquipmentModal({
   onSubmit,
   onUploadPDF
 }) {
-  const [uploadedImage, setUploadedImage] = useState(null);
+  // const [uploadedImage, setUploadedImage] = useState(null);
+  const [previewImage, setPreviewImage] = useState(null);
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setUploadedImage(reader.result);
-      };
-      reader.readAsDataURL(file);
+      // setUploadedImage(file)
+      setPreviewImage(URL.createObjectURL(file))
+
+      // const reader = new FileReader();
+      // reader.onloadend = () => {
+      //   setUploadedImage(reader.result);
+      // };
+      // reader.readAsDataURL(file);
     }
   };
+
+  // resets the img selected in the upload img
+  useEffect(()=>{
+    if(!isOpen){
+      setPreviewImage(null);
+    }
+  },[isOpen]); 
 
   if (!isOpen) return null;
 
@@ -50,9 +61,9 @@ export default function AddEquipmentModal({
               htmlFor="imageUpload"
               className="w-72 h-72 border-2 border-dashed border-gray-400 rounded-md flex items-center justify-center cursor-pointer bg-gray-50 hover:bg-gray-100 mb-4"
             >
-              {uploadedImage ? (
+              {previewImage ? (
                 <img
-                  src={uploadedImage}
+                  src={previewImage}
                   alt="Uploaded"
                   className="w-full h-full object-contain rounded-md"
                 />

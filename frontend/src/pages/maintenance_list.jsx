@@ -1,15 +1,20 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import BTRheader from "../components/modals/btrHeader";
 import Navbar from "../components/modals/serviceNavbar.jsx";
 import BTRNavbar from '../components/modals/btrNavbar.jsx';
 import { useMonitorMaintenance } from '../hooks/useMonitorMaintenance.js';
+import { usePredictiveMaintenance } from '../hooks/usePredictiveMaintenance.js';
 
 export default function MaintenanceList() {
   const navigate = useNavigate();
   const [openId, setOpenId] = useState(null);
-  
-  // Use the custom hook
+  const [searchParams, setSearchParams] = useSearchParams();
+  const assetId = searchParams.get("id");
+
+  /* -------------------------------------------------- */
+  /*  Hooks                                             */
+  /* -------------------------------------------------- */
   const {
     filteredSchedules,
     searchQuery,
@@ -19,14 +24,28 @@ export default function MaintenanceList() {
     setSortBy
   } = useMonitorMaintenance();
 
-  const formatDate = (d) => new Date(d).toLocaleString();
+  const { maintenanceDates } = usePredictiveMaintenance();   // predictive data
+  /* -------------------------------------------------- */
+
+  /* Helper – pick predicted next check-up for an asset */
+  const getNextCheckup = (assetId) => {
+    const item = maintenanceDates.find(md => md.id === assetId);
+    return item?.next_maintenance_checkup || null;
+  };
+
+  const formatDate = (d) => (d ? new Date(d).toLocaleString() : 'Not scheduled');
 
   const toggle = (id) => setOpenId((prev) => (prev === id ? null : id));
 
+  useEffect(() => {
+    if (!assetId) return;
+    setSearchQuery(`id:${assetId}`);
+  }, [setSearchQuery, assetId]);
+
   return (
     <div className="min-h-screen bg-gray-50 relative">
-      <BTRheader/>
-      <BTRNavbar/>
+      <BTRheader />
+      <BTRNavbar />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 mt-4">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
@@ -39,7 +58,7 @@ export default function MaintenanceList() {
           </button>
         </div>
 
-        {/* Search Bar */}
+        {/* Search / Sort */}
         <div className="mb-4 flex gap-2 sm:justify-end mt-4">
           <input
             type="text"
@@ -50,7 +69,7 @@ export default function MaintenanceList() {
           />
           <select
             onChange={(e) => setSortBy(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-yellow-400 "
+            className="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-yellow-400"
           >
             <option value="asset_name">Sort by Name</option>
             <option value="scheduled_at">Sort by Date</option>
@@ -67,8 +86,8 @@ export default function MaintenanceList() {
         {/* Accordion list */}
         {!loading && filteredSchedules.length > 0 && (
           <div className="bg-white rounded shadow divide-y divide-gray-200">
-            {filteredSchedules.map((s) => (
-              <div key={s.asset_id} className="cursor-pointer">
+            {filteredSchedules.map((s, k) => (
+              <div key={k} className="cursor-pointer">
                 {/* Visible bar – click to expand */}
                 <div
                   onClick={() => toggle(s.asset_id)}
@@ -100,8 +119,10 @@ export default function MaintenanceList() {
                       <p>
                         <span
                           className={`inline-block px-2 py-1 text-xs rounded ${
-                            s.status === 'confirmed'
+                            s.status === 'done'
                               ? 'bg-green-100 text-green-800'
+                              : s.status === 'in-progress'
+                              ? 'bg-blue-100 text-blue-800'
                               : 'bg-yellow-100 text-yellow-800'
                           }`}
                         >
@@ -112,6 +133,14 @@ export default function MaintenanceList() {
                     <div>
                       <span className="text-gray-500">Sender e-mail:</span>
                       <p className="font-mono text-gray-600">{s.user_email ? 'Sent' : '-'}</p>
+                    </div>
+
+                    {/* Predictive maintenance row */}
+                    <div className="sm:col-span-2">
+                      <span className="text-gray-500">Predictive Next Check-up:</span>
+                      <p className="font-medium text-blue-600">
+                        {formatDate(getNextCheckup(s.asset_id))}
+                      </p>
                     </div>
                   </div>
                 )}
