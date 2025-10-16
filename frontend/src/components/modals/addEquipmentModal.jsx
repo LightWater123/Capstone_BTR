@@ -95,7 +95,7 @@ export default function AddEquipmentModal({
             )}
             <input
               type="text"
-              placeholder="Unit"
+              placeholder="Unit of Measure"
               value={newItem.unit}
               onChange={(e) => setNewItem({ ...newItem, unit: e.target.value })}
               className="w-full px-3 py-2 border border-black rounded bg-white placeholder-black"
