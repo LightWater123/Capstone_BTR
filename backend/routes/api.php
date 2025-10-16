@@ -15,6 +15,7 @@ use Illuminate\Auth\Events\PasswordReset;
 // PUBLIC   
 Route::post('/login',    [AuthenticatedSessionController::class, 'store']);
 Route::post('/logout',   [AuthenticatedSessionController::class, 'destroy']);
+Route::get('/verifyUser',   [AuthenticatedSessionController::class, 'verify']);
 Route::post('/register', [RegisteredUserController::class, 'store']);
 Route::post('/forgot-password',  fn(Request $r) => … );
 Route::post('/reset-password',   fn(Request $r) => … );

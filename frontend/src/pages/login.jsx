@@ -1,16 +1,17 @@
 import { useState } from "react";
 import api from "../api/api"; // centralized Axios instance
 import { useNavigate } from "react-router-dom";
-import btrlogo from '../assets/btrlogo.png';
-import btrlegpics from '../assets/btrlegpics.jpg';
+import btrlogo from "../assets/btrlogo.png";
+import btrlegpics from "../assets/btrlegpics.jpg";
 import { Link } from "react-router-dom";
-
+import { useAuth } from "../auth/AuthContext";
 
 export default function Login() {
   const [identifier, setIdentifier] = useState(""); // username or email
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
@@ -23,24 +24,32 @@ export default function Login() {
       await api.get("/sanctum/csrf-cookie");
 
       // Attempt login
-      const response = await api.post("/api/login", {
-        login: identifier,
-        password,
+      // const response = await api.post("/api/login", {
+      //   login: identifier,
+      //   password,
+      // });
+      await login(identifier, password).then((e) => {
+        console.log("vals", e);
+        if (e.redirect) {
+          navigate(e.redirect);
+        }
       });
 
-      console.log('Login response:', response.data);
+      // console.log("Login response:", response.data);
 
       // Navigate to the redirect URL provided by the backend
-      if (response.data.redirect) {
-        console.log('Navigating to:', response.data.redirect);
-        navigate(response.data.redirect);
-      } else {
-        console.log('No redirect URL, navigating to home');
-        navigate("/");
-      }
+      // if (response.data.redirect) {
+      //   console.log("Navigating to:", response.data.redirect);
+      //   navigate(response.data.redirect);
+      // } else {
+      //   console.log("No redirect URL, navigating to home");
+      //   navigate("/");
+      // }
     } catch (err) {
-      console.error("Login error:", err.response || err);
-      setError(err.response?.data?.message || "Invalid credentials or login failed.");
+      console.error("Login error:", err.message ?? err);
+      setError(
+        err.response?.data?.message || "Invalid credentials or login failed."
+      );
     } finally {
       setLoading(false);
     }
@@ -48,7 +57,6 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex items-center justify-center relative">
-      
       {/* background image */}
       <div
         className="absolute inset-0"
@@ -62,7 +70,7 @@ export default function Login() {
 
       {/* yellow overlay */}
       <div className="absolute inset-0 bg-[#FCFC62] opacity-90"></div>
-      
+
       {/* login form */}
       <form
         onSubmit={handleLogin}
@@ -75,30 +83,30 @@ export default function Login() {
 
         {/* username */}
         <div className="flex flex-col items-start space-y-2">
-        <input
-          type="text"
-          value={identifier}
-          onChange={(e) => setIdentifier(e.target.value)}
-          placeholder="Username or Email"
-          required
-          className="w-full px-4 py-2 border rounded focus:outline-none focus:ring focus:ring-yellow-400"
-        />
+          <input
+            type="text"
+            value={identifier}
+            onChange={(e) => setIdentifier(e.target.value)}
+            placeholder="Username or Email"
+            required
+            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring focus:ring-yellow-400"
+          />
         </div>
 
         {/* password */}
         <div className="flex flex-col items-start space-y-2">
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Password"
-          required
-          className="w-full px-4 py-2 border rounded focus:outline-none focus:ring focus:ring-yellow-400"
-        />
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Password"
+            required
+            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring focus:ring-yellow-400"
+          />
 
-        {error && <p className="text-red-600 text-sm">{error}</p>}
+          {error && <p className="text-red-600 text-sm">{error}</p>}
         </div>
-        
+
         {/* login button */}
         <button
           type="submit"
@@ -113,17 +121,17 @@ export default function Login() {
         {/* register Link */}
         <p className="text-center text-sm">
           Don’t have an account?{" "}
-            <Link to="/register/admin" className="text-blue-600 hover:underline font-medium">
+          <Link
+            to="/register/admin"
+            className="text-blue-600 hover:underline font-medium"
+          >
             Register
-            </Link>
+          </Link>
         </p>
 
         {/* forgot password */}
         <div className="text-sm text-right -mt-2 mb-2">
-          <Link
-            to="/forgot-password"
-            className="text-blue-600 hover:underline"
-          >
+          <Link to="/forgot-password" className="text-blue-600 hover:underline">
             Forgot password?
           </Link>
         </div>

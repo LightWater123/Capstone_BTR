@@ -1,18 +1,19 @@
-import Bell from '../../assets/notification.png';
-import profileuser from '../../assets/profile-user.png';
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import LogoutButton from './LogoutButton';
-import { Settings } from 'lucide-react';
-import { UserPlus } from 'lucide-react';
-
+import Bell from "../../assets/notification.png";
+import profileuser from "../../assets/profile-user.png";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import LogoutButton from "./LogoutButton";
+import { Settings } from "lucide-react";
+import { UserPlus } from "lucide-react";
+import { useAuth } from "../../auth/AuthContext";
 
 export default function BTRNavbar() {
   const [isDropOpen, setIsDropOpen] = useState(false);
   const navigate = useNavigate();
+  const { user } = useAuth();
 
-  const handleCreateServiceAccount = () => navigate('/register/service');
-  const handleBack = () => navigate('/admin/dashboard');
+  const handleCreateServiceAccount = () => navigate("/register/service");
+  const handleBack = () => navigate("/admin/dashboard");
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 mt-4">
@@ -31,7 +32,6 @@ export default function BTRNavbar() {
 
         {/* RIGHT */}
         <div className="flex items-center gap-4">
-
           {/* User dropdown */}
           <div className="relative">
             <button
@@ -43,9 +43,13 @@ export default function BTRNavbar() {
                 alt="User"
                 className="h-7 w-7 rounded-full object-cover"
               />
-              <span className="hidden sm:inline text-lg p-2">Username</span>
+              <span className="hidden sm:inline text-lg p-2">
+                {user ? user.username : "Username"}
+              </span>
               <svg
-                className={`h-4 w-4 transition ${isDropOpen ? 'rotate-180' : ''}`}
+                className={`h-4 w-4 transition ${
+                  isDropOpen ? "rotate-180" : ""
+                }`}
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -66,17 +70,17 @@ export default function BTRNavbar() {
                   href="#"
                   className="block w-full text-left px-4 py-2 hover:bg-gray-100"
                 >
-                  <UserPlus className='h-4 w-4 inline-block mr-2'/>
+                  <UserPlus className="h-4 w-4 inline-block mr-2" />
                   Create Service User Account
                 </a>
                 <button
                   onClick={() => {
                     setIsDropOpen(false);
-                    navigate('/settings');  
+                    navigate("/settings");
                   }}
                   className="block w-full text-left px-4 py-2 hover:bg-gray-100"
                 >
-                  <Settings className='h-4 w-4 inline-block mr-2'/>
+                  <Settings className="h-4 w-4 inline-block mr-2" />
                   Settings
                 </button>
 

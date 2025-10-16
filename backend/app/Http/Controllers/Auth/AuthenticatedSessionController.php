@@ -78,9 +78,13 @@ class AuthenticatedSessionController extends Controller
         // $tokenId = $request->user()->currentAccessToken()->id;
 
         // $user->tokens()->where('id', '!=',$tokenId)->delete(); 
+        // return $user?->toArray()
+
+        $request->session()->put('auth_guard', $guard);
 
         return response()->json([
-            'redirect' => $redirectUrl
+            'redirect' => $redirectUrl,
+            'user' => $user?->toArray()
         ]);
     }
     
@@ -113,6 +117,20 @@ class AuthenticatedSessionController extends Controller
         
         // Don't guess. Log them out or send them to a "no permission" page.
         return '/login?error=no_role';
+    }
+
+    public function verify(Request $request) {
+         if (!$request->hasSession() || !$request->session()->isStarted()) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        // Load user from the guard that was used at login
+        $guard = session('auth_guard', 'web');   // fallback to default
+        $user  = Auth::guard($guard)->user();
+
+        return $user
+            ? response()->json(['user' => $user])
+            : response()->json(['error' => 'Unauthorized'], 401);
     }
 
     /**

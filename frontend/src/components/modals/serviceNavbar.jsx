@@ -1,17 +1,18 @@
-import Bell from '../../assets/notification.png';
-import profileuser from '../../assets/profile-user.png';
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import LogoutButton from './LogoutButton';
-import { Settings } from 'lucide-react';
-import { useServiceAuth } from '../../hooks/useServiceAuth';
+import Bell from "../../assets/notification.png";
+import profileuser from "../../assets/profile-user.png";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import LogoutButton from "./LogoutButton";
+import { Settings } from "lucide-react";
+import { useServiceAuth } from "../../hooks/useServiceAuth";
+import { useAuth } from "../../auth/AuthContext";
 
 export default function Navbar() {
   const [isDropOpen, setIsDropOpen] = useState(false);
   const navigate = useNavigate();
   const handleBack = () => navigate("/service/dashboard");
   const { user, isLoading } = useServiceAuth();
-  
+  const { user: userData } = useAuth();
   // Log the user data to see what we're getting
   // console.log("Service user data:", user);
   // console.log("Is loading:", isLoading);
@@ -45,7 +46,11 @@ export default function Navbar() {
                 className="h-7 w-7 rounded-full object-cover"
               />
               <span className="hidden sm:inline text-lg p-2">
-                {isLoading ? "Loading..." : user?.name || "Username"}
+                {isLoading
+                  ? "Loading..."
+                  : userData
+                  ? userData.username
+                  : "Username"}
               </span>
               <svg
                 className={`h-4 w-4 transition ${
@@ -66,17 +71,16 @@ export default function Navbar() {
 
             {isDropOpen && (
               <div className="absolute right-0 top-full mt-2 w-40 rounded-lg border bg-white shadow-lg py-1 z-40">
-                  <button
-                    onClick=
-                    {() => {
-                      setIsDropOpen(false);
-                      navigate("/service/settings");
-                    }}
-                    className="block w-full text-left px-4 py-2 hover:bg-gray-100"
-                    >
-                    <Settings className="h-4 w-4 inline-block mr-2" />
-                    Settings
-                  </button>
+                <button
+                  onClick={() => {
+                    setIsDropOpen(false);
+                    navigate("/service/settings");
+                  }}
+                  className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                >
+                  <Settings className="h-4 w-4 inline-block mr-2" />
+                  Settings
+                </button>
 
                 <LogoutButton className="block w-full text-left px-4 py-2 hover:bg-gray-100" />
               </div>
