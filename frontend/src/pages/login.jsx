@@ -142,15 +142,15 @@ export default function Login() {
         </button>
 
         {/* register Link */}
-        <p className="text-center text-sm">
+        {/* <p className="text-center text-sm">
           Don’t have an account?{" "}
           <Link
             to="/register/admin"
             className="text-blue-600 hover:underline font-medium"
           >
-            Register
+            Register  
           </Link>
-        </p>
+        </p> */}
 
         {/* forgot password */}
         <div className="text-sm text-right -mt-2 mb-2">
