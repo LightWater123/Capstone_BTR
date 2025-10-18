@@ -46,11 +46,12 @@ export default function AdminRegister() {
         username: formData.username,
         email: formData.email,
         password: formData.password,
+        password_confirmation: formData.confirm_password,
         mobile_number: formData.mobile_number,
         role: 'admin',
       });
 
-      //console.log("Registered user:", response.data.user);
+      console.log("Registered admin user:", response.data.user);
       navigate('/');
     } catch (err) {
       console.error("Registration error:", err.response?.data);

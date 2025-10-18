@@ -7,22 +7,22 @@ const AuthContext = createContext(null);
 export default function AuthProvider({ children }) {
   const [user, setUser] = useState(undefined);
 
-  useEffect(() => {
-    async function run() {
-      if (user === undefined) {
-        const res = await api.get("/api/verifyUser");
-        if (res.data.user) {
-          setUser(res.data.user);
-        } else {
-          throw new Error("no user data");
-        }
-      }
-    }
-    run().catch(() => {
-      setUser(null);
-      redirect("/");
-    });
-  }, [user]);
+  // useEffect(() => {
+  //   async function run() {
+  //     if (user === undefined) {
+  //       const res = await api.get("/api/verifyUser");
+  //       if (res.data.user) {
+  //         setUser(res.data.user);
+  //       } else {
+  //         throw new Error("no user data");
+  //       }
+  //     }
+  //   }
+  //   run().catch(() => {
+  //     setUser(null);
+  //     redirect("/");
+  //   });
+  // }, [user]);
 
   const login = async (user, password) => {
     const response = await api.post("/api/login", {

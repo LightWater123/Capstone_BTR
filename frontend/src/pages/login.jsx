@@ -39,7 +39,7 @@ export default function Login() {
       //   password,
       // });
       await login(identifier, password).then((e) => {
-        console.log("vals", e);
+        console.log("Current user logged-in:", identifier, e);
         if (e.redirect) {
           navigate(e.redirect);
         }
@@ -121,9 +121,9 @@ export default function Login() {
             className="absolute right-3 inline-block top-1 focus:outline-none"
           >
             {showPassword ? (
-              <EyeClosed className="h-5 w-5 text-gray-600 hover:text-gray-800" />
-            ) : (
               <Eye className="h-5 w-5 text-gray-600 hover:text-gray-800" />
+            ) : (
+              <EyeClosed className="h-5 w-5 text-gray-600 hover:text-gray-800" />
             )}
           </button>
 

@@ -227,6 +227,7 @@ class MaintenanceController extends Controller
             'pc set' => 12,
             'notebook' => 12,
             'refrigerator' => 6,
+            'motor vehicle' => 7, // checked every 7 months
         ];
 
         // 2. Get the keywords to search for.
