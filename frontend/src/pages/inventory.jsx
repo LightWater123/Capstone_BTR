@@ -67,7 +67,7 @@ export default function InventoryDashboard() {
       setSortBy(`${type}:asc`);
     }
 
-    setShowSortOptions(false); // close after picking
+    setShowSortOptions(false); // close after picking an option
   };
   // Modals
   const [showTypeSelector, setShowTypeSelector] = useState(false);
